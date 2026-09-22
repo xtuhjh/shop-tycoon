@@ -14,7 +14,7 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
 html{height:100%;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{height:100%;overscroll-behavior-y:contain}
-button,.cell,.guest-card,.shop-chip,.g-skip,.chip,.p-btn,.mh-btn{touch-action:manipulation}
+button,.cell,.bguest,.bg-skip,.shop-chip,.chip,.p-btn,.mh-btn{touch-action:manipulation}
 body{
   font-family:'Segoe UI',system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
   background:linear-gradient(175deg,#8ec5fc 0%,#e0c3fc 55%,#ffd6e8 100%);
@@ -80,45 +80,76 @@ body{
 .shop-chip.locked{opacity:.5;background:rgba(255,255,255,.4);cursor:not-allowed}
 .shop-chip .sc-tag{background:#f1e7f5;color:#9b59b6;border-radius:6px;padding:1px 5px;font-size:10px;font-weight:800}
 
-/* ===== 客人排队 ===== */
-.queue-title{
-  font-size:13.5px;font-weight:800;color:#8a6d2f;margin:4px 0 7px;
-  display:flex;justify-content:space-between;align-items:center;
+/* ===== 吧台场景 ===== */
+.bar-scene{
+  position:relative;border-radius:18px;overflow:hidden;margin-bottom:10px;
+  background:linear-gradient(180deg,#fff8ec 0%,#ffedd3 58%,#ffe0b8 100%);
+  box-shadow:0 6px 20px rgba(180,130,60,.2);border:1px solid #f2dcb6;
 }
-.queue-title .qt-sub{font-size:11px;color:#b09454;font-weight:600}
-.quest-row{display:flex;gap:6px;align-items:stretch;margin-bottom:8px}
-.guest-card{
-  flex:1;min-width:0;
-  background:linear-gradient(135deg,#fff9ec,#ffefd8);border-radius:16px;padding:11px 12px;
-  box-shadow:0 4px 14px rgba(230,180,80,.18);border:1.5px solid #ffe3a3;
-  display:flex;gap:10px;align-items:center;cursor:pointer;transition:all .15s;
-  font-family:inherit;font-size:inherit;text-align:left;
+.bar-inside{display:flex;align-items:center;gap:7px;padding:9px 11px 4px}
+.bar-sign{
+  display:flex;align-items:center;gap:5px;font-weight:800;font-size:12.5px;color:#8a6d2f;
+  background:rgba(255,255,255,.78);border-radius:10px;padding:3px 8px;
 }
-.guest-card.serving{border-color:#ff5e62;box-shadow:0 5px 18px rgba(255,94,98,.3);transform:translateY(-2px)}
-.guest-card.shake{animation:shake .4s ease}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
-.guest-card.paid{animation:paidPop 1.05s ease forwards;border-color:#27ae60}
-@keyframes paidPop{0%{transform:scale(1)}25%{transform:scale(1.07)}55%{transform:scale(1.02)}100%{transform:scale(.88);opacity:.15}}
-.guest-card .g-face{font-size:30px;animation:wave 2.2s ease infinite}
-@keyframes wave{0%,80%,100%{transform:rotate(0)}85%{transform:rotate(14deg)}90%{transform:rotate(-8deg)}95%{transform:rotate(10deg)}}
-.guest-card .g-body{flex:1;min-width:0}
-.guest-card .g-items{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px}
-.gi{
-  background:#fff;border-radius:8px;padding:2px 7px;font-size:11.5px;font-weight:700;color:#6b5b6e;
-  border:1.5px solid #f0e2c8;transition:all .2s;
+.bar-sign em{font-style:normal;font-size:10px;background:#f5c242;color:#5c4300;border-radius:6px;padding:1px 5px;font-weight:800}
+.bar-hint{margin-left:auto;font-size:10px;color:#b09454;font-weight:600;text-align:right;line-height:1.35}
+/* 吧台里忙碌的服务员 */
+.bar-staff{position:relative;height:48px;margin:0 11px}
+.bar-staff .kitchen{
+  height:100%;border-radius:12px 12px 0 0;overflow:hidden;
+  background:repeating-linear-gradient(90deg,#ffeecf,#ffeecf 16px,#ffe5c0 16px,#ffe5c0 32px);
+  display:flex;align-items:flex-end;justify-content:center;
 }
-.gi.done{background:#e8f8ef;border-color:#b8e6c9;color:#27ae60;animation:giPop .35s ease}
-.gi.tray{background:#fff3d6;border-color:#f5c242;color:#b07d0a;animation:giPop .35s ease}
+.bar-staff .st-pot{font-size:20px;margin-bottom:5px;animation:busy 2.1s .3s ease-in-out infinite}
+.bar-staff .st-chef{font-size:31px;line-height:1;animation:busy 1.6s ease-in-out infinite;transform-origin:50% 92%}
+.bar-staff .st-tray{font-size:16px;margin-bottom:7px;animation:carry 3.4s ease-in-out infinite}
+.bar-staff .st-steam{
+  position:absolute;left:calc(50% - 34px);bottom:30px;font-size:11px;opacity:0;
+  animation:steam 3s ease-out infinite;
+}
+@keyframes steam{0%{opacity:0;transform:translateY(4px) scale(.7)}25%{opacity:.75}100%{opacity:0;transform:translateY(-16px) scale(1.35)}}
+@keyframes busy{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-4px) rotate(5deg)}}
+@keyframes carry{
+  0%,100%{transform:translateX(-30px) translateY(2px) scale(.88);opacity:.5}
+  45%,60%{transform:translateX(2px) translateY(-3px) scale(1.08);opacity:1}
+}
+/* 吧台台面（客人把盘子放这上面） */
+.bar-surface{
+  height:15px;margin:0 5px;border-radius:4px;
+  background:linear-gradient(180deg,#d09853,#ab7231 52%,#8a5a20);
+  box-shadow:0 3px 9px rgba(120,80,30,.32),inset 0 2px 0 rgba(255,255,255,.4);
+}
+/* 吧台前排队等餐的客人 */
+.bar-guests{display:flex;gap:6px;padding:0 7px 9px;align-items:flex-start;margin-top:-9px}
+.bguest{
+  flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:rgba(255,255,255,.66);border-radius:12px;padding:5px 4px 6px;border:1.5px solid transparent;
+  transition:all .2s;
+}
+.bguest.vip{border-color:#f5c242;background:rgba(255,255,255,.9);box-shadow:0 0 0 2px rgba(245,194,66,.28)}
+.bguest.happy{animation:giPop .35s ease}
+.bguest.paid{animation:paidPop 1.05s ease forwards;border-color:#27ae60}
+.bguest.shake{animation:shake .4s ease}
+.bguest .bg-face{font-size:23px;line-height:1.15}
+.bguest.vip .bg-face{animation:wave 2.2s ease infinite}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes paidPop{0%{transform:scale(1)}25%{transform:scale(1.06)}55%{transform:scale(1.01)}100%{transform:scale(.86);opacity:.15}}
+/* 盘子：放已上到的菜，没上到的暗显 */
+.bg-plate{
+  width:100%;min-height:25px;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;align-items:center;
+  background:linear-gradient(180deg,#ffffff,#f0f3f8);border:1.5px solid #d6dde8;border-radius:999px;
+  padding:3px 5px;box-shadow:0 2px 6px rgba(90,70,40,.18);
+}
+.pl{font-size:9px;font-weight:800;border-radius:7px;padding:1px 4px;background:#eef1f5;color:#9aa3b0;white-space:nowrap}
+.pl.part{background:#fff3d6;color:#b07d0a}
+.pl.full{background:#e8f8ef;color:#1e8449;animation:giPop .35s ease}
 @keyframes giPop{0%{transform:scale(.8)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
-.guest-card.vip{border-color:#f5c242;background:linear-gradient(135deg,#fffdf3,#fff3d6);box-shadow:0 4px 16px rgba(245,194,66,.35)}
-.guest-card .g-vip{font-size:10.5px;font-weight:800;color:#b07d0a;background:#fff3d6;border-radius:6px;padding:1px 6px;display:inline-block;margin-bottom:3px}
-.guest-card .g-reward{font-size:11.5px;font-weight:800;color:#d35400;margin-top:4px}
-.guest-card .g-state{font-size:16px}
-.g-skip{
-  flex:0 0 auto;border:1.5px solid #ecd9ac;background:#fff;border-radius:12px;color:#b09454;
-  font-size:10.5px;font-weight:800;padding:0 8px;cursor:pointer;white-space:nowrap;line-height:1.3;
+.bg-pay{font-size:9.5px;font-weight:800;color:#d35400;text-align:center;line-height:1.3;white-space:nowrap}
+.bg-skip{
+  border:1.5px solid #ecd9ac;background:#fff;border-radius:9px;color:#b09454;
+  font-size:9.5px;font-weight:800;padding:2px 6px;cursor:pointer;font-family:inherit;white-space:nowrap;
 }
-.g-skip:active{transform:scale(.95)}
+.bg-skip:active{transform:scale(.95)}
 
 /* ===== 上菜动效 ===== */
 .fly-emoji{
@@ -264,8 +295,8 @@ body{
 .lv9{background:#8ea6ff}.lv10{background:#63d8e8}.lv11{background:#6fe09a}
 .lv12{background:linear-gradient(135deg,#fceabb,#f8b500);box-shadow:0 0 12px rgba(248,181,0,.75)}
 
-.cell:focus,.guest-card:focus,.shop-chip:focus,.g-skip:focus{outline:none}
-.cell:focus-visible,.guest-card:focus-visible,.shop-chip:focus-visible,.g-skip:focus-visible{outline:2px solid #ff5e62}
+.cell:focus,.bguest:focus,.shop-chip:focus,.bg-skip:focus{outline:none}
+.cell:focus-visible,.bguest:focus-visible,.shop-chip:focus-visible,.bg-skip:focus-visible{outline:2px solid #ff5e62}
 
 /* ===== 飘字 & Toast ===== */
 .float{
@@ -328,13 +359,15 @@ body{
   .stats-bar{font-size:11.5px;padding:7px 10px;gap:3px}
   .shop-chip{font-size:11px;padding:6px 8px}
   .shop-chip .sc-e{font-size:15px}
-  .quest-row{gap:5px;margin-bottom:7px}
-  .guest-card{padding:9px 10px;gap:8px;border-radius:14px}
-  .guest-card .g-face{font-size:25px}
-  .guest-card .g-items{gap:4px}
-  .gi{font-size:10.5px;padding:2px 5px}
-  .guest-card .g-reward{font-size:11px}
-  .g-skip{font-size:10px;padding:0 6px;border-radius:10px}
+  .bar-inside{padding:8px 9px 3px}
+  .bar-hint{font-size:9.5px}
+  .bar-staff{height:44px;margin:0 9px}
+  .bar-staff .st-chef{font-size:27px}
+  .bar-guests{gap:4px;padding:0 5px 8px}
+  .bguest{padding:4px 3px 5px;border-radius:10px;gap:2px}
+  .bguest .bg-face{font-size:21px}
+  .bg-plate{padding:2px 4px;min-height:23px}
+  .pl{font-size:8.5px;padding:1px 3px}
   .card{padding:8px 10px;gap:9px;margin-bottom:7px;border-radius:14px}
   .card .p-emoji{font-size:27px;width:38px}
   .card .p-name{font-size:14px}
@@ -386,8 +419,20 @@ body{
     <section id="page-shop" class="page active">
       <div class="stats-bar" id="statsBar"></div>
       <div class="shop-strip" id="shopStrip"></div>
-      <div class="queue-title">🍽️ 排队的客人 <span class="qt-sub">点客人选他，再从下面货架点「端菜」给他</span></div>
-      <div id="queueList"></div>
+      <div class="bar-scene">
+        <div class="bar-inside">
+          <span class="bar-sign"><span id="barSignEmoji">🛖</span><span id="barSignName">街边小摊</span><em id="barSignLv">Lv.1</em></span>
+          <span class="bar-hint">点下面货架上<b>做好的菜</b><br>自动端给排队的第一位客人</span>
+        </div>
+        <div class="bar-staff" aria-hidden="true">
+          <div class="kitchen">
+            <span class="st-pot">🍳</span><span class="st-chef">🧑‍🍳</span><span class="st-tray">🍽️</span>
+          </div>
+          <span class="st-steam">💨</span>
+        </div>
+        <div class="bar-surface"></div>
+        <div class="bar-guests" id="barGuests"></div>
+      </div>
       <div style="font-size:13.5px;font-weight:800;color:#6b5b6e;margin:8px 0 7px">🧺 货架（按时间自动生产，每样最多囤 5 件）</div>
       <div id="productList"></div>
       <div class="actions">
@@ -416,9 +461,10 @@ body{
       <ul>
         <li>🏭 <b>货架按时间自动生产</b>：每秒慢慢出货到货架（每样最多囤 5 件）—— 但<b>钱不会自己涨</b></li>
         <li>💰 <b>只有把商品端给客人，才收得到钱</b>：客人付款 = 商品价 × 售价倍率 × 客人数量；能量也是上菜才给</li>
-        <li>🍽️ <b>当服务员</b>：点客人选中他 → 他要的商品在货架亮起绿色「端菜」→ 点它上菜（菜会飞向客人）→ 凑齐自动结账，客人走人下一位补位</li>
+        <li>🍽️ <b>当服务员</b>：吧台里大厨在做菜，客人端着盘子在台前排队，盘子上的 <b>1/3</b> 就是上菜进度</li>
+        <li>👉 <b>上菜只需点「做好的菜」</b>：自动端给排队顺序里第一个要它的客人，凑齐自动结账、客人走人下一位补位</li>
         <li>✨ <b>稀有客人</b>：偶尔有人出天价点名要你那道稀有菜（🍀🌈👑）</li>
-        <li>🚫 给错菜客人会摇头；点客人卡可结束服务，已端的菜退回货架</li>
+        <li>🚫 队伍里没人点的菜端不出去；点客人脚下的「送走」可花小费换一位客人</li>
         <li>📋 <b>客人的口味会跟着你成长</b>：合成出新商品后，后续客人的订单里就会出现新菜</li>
         <li>💰 <b>金币管商店线</b>：升级店铺（卖更快）、<b>开新店</b>（价格随你的收入自动缩放，永远是"攒一会儿"）、金币解锁商品、送走客人</li>
         <li>⚡ <b>能量管合成线</b>：生成产品、升级合成台；出货模式可把产品回收成能量</li>
@@ -506,7 +552,7 @@ const defaultState=()=>({
 let state=defaultState();
 let progs=PRODUCTS.map(()=>0);
 let hidProgs={};
-let selIdx=-1, shipMode=false, genLv=1, lastMergedIdx=-1, servingIdx=-1, orderBusy=false;
+let selIdx=-1, shipMode=false, genLv=1, lastMergedIdx=-1, orderBusy=false;
 
 /* ================= 工具 & 加成 ================= */
 const $=s=>document.querySelector(s);
@@ -761,7 +807,6 @@ function refreshGuestsForNewProduct(level){
   if(level<2)return;
   let n=0;
   state.queue.forEach((g,i)=>{
-    if(i===servingIdx)return;                          // 正在服务的不动
     if(Object.keys(g.tray||{}).length)return;           // 已上菜的不动
     if(g.items.some(it=>it.level>=level))return;        // 已经包含新等级
     state.queue[i]=newGuest();
@@ -777,59 +822,42 @@ function trayNeed(g){
   return need;
 }
 function guestServed(g){return Object.keys(trayNeed(g)).length===0}
-function guestElAt(i){return document.querySelectorAll('.guest-card')[i]}
-function clickGuest(i){
-  if(orderBusy)return;
-  if(servingIdx===i){
-    const g=state.queue[i];
-    Object.keys(g.tray).forEach(k=>{for(let n=0;n<g.tray[k];n++)giveStock(k)});
-    g.tray={};g.fx='';
-    servingIdx=-1;
-    toast('🙏','结束服务，已端的菜退回了货架');
-  }else{
-    if(servingIdx>=0)clickGuest(servingIdx);
-    servingIdx=i;
-    const g=state.queue[i];
-    const need=trayNeed(g);
-    const needTxt=Object.keys(need).map(k=>keyName(k)+'×'+need[k]).join(' ');
-    toast(g.face,g.vip?('这位客人出天价！去货架点「端菜」上：'+needTxt):('开始服务！去货架点绿色「端菜」给他：'+needTxt));
-  }
-  renderQueue();renderShop();save();
+function guestElAt(i){
+  const el=document.querySelectorAll('.bguest')[i];
+  return el?el.querySelector('.bg-plate'):null;
 }
-// 玩家从货架选商品端给客人
+// 玩家点「做好的菜」→ 自动端给排队顺序里第一个还需要它的客人
 function serveItem(key){
   if(orderBusy)return;
-  if(servingIdx<0||!state.queue[servingIdx]){
-    toast('👉','先点一位客人，再给他端菜');
-    return;
-  }
-  const g=state.queue[servingIdx];
-  const need=trayNeed(g);
-  if(!need[key]){
-    shakeGuest(guestElAt(servingIdx));
-    toast(FACE_NO,'客人摇了摇头：这道菜我不要～');
-    return;
-  }
   if(stockOf(key)<=0){
-    toast('🧺','这道菜货架没现货了！货架会按时间自动补货');
+    toast('🧺','这道菜还没做好～等吧台里的大厨再做一份');
     return;
   }
+  let idx=-1;
+  for(let i=0;i<state.queue.length;i++){
+    if(trayNeed(state.queue[i])[key]){idx=i;break}
+  }
+  if(idx<0){
+    toast(FACE_NO,'队伍里没人点这道菜～');
+    return;
+  }
+  const g=state.queue[idx];
   const srcSel=keySrcSel(key), emoji=keyEmoji(key);
   takeStock(key);
   g.tray[key]=(g.tray[key]||0)+1;
   const done=guestServed(g);
   save();
   if(done){
-    completeOrder(servingIdx,srcSel,emoji);
+    completeOrder(idx,srcSel,emoji);
   }else{
     g.fx='happy';
-    renderQueue();renderShop();updateHUD();
-    const cEl=document.querySelector(srcSel), gEl=guestElAt(servingIdx);
+    renderBar();renderShop();updateHUD();
+    const cEl=document.querySelector(srcSel), gEl=guestElAt(idx);
     flyEmoji(cEl,gEl,emoji);
     flashCard(cEl);
     const rest=trayNeed(g);
-    toast(g.face,'真香！还差：'+Object.keys(rest).map(k=>keyName(k)+'×'+rest[k]).join(' '));
-    setTimeout(()=>{if(g.fx==='happy'){g.fx='';renderQueue()}},950);
+    toast(g.face,'端给第'+(idx+1)+'位客人！他还差：'+Object.keys(rest).map(k=>keyName(k)+'×'+rest[k]).join(' '));
+    setTimeout(()=>{if(g.fx==='happy'){g.fx='';renderBar()}},950);
   }
 }
 // 凑齐 → 客人付钱自己走 → 下一位补位
@@ -840,20 +868,19 @@ function completeOrder(i,srcSel,emoji){
   state.ordersDone++;
   g.fx='paid';
   orderBusy=true;
-  servingIdx=-1;
   save();
-  renderQueue();renderShop();updateHUD();
+  renderBar();renderShop();updateHUD();
   const gEl=guestElAt(i);
   coinBurst(gEl);
   floatText(gEl,'+'+fmt(g.rewardCoins)+'💰','#d35400');
   flyEmoji(document.querySelector(srcSel),gEl,emoji);
-  toast('💰','客人付钱走了！+'+fmt(g.rewardCoins)+'💰 +'+fmt(g.rewardEnergy)+'⚡');
+  toast('💰','第'+(i+1)+'位客人付钱走了！+'+fmt(g.rewardCoins)+'💰 +'+fmt(g.rewardEnergy)+'⚡');
   setTimeout(()=>{
     const k=state.queue.indexOf(g);
     if(k>=0)state.queue.splice(k,1);
     fillQueue();
     orderBusy=false;
-    renderQueue();renderShop();save();
+    renderBar();renderShop();save();
   },1050);
 }
 
@@ -975,7 +1002,6 @@ function celebrate(s){
 }
 function switchShop(i){
   if(i===state.activeShop)return;
-  if(servingIdx>=0)clickGuest(servingIdx);
   state.activeShop=i;
   toast(SHOPS[i].e,'现在经营：'+SHOPS[i].n+'（'+SHOPS[i].perkDesc+'）');
   renderShop();save();
@@ -1004,68 +1030,58 @@ function renderShopStrip(){
     strip.appendChild(d);
   });
 }
-function renderQueue(){
-  const list=$('#queueList');
+// 吧台场景渲染：店里的大厨 + 台面上客人手里的盘子
+function renderBar(){
+  const list=$('#barGuests');
   if(!list)return;
-  list.innerHTML='';
   fillQueue();
+  $('#barSignEmoji').textContent=shop().e;
+  $('#barSignName').textContent=shop().n;
+  $('#barSignLv').textContent='Lv.'+state.shopLevel;
+  list.innerHTML='';
   state.queue.forEach((g,i)=>{
-    const itemsHtml=g.items.map(it=>{
-      const k=itemKey(it), have=g.tray[k]||0;
-      const cls=have>=it.count?'done':(have>0?'tray':'');
-      const mark=have>=it.count?'✓':(have>0?' ('+have+'/'+it.count+')':'');
-      return `<span class="gi ${cls}">${keyName(k)}×${it.count}${mark}</span>`;
-    }).join('');
-    const serving=i===servingIdx;
     const face=g.fx==='paid'?FACE_PAID:(g.fx==='happy'?FACE_HAPPY:g.face);
-    const row=document.createElement('div');
-    row.className='quest-row';
-    const card=document.createElement('button');
-    card.className='guest-card'+(serving?' serving':'')+(g.fx==='paid'?' paid':'')+(g.vip?' vip':'');
-    card.setAttribute('aria-label',`${g.vip?'稀有客人':'客人'}${i+1} 需要 `+
-      g.items.map(it=>it.rare?HIDDEN[it.rare].n+'×'+it.count:(PRODUCTS[it.level-1].n+'Lv'+it.level+'×'+it.count)).join(' ')+
-      ` 奖励${g.rewardCoins}金币 ${g.rewardEnergy}能量${serving?'（正在服务）':''}`);
-    card.innerHTML=
-      `<span class="g-face">${face}</span>`+
-      `<div class="g-body">`+
-        (g.vip?`<div class="g-vip">✨ 稀有客人 · 出天价</div>`:'')+
-        `<div class="g-items">${itemsHtml}</div>`+
-        `<div class="g-reward">💰${fmt(g.rewardCoins)} ⚡${fmt(g.rewardEnergy)}</div>`+
-      `</div>`+
-      `<span class="g-state">${g.fx==='paid'?'💰':(serving?'🍽️':'👉')}</span>`;
-    card.onclick=()=>clickGuest(i);
-    const skip=document.createElement('button');
-    skip.className='g-skip';
-    skip.setAttribute('aria-label','送走客人'+(i+1));
-    skip.innerHTML='送走<br>¥'+fmt(50*mult());
-    skip.onclick=e=>{e.stopPropagation();skipGuest(i)};
-    row.appendChild(card);
-    row.appendChild(skip);
-    list.appendChild(row);
+    const orderTxt=g.items.map(it=>it.rare
+      ?(HIDDEN[it.rare].n+'×'+it.count)
+      :(PRODUCTS[it.level-1].n+'Lv'+it.level+'×'+it.count)).join(' ');
+    const plate=g.items.map(it=>{
+      const k=itemKey(it), have=g.tray[k]||0;
+      const cls=have>=it.count?'full':(have>0?'part':'');
+      return `<span class="pl ${cls}">${keyEmoji(k)}${have}/${it.count}</span>`;
+    }).join('');
+    const d=document.createElement('div');
+    d.className='bguest'+(g.vip?' vip':'')+(g.fx==='paid'?' paid':'')+(g.fx==='happy'?' happy':'');
+    d.setAttribute('aria-label',`第${i+1}位客人${g.vip?'（稀有客人）':''} 需要 ${orderTxt} 赏金${g.rewardCoins}金币${g.rewardEnergy}能量`);
+    d.innerHTML=
+      `<div class="bg-plate">${plate}</div>`+
+      `<div class="bg-face">${face}</div>`+
+      `<div class="bg-pay">💰${fmt(g.rewardCoins)}<br>⚡${fmt(g.rewardEnergy)}</div>`+
+      `<button class="bg-skip" aria-label="送走第${i+1}位客人">送走 ¥${fmt(50*mult())}</button>`;
+    d.querySelector('.bg-skip').onclick=()=>skipGuest(i);
+    list.appendChild(d);
   });
 }
 function skipGuest(i){
   if(orderBusy)return;
   const fee=Math.floor(50*mult());
   if(state.coins<fee){toast('💰','送走客人要 ¥'+fmt(fee)+' 小费，钱不够');return}
-  if(servingIdx===i)clickGuest(i);
   state.coins-=fee;
   state.queue.splice(i,1);
   fillQueue();
-  if(servingIdx>i)servingIdx--;
-  renderQueue();renderShop();updateHUD();save();
+  renderBar();renderShop();updateHUD();save();
 }
 function renderShop(){
   updateHUD();
   renderShopStrip();
-  const serving=servingIdx>=0&&state.queue[servingIdx];
-  const need=serving?trayNeed(serving):null;
+  // 队伍里还有人要的菜（已做好的才显示上菜按钮）
+  const wanted=new Set();
+  state.queue.forEach(g=>Object.keys(trayNeed(g)).forEach(k=>wanted.add(k)));
   $('#statsBar').innerHTML=
     `<span>🏭 生产 ${prodInterval().toFixed(1)} 秒/件</span>`+
     `<span>💰 售价 ×${mult()}</span>`+
     `<span>⚡ 上菜能量 ×${Math.round(energyRate())}</span>`+
     `<span class="perk">${shop().perkDesc}</span>`+
-    (serving?`<span style="color:#ff5e62">🍽️ 服务中：${serving.face}，点绿色「端菜」上菜</span>`:'');
+    `<span style="color:#ff5e62">🍽️ 点做好的菜自动上给排队客人</span>`;
   const list=$('#productList');
   list.innerHTML='';
   PRODUCTS.forEach((p,idx)=>{
@@ -1077,9 +1093,10 @@ function renderShop(){
       const stock=state.stock[idx];
       const stockTag=`<span class="stock-tag${stock>0?'':' empty'}">🧺${stock}/${STOCK_CAP}</span>`;
       let action='';
-      if(serving&&need['l:'+lv]){
+      // 有人要就一直显示上菜按钮（没货时置灰，等吧台做好自动恢复）
+      if(wanted.has('l:'+lv)){
         card.classList.add('serving-need');
-        action=`<button class="p-btn serve-btn" id="serve${idx}">端菜 🍽️<br>剩 ${stock}</button>`;
+        action=`<button class="p-btn serve-btn" id="serve${idx}" aria-label="上菜 ${p.n} Lv.${lv}"${stock>0?'':' disabled'}>上菜 🍽️<br>${stock>0?('剩 '+stock):'已卖完'}</button>`;
       }
       card.innerHTML=
         `<div class="p-emoji">${p.e}</div>`+
@@ -1106,12 +1123,9 @@ function renderShop(){
         `</div>`;
     }
     list.appendChild(card);
-    if(serving&&need['l:'+lv]){
+    if(wanted.has('l:'+lv)){
       const btn=document.getElementById('serve'+idx);
-      if(btn){
-        btn.disabled=state.stock[idx]<=0;
-        btn.onclick=()=>serveItem('l:'+lv);
-      }
+      if(btn)btn.onclick=()=>serveItem('l:'+lv);
     }
   });
   Object.keys(HIDDEN).forEach(key=>{
@@ -1122,9 +1136,9 @@ function renderShop(){
     card.className='card rare';
     card.id='hcard'+key;
     let action='';
-    if(serving&&need['r:'+key]){
+    if(wanted.has('r:'+key)){
       card.classList.add('serving-need');
-      action=`<button class="p-btn serve-btn" id="hserve${key}">端菜 🍽️<br>剩 ${cur}</button>`;
+      action=`<button class="p-btn serve-btn" id="hserve${key}" aria-label="上菜 ${h.n}"${cur>0?'':' disabled'}>上菜 🍽️<br>${cur>0?('剩 '+cur):'已卖完'}</button>`;
     }
     card.innerHTML=
       `<div class="p-emoji">${h.e}</div>`+
@@ -1135,12 +1149,9 @@ function renderShop(){
         `<div class="bar rare"><i id="hbar${key}"></i></div>`+
       `</div>`+action;
     list.appendChild(card);
-    if(serving&&need['r:'+key]){
+    if(wanted.has('r:'+key)){
       const btn=document.getElementById('hserve'+key);
-      if(btn){
-        btn.disabled=cur<=0;
-        btn.onclick=()=>serveItem('r:'+key);
-      }
+      if(btn)btn.onclick=()=>serveItem('r:'+key);
     }
   });
   Object.keys(GOLD_BUY).forEach(lvStr=>{
@@ -1168,7 +1179,7 @@ function renderShop(){
     nb.innerHTML='🏆 全部店铺已解锁！';
     nb.disabled=true;
   }
-  renderQueue();
+  renderBar();
 }
 function renderMergeHead(){
   const head=$('#mergeHead');
@@ -1251,7 +1262,7 @@ function tick(){
     if(nb&&next)nb.disabled=state.coins<openCostCoins(state.shopTier+1);
   }
 }
-// 库存徽标 / 端菜按钮的低频刷新
+// 库存徽标 / 上菜按钮的低频刷新
 function refreshStockBadges(){
   PRODUCTS.forEach((p,idx)=>{
     if(!state.unlocked[idx])return;
@@ -1261,7 +1272,11 @@ function refreshStockBadges(){
       tag.classList.toggle('empty',state.stock[idx]<=0);
     }
     const sb=document.getElementById('serve'+idx);
-    if(sb){sb.disabled=state.stock[idx]<=0;sb.innerHTML='端菜 🍽️<br>剩 '+state.stock[idx]}
+    if(sb){
+      // 做完了才给上菜按钮；卖光了就撤掉（等再做好）
+      if(state.stock[idx]<=0){sb.disabled=true;sb.innerHTML='上菜 🍽️<br>已卖完'}
+      else{sb.disabled=false;sb.innerHTML='上菜 🍽️<br>剩 '+state.stock[idx]}
+    }
   });
   Object.keys(state.hiddenOwned).forEach(key=>{
     if(!state.hiddenOwned[key])return;
@@ -1272,7 +1287,10 @@ function refreshStockBadges(){
       tag.classList.toggle('empty',cur<=0);
     }
     const btn=document.getElementById('hserve'+key);
-    if(btn){btn.disabled=cur<=0;btn.innerHTML='端菜 🍽️<br>剩 '+cur}
+    if(btn){
+      if(cur<=0){btn.disabled=true;btn.innerHTML='上菜 🍽️<br>已卖完'}
+      else{btn.disabled=false;btn.innerHTML='上菜 🍽️<br>剩 '+cur}
+    }
   });
 }
 
@@ -1322,7 +1340,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
 /* ================= 启动 ================= */
 load();
 fillQueue();
-renderShop();        // 内部已含 renderQueue()
+renderShop();        // 内部已含 renderBar()
 renderMergeHead();
 renderGrid();
 renderChips();

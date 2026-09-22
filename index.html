@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <meta name="theme-color" content="#ff5e62"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -12,7 +12,9 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏪</text></svg>">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
-html,body{height:100%}
+html{height:100%;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{height:100%;overscroll-behavior-y:contain}
+button,.cell,.guest-card,.shop-chip,.g-skip,.chip,.p-btn,.mh-btn{touch-action:manipulation}
 body{
   font-family:'Segoe UI',system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
   background:linear-gradient(175deg,#8ec5fc 0%,#e0c3fc 55%,#ffd6e8 100%);
@@ -61,12 +63,13 @@ body{
 }
 .stats-bar .perk{color:#27ae60}
 
-/* ===== 店铺条（可点击切换）===== */
-.shop-strip{display:flex;gap:7px;overflow-x:auto;padding:4px 2px 8px;margin-bottom:6px;scrollbar-width:none}
-.shop-strip::-webkit-scrollbar{display:none}
+/* ===== 店铺条（自动换行，全部可见可点）===== */
+.shop-strip{
+  display:flex;flex-wrap:wrap;gap:6px;padding:2px 0 8px;margin-bottom:6px;
+}
 .shop-chip{
-  flex:0 0 auto;background:rgba(255,255,255,.85);border-radius:12px;padding:7px 10px;
-  font-size:11.5px;font-weight:700;color:#6b5b6e;display:flex;align-items:center;gap:5px;
+  flex:0 0 auto;background:rgba(255,255,255,.85);border-radius:12px;padding:6px 9px;
+  font-size:11.5px;font-weight:700;color:#6b5b6e;display:flex;align-items:center;gap:4px;
   border:2px solid transparent;white-space:nowrap;cursor:pointer;transition:all .15s;font-family:inherit;
 }
 .shop-chip .sc-e{font-size:17px}
@@ -176,7 +179,19 @@ body{
 .lock-desc{font-size:12px;color:#a08fa6}
 
 /* ===== 操作按钮 ===== */
-.actions{display:flex;gap:9px;margin-top:12px}
+/* 商店页：升级/开店按钮吸底常驻（商品列表很长，滚不到底也点得到） */
+.actions{
+  display:flex;gap:9px;margin-top:12px;
+  position:sticky;bottom:calc(6px + env(safe-area-inset-bottom,0px));z-index:30;
+  padding:8px;border-radius:16px;
+  background:rgba(255,255,255,.86);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:0 6px 22px rgba(80,60,90,.18);
+}
+/* 合成台页：不吸底（页面本就不高），否则会遮住上方的「生成等级」选择条 */
+.merge-actions{
+  display:flex;gap:9px;margin-top:11px;padding:8px;border-radius:16px;
+  background:rgba(255,255,255,.86);box-shadow:0 4px 14px rgba(80,60,90,.12);
+}
 .big-btn{
   flex:1;border:none;border-radius:14px;padding:13px 8px;cursor:pointer;color:#fff;
   font-size:13.5px;font-weight:800;line-height:1.45;transition:transform .12s;
@@ -231,7 +246,6 @@ body{
 @keyframes shimmer{0%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
 .cell.hidden-item .c-lv{background:linear-gradient(135deg,#f5c242,#e89b0c)}
 
-.merge-actions{display:flex;gap:9px;margin-top:12px}
 #btnGen{background:linear-gradient(135deg,#43e97b,#38f9d7);box-shadow:0 5px 14px rgba(56,249,215,.35);color:#0c4633}
 #btnShipMode{background:linear-gradient(135deg,#f7971e,#ffd200);box-shadow:0 5px 14px rgba(255,210,0,.3);color:#5c4300}
 #btnShipMode.on{background:linear-gradient(135deg,#ff5858,#f857a6);color:#fff}
@@ -302,10 +316,56 @@ body{
 .m-danger{background:#ffe3e3;color:#d63031}
 .hidden{display:none!important}
 
-@media (max-width:400px){
-  .card .p-emoji{font-size:28px;width:40px}
-  .cell .c-emoji{font-size:26px}
+/* ================= 手机自适应 =================
+   断点取 520px（高于内容容器 max-width:480），确保所有手机（320~480）
+   都稳定命中，不受滚动条/缩放导致的 1~15px 视口抖动影响 */
+@media (max-width:520px){
+  #app{padding:10px 10px 14px}
+  #hud{padding:10px 12px;border-radius:16px}
+  .res{min-width:0;flex:1 1 0;font-size:14px;padding:5px 10px;justify-content:center}
+  #btnMenu{width:40px;height:40px;font-size:19px}
+  .tab{padding:10px 0;font-size:14px}
+  .stats-bar{font-size:11.5px;padding:7px 10px;gap:3px}
+  .shop-chip{font-size:11px;padding:6px 8px}
+  .shop-chip .sc-e{font-size:15px}
+  .quest-row{gap:5px;margin-bottom:7px}
+  .guest-card{padding:9px 10px;gap:8px;border-radius:14px}
+  .guest-card .g-face{font-size:25px}
+  .guest-card .g-items{gap:4px}
+  .gi{font-size:10.5px;padding:2px 5px}
+  .guest-card .g-reward{font-size:11px}
+  .g-skip{font-size:10px;padding:0 6px;border-radius:10px}
+  .card{padding:8px 10px;gap:9px;margin-bottom:7px;border-radius:14px}
+  .card .p-emoji{font-size:27px;width:38px}
+  .card .p-name{font-size:14px}
+  .card .p-info{font-size:11.5px}
+  .card .p-btn{font-size:12px;padding:8px 9px}
+  .big-btn{font-size:12.5px;padding:11px 6px}
+  .actions,.merge-actions{gap:7px;padding:7px;margin-top:10px}
+  .merge-head{flex-wrap:wrap;gap:6px}
+  .merge-head .mh-btn{width:100%;margin-left:0;text-align:center}
+  .merge-tip{font-size:11.5px;padding:7px 10px}
+  /* 手机端 20 格改为 5 列 × 4 行：更宽更矮，整页能一屏放下（无需滚动就能点生成） */
+  #grid{grid-template-columns:repeat(5,1fr);max-width:400px;margin:0 auto}
+  .cell .c-emoji{font-size:25px}
+  .cell .c-lv{font-size:9.5px;bottom:3px;right:4px}
+  .chip{font-size:11.5px;padding:5px 11px}
+  .float{font-size:12px}
+  .toast{font-size:12.5px;padding:9px 12px}
 }
+@media (max-width:340px){
+  #grid{gap:6px;padding:8px}
+  .cell .c-emoji{font-size:21px}
+  .shop-chip{font-size:10px;padding:5px 7px}
+  .actions,.merge-actions{flex-direction:column}
+  .big-btn{font-size:12px}
+}
+/* 横屏矮视口（手机横过来）：压缩顶部，避免内容区太扁 */
+@media (max-height:480px) and (orientation:landscape){
+  #hud{padding:8px 12px}
+  #tabs{margin:8px 0}
+}
+
 </style>
 </head>
 <body>

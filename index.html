@@ -499,6 +499,26 @@ body{
 .ach-bar{height:4px;border-radius:99px;background:#efe6f3;overflow:hidden;margin-top:5px}
 .ach-bar i{display:block;height:100%;background:linear-gradient(90deg,#ffc46b,#ef6f4e);border-radius:99px}
 .ach-prog{font-size:9.5px;color:#b0a2b8;font-weight:700;margin-top:3px;text-align:right}
+/* ===== Q 版小人 ===== */
+.px{display:block}
+.pxchar{position:relative;display:inline-block;line-height:0}
+.pxchar>span{position:absolute;left:0;top:0}
+.pxchar>span.f0{position:relative}
+.pxchar>span.f1{opacity:0;animation:pxSwap .8s steps(1) infinite}
+@keyframes pxSwap{0%,49%{opacity:0}50%,100%{opacity:1}}
+/* 尺寸：故意做小，乖在场景里不抢戏 */
+.px-waiter{width:22px}
+.px-guest{width:20px}
+/* 像素小人尺寸：宠物按成长阶段变大 */
+.pet-btn{--petw:30px}
+.pet-sprite{display:inline-block;width:var(--petw)}
+.px-pet{width:100%}
+.pet-mood{font-size:11px;position:absolute;right:-4px;top:-6px}
+.pet-eat{position:absolute;left:-6px;top:-4px;font-size:12px;animation:giPop .5s ease}
+/* 客人反应小表情（叠加在像素小人右上角） */
+.actor.g .bd{position:relative}
+.gfx{position:absolute;right:-8px;top:-6px;font-size:14px;animation:giPop .4s ease}
+
 /* ===== 果冻效果 ===== */
 .cell.jelly{animation:jelly .52s cubic-bezier(.3,1.25,.4,1)}
 .cell.jelly .c-emoji{animation:jelly .52s cubic-bezier(.3,1.25,.4,1)}
@@ -2469,6 +2489,123 @@ function checkDaily(){
   updateHUD();
 }
 
+/* ================= Q 版扁平小人（矢量，小尺寸也清楚）================= */
+// 风格：大头小身 + 豆豆眼 + 腮红 + 圆润四肢，两帧切换出走路感
+const CHIBI_STYLES=['short','bun','long','curly'];
+const CHIBI_PALS=[
+  {hair:'#5b4034',cloth:'#7fa8f0',pants:'#4a5a78'},
+  {hair:'#2f2a28',cloth:'#7fd6a8',pants:'#3f5a52'},
+  {hair:'#c9904b',cloth:'#ffb3c7',pants:'#6a5570'},
+  {hair:'#8b5e83',cloth:'#ffd166',pants:'#5a4a3a'},
+  {hair:'#4a6fa5',cloth:'#ffb08a',pants:'#44506e'},
+];
+const SKIN='#ffd9b4', SKIN_D='#f0bd93', DARK='#3f3129', BLUSH='#ff9aa2';
+// 宠物项圈颜色（随成长阶段变化）
+const PET_COLLARS=['#ff9ec4','#ffd166','#7fd6a8','#9ec4ff','#f5c242'];
+// 身体（带两帧腿部动作）：viewBox 24×32
+function chibiSVG(o){
+  const d=o||{};
+  const hair=d.hair||'#5b4034', cloth=d.cloth||'#7fa8f0', pants=d.pants||'#4a5a78';
+  const style=d.style||'short', hat=!!d.hat, apron=!!d.apron, fr=d.frame?1:0;
+  let x='';
+  // 影子
+  x+='<ellipse cx="12" cy="30.6" rx="7" ry="1.6" fill="rgba(40,20,8,.22)"/>';
+  // 腿（两帧：一前一后 → 走路）
+  if(fr===0){
+    x+='<rect x="9.2" y="25.6" width="2.6" height="4.6" rx="1.3" fill="'+pants+'"/>';
+    x+='<rect x="12.2" y="25.6" width="2.6" height="4.6" rx="1.3" fill="'+pants+'"/>';
+    x+='<rect x="8.6" y="29.4" width="3.4" height="2" rx="1" fill="'+DARK+'"/>';
+    x+='<rect x="12" y="29.4" width="3.4" height="2" rx="1" fill="'+DARK+'"/>';
+  }else{
+    x+='<rect x="8.6" y="25.6" width="2.6" height="3" rx="1.3" fill="'+pants+'"/>';
+    x+='<rect x="13" y="25.6" width="2.6" height="5.4" rx="1.3" fill="'+pants+'"/>';
+    x+='<rect x="8" y="27.6" width="3.4" height="1.9" rx=".95" fill="'+DARK+'"/>';
+    x+='<rect x="12.8" y="30.2" width="3.4" height="1.9" rx=".95" fill="'+DARK+'"/>';
+  }
+  // 身体
+  x+='<rect x="7.6" y="18.2" width="8.8" height="8.6" rx="4.2" fill="'+cloth+'"/>';
+  // 手臂
+  x+='<circle cx="6.4" cy="21.6" r="1.9" fill="'+cloth+'"/>';
+  x+='<circle cx="17.6" cy="21.6" r="1.9" fill="'+cloth+'"/>';
+  x+='<circle cx="6.4" cy="22.6" r="1.6" fill="'+SKIN+'"/>';
+  x+='<circle cx="17.6" cy="22.6" r="1.6" fill="'+SKIN+'"/>';
+  // 围裙
+  if(apron)x+='<path d="M8.6 20.4h6.8v6.4a1 1 0 0 1-1 1H9.6a1 1 0 0 1-1-1z" fill="#fdfdff" opacity=".95"/>';
+  // 脖子
+  x+='<rect x="10.6" y="17.4" width="2.8" height="2" rx="1" fill="'+SKIN_D+'"/>';
+  // 后发
+  if(style==='long')x+='<path d="M4.6 11.4v7.8a2.2 2.2 0 0 0 2.2 2.2V11.4z" fill="'+hair+'"/><path d="M19.4 11.4v7.8a2.2 2.2 0 0 1-2.2 2.2V11.4z" fill="'+hair+'"/>';
+  // 头
+  x+='<circle cx="12" cy="11" r="8.1" fill="'+SKIN+'"/>';
+  // 耳朵
+  x+='<circle cx="4.4" cy="12" r="1.7" fill="'+SKIN_D+'"/>';
+  x+='<circle cx="19.6" cy="12" r="1.7" fill="'+SKIN_D+'"/>';
+  // 腮红
+  x+='<ellipse cx="6.9" cy="13.8" rx="1.7" ry="1" fill="'+BLUSH+'" opacity=".55"/>';
+  x+='<ellipse cx="17.1" cy="13.8" rx="1.7" ry="1" fill="'+BLUSH+'" opacity=".55"/>';
+  // 眼睛（豆豆眼 + 高光）+ 微笑
+  x+='<circle cx="9.3" cy="11.4" r="1.35" fill="'+DARK+'"/><circle cx="9.7" cy="10.9" r=".5" fill="#fff"/>';
+  x+='<circle cx="14.7" cy="11.4" r="1.35" fill="'+DARK+'"/><circle cx="15.1" cy="10.9" r=".5" fill="#fff"/>';
+  x+='<path d="M11 14.4q1 1.1 2 0" stroke="#a4655a" stroke-width=".75" fill="none" stroke-linecap="round"/>';
+  // 头发 / 厨师帽
+  if(hat){
+    x+='<ellipse cx="12" cy="3.4" rx="6.4" ry="3.4" fill="#fff"/>';
+    x+='<ellipse cx="7.8" cy="4" rx="3.6" ry="3" fill="#fff"/>';
+    x+='<ellipse cx="16.2" cy="4" rx="3.6" ry="3" fill="#fff"/>';
+    x+='<rect x="6.2" y="5.4" width="11.6" height="2.8" rx="1.4" fill="#eef2f8"/>';
+  }else{
+    x+='<path d="M3.9 11A8.1 8.1 0 0 1 20.1 11L20.1 9.6Q16.4 14 12 10.6Q7.6 14 3.9 9.6Z" fill="'+hair+'"/>';
+    if(style==='bun')x+='<circle cx="12" cy="2.8" r="3.1" fill="'+hair+'"/>';
+    if(style==='curly')x+='<circle cx="5.4" cy="8.4" r="2.7" fill="'+hair+'"/><circle cx="18.6" cy="8.4" r="2.7" fill="'+hair+'"/>';
+  }
+  return '<svg class="px" viewBox="0 0 24 32">'+x+'</svg>';
+}
+// 狗子（侧身坐姿/站姿，两帧）：viewBox 28×22
+function dogSVG(collar,frame){
+  const fur='#d5a274', furD='#b58757', furL='#e8c19a';
+  let x='';
+  x+='<ellipse cx="14" cy="20.4" rx="9" ry="1.7" fill="rgba(40,20,8,.22)"/>';
+  // 尾巴
+  x+='<path d="'+(frame?'M22.6 8.6q4.2-2.6 2.4-6.4':'M22.6 9.4q4.4-1.4 3.4-5.6')+'" stroke="'+fur+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
+  // 后腿
+  x+='<rect x="17.4" y="15.4" width="3" height="4.8" rx="1.4" fill="'+furD+'"/>';
+  x+='<rect x="21" y="15.4" width="3" height="4.8" rx="1.4" fill="'+fur+'"/>';
+  // 身体
+  x+='<ellipse cx="15" cy="12.6" rx="8" ry="5.4" fill="'+fur+'"/>';
+  x+='<ellipse cx="14" cy="14.6" rx="6" ry="3.2" fill="'+furL+'"/>';
+  // 前腿
+  x+='<rect x="8.4" y="15.4" width="3" height="4.8" rx="1.4" fill="'+furD+'"/>';
+  x+='<rect x="11.8" y="15.4" width="3" height="4.8" rx="1.4" fill="'+fur+'"/>';
+  // 项圈
+  x+='<path d="M8.6 15.2h7.4" stroke="'+(collar||'#ff9ec4')+'" stroke-width="2" stroke-linecap="round"/>';
+  // 头
+  x+='<circle cx="8.6" cy="9" r="6.6" fill="'+furL+'"/>';
+  // 耳朵（一只立一只垂，更可爱）
+  x+='<ellipse cx="3.4" cy="7.4" rx="2.6" ry="4.2" fill="'+furD+'" transform="rotate(-22 3.4 7.4)"/>';
+  x+='<ellipse cx="13.6" cy="5.6" rx="2.5" ry="3.8" fill="'+furD+'" transform="rotate(24 13.6 5.6)"/>';
+  // 嘴部
+  x+='<ellipse cx="4.4" cy="11.4" rx="3.4" ry="2.7" fill="#fbeed8"/>';
+  x+='<ellipse cx="2.4" cy="10.4" rx="1.3" ry="1.1" fill="'+DARK+'"/>';
+  x+='<path d="M4.2 12.4q1.2 1 2.4 0" stroke="'+DARK+'" stroke-width=".7" fill="none" stroke-linecap="round"/>';
+  // 眼睛
+  x+='<circle cx="7.8" cy="8.4" r="1.35" fill="'+DARK+'"/><circle cx="8.2" cy="7.9" r=".5" fill="#fff"/>';
+  // 腮红
+  x+='<ellipse cx="6.2" cy="11.4" rx="1.5" ry=".9" fill="'+BLUSH+'" opacity=".5"/>';
+  return '<svg class="px" viewBox="0 0 28 22">'+x+'</svg>';
+}
+// 两帧交替容器（走路/呼吸感）
+function frameSwap(svgA,svgB,cls){
+  return '<span class="pxchar '+(cls||'')+'">'+
+    '<span class="f0">'+svgA+'</span><span class="f1">'+svgB+'</span></span>';
+}
+function chibiChar(o,cls){
+  const d=o||{};
+  return frameSwap(chibiSVG(Object.assign({},d,{frame:0})),chibiSVG(Object.assign({},d,{frame:1})),cls);
+}
+function dogChar(collar,cls){
+  return frameSwap(dogSVG(collar,0),dogSVG(collar,1),cls);
+}
+
 /* ================= 2.5D 店铺场景 ================= */
 const MACHINE_SLOTS=[16,29,42,55,68,81];         // 后厨操作台上机器站位（%）
 function renderScene(){
@@ -2493,7 +2630,7 @@ function renderScene(){
   if(!act.dataset.built){
     act.dataset.built='1';
     act.innerHTML='<div class="actor s3-waiter" id="s3Waiter" style="--z:1"><span class="sh"></span>'+
-      '<span class="mv"><span class="bd">🧑‍🍳</span><span class="tray">🍽️</span></span></div>';
+      '<span class="mv"><span class="bd">'+chibiChar({hat:true,apron:true,cloth:'#ffffff',hair:'#4a3328'},'px-waiter')+'</span><span class="tray">🍽️</span></span></div>';
   }
   const spots=[{left:'20%',bottom:'22%',z:0.86},{left:'50%',bottom:'20%',z:0.92},{left:'78%',bottom:'18%',z:1}];
   state.queue.forEach((g,i)=>{
@@ -2515,8 +2652,14 @@ function renderScene(){
     if(gp.textContent!==gpTxt)gp.textContent=gpTxt;
     gp.classList.toggle('done',has);
     const bd=el.querySelector('.bd');
-    const face=g.fx==='paid'?FACE_PAID:(g.fx==='happy'?FACE_HAPPY:g.face);
-    if(bd.textContent!==face)bd.textContent=face;
+    // 客人：Q 版小人（每人固定一套发色/衣服/发型），表情用右上角小图标
+    const pal=CHIBI_PALS[i%CHIBI_PALS.length];
+    const style=CHIBI_STYLES[i%CHIBI_STYLES.length];
+    const key=pal.hair+pal.cloth+style;
+    const face=g.fx==='paid'?'😍':(g.fx==='happy'?'😋':'');
+    const want=chibiChar({hair:pal.hair,cloth:pal.cloth,pants:pal.pants,style:style},'px-guest')+
+      (face?'<span class="gfx">'+face+'</span>':'');
+    if(bd.dataset.k!==key+face){bd.dataset.k=key+face;bd.innerHTML=want}
   });
   for(let i=state.queue.length;i<6;i++){
     const el=document.getElementById('s3Guest'+i);
@@ -2581,11 +2724,11 @@ function bumpCombo(){
 /* ================= 宠物系统 ================= */
 // 成长阶段：投喂货架上做好的菜来长大（等级越高，样子越大、越花哨）
 const PET_STAGES=[
-  {lv:1,e:'🐶',n:'小奶狗',size:26,tip:'刚来到店里，什么都要闻一闻'},
-  {lv:2,e:'🐕',n:'看店狗',size:31,tip:'会坐在吧台边帮你迎客了',perk:'每 30 秒帮你捡点金币'},
-  {lv:3,e:'🦮',n:'老伙计',size:36,tip:'听得懂你的口令，全场售价 +5%',perk:'全场售价 +5%'},
-  {lv:4,e:'🐕‍🦺',n:'镇店之宝',size:41,tip:'客人都是冲着它来的，赏金 +10%',perk:'客人赏金 +10%'},
-  {lv:5,e:'🌟',n:'传说店员',size:46,tip:'它已经是这家店的招牌，稀有客人出现率翻倍',perk:'稀有客人出现率 ×2'},
+  {lv:1,e:'🐶',n:'小奶狗',size:24,tip:'刚来到店里，什么都要闻一闻'},
+  {lv:2,e:'🐕',n:'看店狗',size:27,tip:'会坐在吧台边帮你迎客了',perk:'每 30 秒帮你捡点金币'},
+  {lv:3,e:'🦮',n:'老伙计',size:30,tip:'听得懂你的口令，全场售价 +5%',perk:'全场售价 +5%'},
+  {lv:4,e:'🐕‍🦺',n:'镇店之宝',size:33,tip:'客人都是冲着它来的，赏金 +10%',perk:'客人赏金 +10%'},
+  {lv:5,e:'🌟',n:'传说店员',size:36,tip:'它已经是这家店的招牌，稀有客人出现率翻倍',perk:'稀有客人出现率 ×2'},
 ];
 const PET_NEED=[0,60,180,500,1200,0];              // 升到下一级需要的成长值（下标=当前等级）
 const PET_LINES={
@@ -2650,8 +2793,10 @@ function renderPet(){
     bowl.onclick=openPetPanel;
     box.appendChild(bowl);
   }
-  const html='<span style="font-size:'+st.size+'px">'+face+'</span><span class="pet-mood">'+moodIcon+'</span>';
+  const html='<span class="pet-sprite">'+dogChar(PET_COLLARS[Math.min(st.lv,5)-1],'px-pet')+'</span>'+
+    '<span class="pet-mood">'+moodIcon+'</span>'+(face==='😋'?'<span class="pet-eat">😋</span>':'');
   if(btn._h!==html){btn._h=html;btn.innerHTML=html}
+  btn.style.setProperty('--petw',st.size+'px');
   btn.setAttribute('aria-label','摸摸'+p.name);
   if(!p.met){p.met=true;save();setTimeout(()=>petSay('idle'),1200);}
 }

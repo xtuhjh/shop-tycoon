@@ -378,6 +378,19 @@ body{
 .p-e-inline{display:none}   /* 窄屏把 emoji 收进菜名行，省掉独立图标列 */
 .card .p-info{font-size:11px;color:#8d7a92;margin-top:1px}
 .card .p-info b{color:#f0783c}
+/* ===== 出餐台/稀有：固定 2×2 四方格（任何屏宽都一样，不再随宽度变成一行一道菜）===== */
+#paneUp,#paneRare{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:start}
+#paneUp .card,#paneRare .card{
+  flex-direction:column;align-items:stretch;gap:5px;padding:8px 10px;margin-bottom:0;min-height:92px;
+}
+#paneUp .card .p-emoji,#paneRare .card .p-emoji{display:none}         /* 图标收进菜名行，给四宫格省位置 */
+#paneUp .card .p-e-inline,#paneRare .card .p-e-inline{display:inline;margin-right:2px}
+#paneUp .card .p-acts,#paneRare .card .p-acts{flex-direction:row;min-width:0;gap:5px;margin-top:auto}
+#paneUp .card .p-btn,#paneRare .card .p-btn{flex:1;min-width:0;padding:6px 4px;font-size:11.5px;line-height:1.15}
+#paneUp .card .p-info,#paneRare .card .p-info{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#paneUp .card.rare .p-info,#paneRare .card.rare .p-info{
+  white-space:normal;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;line-height:1.35;
+}
 .card .bar{height:4px;background:#f3edf5;border-radius:99px;margin-top:4px;overflow:hidden}
 .card .bar i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#ffb347,#ff5e62);border-radius:99px;transition:width .18s linear}
 .card .bar.rare i{background:linear-gradient(90deg,#f5c242,#e89b0c)}
@@ -775,16 +788,11 @@ body{
   .gb-left{font-size:8px}
   .gb-skip{font-size:8px;padding:0 3px}
   .card{padding:8px 10px;gap:9px;margin-bottom:7px;border-radius:14px}
-  /* 出餐台改双列紧凑卡片：单列时一屏只看得到 2 张，菜品「展示不全」 */
-  #paneUp,#paneRare{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:7px;align-content:start}
-  #paneUp,#paneRare .card{flex-direction:column;align-items:stretch;gap:6px;padding:7px 9px;margin-bottom:0}
-  #paneUp,#paneRare .card .p-emoji{display:none}
-  #paneUp,#paneRare .card .p-e-inline{display:inline;margin-right:2px}
-  #paneUp,#paneRare .card .p-acts{flex-direction:row;min-width:0;gap:5px}
-  #paneUp,#paneRare .card .p-btn{flex:1;min-width:0;padding:6px 4px;font-size:11px;line-height:1.15}
-  #paneUp,#paneRare .card .p-info{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  /* 稀有卡的信息要能看全（卖价 + 镇店收益），允许两行 */
-  #paneUp,#paneRare .card.rare .p-info{white-space:normal;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;line-height:1.35}
+  /* 出餐台的 2×2 四宫格与卡片内部排布已在基础样式里定义（任何屏宽一致），这里只做字号微调 */
+  #paneUp .card .p-name,#paneRare .card .p-name{font-size:14px}
+  #paneUp .card .p-info,#paneRare .card .p-info{font-size:11.5px}
+  #paneUp .card .p-acts,#paneRare .card .p-acts{gap:5px}
+  #paneUp .card .p-btn,#paneRare .card .p-btn{padding:6px 4px;font-size:11px}
   .card .p-emoji{font-size:27px;width:38px}
   .card .p-name{font-size:14px}
   .card .p-info{font-size:11.5px}

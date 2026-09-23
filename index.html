@@ -80,47 +80,119 @@ body{
 .shop-chip.locked{opacity:.5;background:rgba(255,255,255,.4);cursor:not-allowed}
 .shop-chip .sc-tag{background:#f1e7f5;color:#9b59b6;border-radius:6px;padding:1px 5px;font-size:10px;font-weight:800}
 
-/* ===== 吧台场景 ===== */
-.bar-scene{
-  position:relative;border-radius:18px;overflow:hidden;margin-bottom:10px;
-  background:linear-gradient(180deg,#fff8ec 0%,#ffedd3 58%,#ffe0b8 100%);
-  box-shadow:0 6px 20px rgba(180,130,60,.2);border:1px solid #f2dcb6;
+/* ===== 2.5D 店铺场景 ===== */
+.shop3d{
+  position:relative;height:238px;border-radius:18px;overflow:hidden;margin-bottom:10px;
+  background:linear-gradient(180deg,#2b2038 0%,#452f42 30%,#7a4a3a 62%,#a8683c 100%);
+  box-shadow:0 8px 24px rgba(60,30,20,.3),inset 0 0 0 1px rgba(255,255,255,.08);
 }
-.bar-inside{display:flex;align-items:center;gap:7px;padding:9px 11px 4px}
-.bar-sign{
-  display:flex;align-items:center;gap:5px;font-weight:800;font-size:12.5px;color:#8a6d2f;
-  background:rgba(255,255,255,.78);border-radius:10px;padding:3px 8px;
+/* 后墙 */
+.s3-wall{position:absolute;left:0;right:0;top:0;height:62%;
+  background:linear-gradient(180deg,#5a3b4e 0%,#7d4f3d 48%,#a86b45 100%)}
+.s3-wall:after{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,rgba(255,225,180,.06) 0 2px,transparent 2px 28px)}
+.s3-lamp{position:absolute;left:50%;top:-8px;width:78%;height:72%;transform:translateX(-50%);
+  background:radial-gradient(ellipse at 50% 0%,rgba(255,220,150,.55),transparent 72%);pointer-events:none}
+/* 墙上的菜单板与置物架（填充空洞） */
+.s3-board{position:absolute;left:33%;top:22px;width:32%;height:40px;border-radius:6px;
+  background:linear-gradient(180deg,#3b2a24,#261b18);border:2px solid #96713c;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 3px 8px rgba(0,0,0,.3)}
+.s3-board:after{content:'';position:absolute;inset:6px 8px;
+  background:repeating-linear-gradient(180deg,rgba(255,214,140,.55) 0 2px,transparent 2px 9px)}
+.s3-shelf{position:absolute;right:7%;top:70px;width:22%;height:7px;border-radius:3px;
+  background:linear-gradient(180deg,#b0773c,#7c5226);box-shadow:0 3px 6px rgba(0,0,0,.35)}
+.s3-shelf:before{content:'🍶 🏺';position:absolute;bottom:5px;left:14%;font-size:12px;letter-spacing:2px}
+/* 墙上招牌 */
+.s3-sign{
+  position:absolute;left:9px;top:8px;z-index:6;display:flex;align-items:center;gap:5px;
+  font-weight:800;font-size:12.5px;color:#5c4300;background:linear-gradient(180deg,#ffe9a8,#f5c242);
+  border:2px solid #a9761c;border-radius:11px;padding:3px 9px;cursor:pointer;font-family:inherit;
+  box-shadow:0 4px 10px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.6);
 }
-.bar-sign em{font-style:normal;font-size:10px;background:#f5c242;color:#5c4300;border-radius:6px;padding:1px 5px;font-weight:800}
-.bar-hint{margin-left:auto;font-size:10px;color:#b09454;font-weight:600;text-align:right;line-height:1.35}
-/* 吧台里忙碌的服务员 */
-.bar-staff{position:relative;height:48px;margin:0 11px}
-.bar-staff .kitchen{
-  height:100%;border-radius:12px 12px 0 0;overflow:hidden;
-  background:repeating-linear-gradient(90deg,#ffeecf,#ffeecf 16px,#ffe5c0 16px,#ffe5c0 32px);
-  display:flex;align-items:flex-end;justify-content:center;
+.s3-sign:active{transform:scale(.95)}
+.s3-sign em{font-style:normal;font-size:10px;background:#5c4300;color:#ffe9a8;border-radius:6px;padding:1px 5px;font-weight:800}
+.s3-night{position:absolute;right:9px;top:10px;z-index:6;font-size:10px;font-weight:800;color:#fff;
+  background:linear-gradient(135deg,#4a4a8a,#20204a);border-radius:8px;padding:3px 7px;white-space:nowrap;
+  box-shadow:0 2px 6px rgba(0,0,0,.4)}
+/* 后厨操作台 + 生产机器 */
+.s3-ck{position:absolute;left:4%;right:4%;bottom:0;height:26px;border-radius:5px 5px 0 0;
+  background:linear-gradient(180deg,#d3a067,#9c6a34 70%);box-shadow:0 3px 0 #7c5226,0 8px 16px rgba(0,0,0,.35)}
+.machine{position:absolute;bottom:20px;width:42px;display:flex;flex-direction:column;align-items:center;
+  transform:translateX(-50%)}
+.machine .m-body{font-size:23px;line-height:1;filter:drop-shadow(0 3px 4px rgba(0,0,0,.4))}
+.machine.cooking .m-body{animation:mCook .9s ease-in-out infinite}
+@keyframes mCook{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-3px) scale(1.08)}}
+.machine .m-bar{width:32px;height:5px;border-radius:9px;background:rgba(0,0,0,.42);overflow:hidden;margin-top:3px}
+.machine .m-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffd166,#ff8a5b);border-radius:9px;transition:width .2s linear}
+.machine .m-badge{position:absolute;top:-8px;right:-2px;font-size:9px;font-weight:800;color:#fff;
+  background:#22a55c;border-radius:7px;padding:0 4px;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+/* 透视地板（更亮，格纹清晰才有 2.5D 纵深） */
+.s3-floor{position:absolute;left:-18%;right:-18%;bottom:0;height:52%;
+  transform:perspective(320px) rotateX(52deg);transform-origin:bottom center;
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(255,220,150,.35),transparent 62%),
+    repeating-conic-gradient(#f0d3a4 0% 25%,#dcbb8b 0% 50%) 50%/26px 26px;
+  box-shadow:inset 0 26px 44px rgba(60,30,10,.42)}
+/* 客人面前的吧台台面 */
+.s3-bar{position:absolute;left:1%;right:1%;bottom:32%;height:15px;border-radius:5px;z-index:5;
+  background:linear-gradient(180deg,#e8b06a,#bd8033 55%,#94601f);
+  box-shadow:0 6px 14px rgba(0,0,0,.45),inset 0 2px 0 rgba(255,255,255,.42)}
+.s3-hint{position:absolute;right:9px;top:34px;z-index:6;font-size:9.5px;font-weight:700;color:#ffe9c0;
+  text-align:right;line-height:1.45;text-shadow:0 1px 3px rgba(0,0,0,.6);opacity:.9}
+/* 场景里的角色（直立、带影子、按深度缩放） */
+.actor{position:absolute;z-index:5;transform:translateX(-50%) scale(var(--z,1));transform-origin:bottom center}
+.actor .sh{position:absolute;left:50%;bottom:-3px;width:20px;height:6px;border-radius:50%;
+  background:rgba(40,18,6,.34);transform:translateX(-50%)}
+.actor .bd{display:block;font-size:22px;line-height:1;animation:bob .6s ease-in-out infinite;
+  filter:drop-shadow(0 3px 4px rgba(0,0,0,.35))}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2.5deg)}50%{transform:translateY(-3px) rotate(2.5deg)}}
+/* 服务员：在吧台后的厨房过道来回走，上菜时走到吧台前 */
+.s3-waiter{left:44%;bottom:34%}
+.s3-waiter .mv{animation:walkX 11s ease-in-out infinite}
+@keyframes walkX{0%,100%{transform:translateX(-52px)}50%{transform:translateX(52px)}}
+.s3-waiter.serving .mv{animation:serveRun 1.25s ease-in-out}
+@keyframes serveRun{
+  0%{transform:translateX(-52px) translateY(0)}
+  35%{transform:translateX(-4px) translateY(12px)}
+  50%{transform:translateX(0) translateY(14px)}
+  65%{transform:translateX(4px) translateY(12px)}
+  100%{transform:translateX(-52px) translateY(0)}
 }
-.bar-staff .st-pot{font-size:20px;margin-bottom:5px;animation:busy 2.1s .3s ease-in-out infinite}
-.bar-staff .st-chef{font-size:31px;line-height:1;animation:busy 1.6s ease-in-out infinite;transform-origin:50% 92%}
-.bar-staff .st-tray{font-size:16px;margin-bottom:7px;animation:carry 3.4s ease-in-out infinite}
-.bar-staff .st-steam{
-  position:absolute;left:calc(50% - 34px);bottom:30px;font-size:11px;opacity:0;
-  animation:steam 3s ease-out infinite;
+.s3-waiter .tray{position:absolute;left:50%;top:-9px;transform:translateX(-50%);font-size:13px}
+.s3-waiter.serving .tray{animation:trayUp 1.25s ease-in-out}
+@keyframes trayUp{0%{transform:translateX(-50%) translateY(0)}45%,60%{transform:translateX(-50%) translateY(-4px) scale(1.15)}100%{transform:translateX(-50%) translateY(0)}}
+/* 吧台前的客人（场景里的立牌，与下方订单卡同步） */
+.actor.g{z-index:6}
+.actor.g .gp{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:1px;
+  font-size:8.5px;font-weight:800;color:#5c4300;background:rgba(255,246,224,.92);border-radius:8px;
+  padding:0 4px;white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,.28)}
+.actor.g .gp.done{background:#43e97b;color:#0b3d22}
+.actor.g.happy .bd{animation:gHop .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes gHop{0%{transform:translateY(0)}40%{transform:translateY(-9px) scale(1.1)}100%{transform:translateY(0)}}
+.actor.g.paid .bd{animation:gLeave .9s ease forwards}
+@keyframes gLeave{0%{transform:scale(1)}35%{transform:scale(1.12) rotate(-8deg)}100%{transform:translateY(-14px) scale(.7) rotate(14deg);opacity:0}}
+/* 狗子：在前面空地溜达玩耍 */
+.bar-pet{position:absolute;left:30%;bottom:5%;z-index:8;display:flex;align-items:flex-end;gap:3px;
+  transform:translateX(-50%);animation:petWander 19s ease-in-out infinite}
+@keyframes petWander{
+  0%{transform:translateX(-50%) translateX(-62px) scaleX(1)}
+  18%{transform:translateX(-50%) translateX(26px) scaleX(1)}
+  22%{transform:translateX(-50%) translateX(30px) scaleX(-1)}
+  40%{transform:translateX(-50%) translateX(-24px) scaleX(-1)}
+  44%{transform:translateX(-50%) translateX(-28px) scaleX(1)}
+  62%{transform:translateX(-50%) translateX(48px) scaleX(1)}
+  66%{transform:translateX(-50%) translateX(50px) scaleX(-1)}
+  84%{transform:translateX(-50%) translateX(10px) scaleX(-1)}
+  88%{transform:translateX(-50%) translateX(8px) scaleX(1)}
+  100%{transform:translateX(-50%) translateX(-62px) scaleX(1)}
 }
-@keyframes steam{0%{opacity:0;transform:translateY(4px) scale(.7)}25%{opacity:.75}100%{opacity:0;transform:translateY(-16px) scale(1.35)}}
-@keyframes busy{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-4px) rotate(5deg)}}
-@keyframes carry{
-  0%,100%{transform:translateX(-30px) translateY(2px) scale(.88);opacity:.5}
-  45%,60%{transform:translateX(2px) translateY(-3px) scale(1.08);opacity:1}
-}
-/* 吧台台面（客人把盘子放这上面） */
-.bar-surface{
-  height:15px;margin:0 5px;border-radius:4px;
-  background:linear-gradient(180deg,#d09853,#ab7231 52%,#8a5a20);
-  box-shadow:0 3px 9px rgba(120,80,30,.32),inset 0 2px 0 rgba(255,255,255,.4);
-}
-/* 吧台前排队等餐的客人 */
-.bar-guests{display:flex;gap:6px;padding:0 7px 9px;align-items:flex-start;margin-top:-9px}
+.bar-pet.rush .pet-btn{animation:petRush .8s ease-in-out infinite}
+@keyframes petRush{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px) scale(1.12)}}
+/* 吧台上的小玩意 */
+.bar-trinkets{position:absolute;right:10px;bottom:31%;display:flex;gap:6px;align-items:flex-end;z-index:7}
+
+/* 吧台前排队等餐的客人（订单卡，与场景里的客人立牌同步） */
+.bar-guests{display:flex;gap:6px;padding:0 2px 9px;align-items:flex-start;margin-top:6px}
 .bguest{
   flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;
   background:rgba(255,255,255,.66);border-radius:12px;padding:5px 4px 6px;border:1.5px solid transparent;
@@ -527,10 +599,14 @@ body{
   .stats-bar{font-size:11.5px;padding:7px 10px;gap:3px}
   .shop-chip{font-size:11px;padding:6px 8px}
   .shop-chip .sc-e{font-size:15px}
-  .bar-inside{padding:8px 9px 3px}
-  .bar-hint{font-size:9.5px}
-  .bar-staff{height:44px;margin:0 9px}
-  .bar-staff .st-chef{font-size:27px}
+  /* 2.5D 场景在手机上略矮、机器略小 */
+  .shop3d{height:212px}
+  .machine{width:38px}
+  .machine .m-body{font-size:21px}
+  .machine .m-bar{width:28px}
+  .actor .bd{font-size:20px}
+  .s3-board{height:34px;top:20px}
+  .s3-hint{font-size:9px;top:32px}
   .bar-guests{gap:4px;padding:0 5px 8px}
   .bguest{padding:4px 3px 5px;border-radius:10px;gap:2px}
   .bguest .bg-face{font-size:21px}
@@ -641,25 +717,24 @@ body{
     <section id="page-shop" class="page active">
       <div class="stats-bar" id="statsBar"></div>
       <div class="shop-strip" id="shopStrip"></div>
-      <div class="bar-scene">
-        <div class="bar-inside">
-          <button class="bar-sign" id="barSign" aria-label="吧台招牌，连点试试看">
-            <span id="barSignEmoji">🛖</span><span id="barSignName">街边小摊</span><em id="barSignLv">Lv.1</em>
-          </button>
-          <span class="bar-night hidden" id="barNight">🌙 深夜赏金 ×3</span>
-          <span class="bar-hint">点下面货架上<b>做好的菜</b><br>自动端给排队的第一位客人</span>
+      <!-- 2.5D 店铺场景：后厨机器在生产、服务员走动上菜、狗子玩耍 -->
+      <div class="shop3d" id="shop3d">
+        <div class="s3-wall"><div class="s3-lamp"></div><div class="s3-board"></div><div class="s3-shelf"></div>
+          <div class="s3-ck"></div>
+          <div id="s3Machines"></div>
         </div>
-        <div class="bar-staff" aria-hidden="true">
-          <div class="kitchen">
-            <span class="st-pot">🍳</span><span class="st-chef">🧑‍🍳</span><span class="st-tray">🍽️</span>
-          </div>
-          <span class="st-steam">💨</span>
-        </div>
-        <div class="bar-surface"></div>
-        <div class="bar-pet" id="barPet"></div>
+        <div class="s3-floor"></div>
+        <div class="s3-bar"></div>
+        <button class="s3-sign" id="barSign" aria-label="吧台招牌，连点试试看">
+          <span id="barSignEmoji">🛖</span><span id="barSignName">街边小摊</span><em id="barSignLv">Lv.1</em>
+        </button>
+        <span class="s3-night hidden" id="barNight">🌙 深夜赏金 ×3</span>
+        <span class="s3-hint">点货架上做好的菜<br>服务员会自动端给客人</span>
+        <div id="s3Actors"></div>
         <div class="bar-trinkets" id="barTrinkets"></div>
-        <div class="bar-guests" id="barGuests"></div>
+        <div class="bar-pet" id="barPet"></div>
       </div>
+      <div class="bar-guests" id="barGuests"></div>
       <div style="font-size:13.5px;font-weight:800;color:#6b5b6e;margin:8px 0 7px">🧺 货架（按时间自动生产，每样最多囤 5 件）</div>
       <div id="productList"></div>
       <div class="actions">
@@ -892,18 +967,23 @@ function bumpEl(el){
   void el.offsetWidth;
   el.classList.add('bump');
 }
-// 后厨出餐：大厨把新做好的菜送到货架（限并发，避免刷屏）
+// 后厨出餐：机器把新做好的菜送到货架（限并发，避免刷屏）
 let produceFlights=0;
 const PRODUCE_FLIGHT_MAX=3;
 function flyProduce(idx,emoji){
   if(produceFlights>=PRODUCE_FLIGHT_MAX)return;
-  const kit=document.querySelector('.bar-staff .st-chef');
+  const kit=document.querySelector('.machine[data-i="'+idx+'"]');
   const card=document.getElementById('pcard'+idx);
   if(!kit||!card)return;
   const cr=card.getBoundingClientRect();
   if(cr.bottom<0||cr.top>window.innerHeight)return;   // 卡片不在屏幕里就不飞
   produceFlights++;
   const el=flyTo(kit,card.querySelector('.p-emoji'),emoji,{mini:true});
+  const badge=kit.querySelector('.m-badge');
+  if(badge){
+    badge.classList.remove('hidden');badge.classList.add('bump');
+    setTimeout(()=>{badge.classList.add('hidden');badge.classList.remove('bump')},900);
+  }
   setTimeout(()=>{
     produceFlights--;
     bumpEl(document.querySelector('#pcard'+idx+' .stock-tag'));
@@ -1153,6 +1233,7 @@ function serveItem(key){
   g.tray[key]=(g.tray[key]||0)+1;
   const done=guestServed(g);
   save();
+  waiterServe();                                    // 服务员走到吧台前递菜
   if(done){
     completeOrder(idx,srcSel,emoji);
   }else{
@@ -1412,6 +1493,7 @@ function renderBar(){
   });
   renderTrinkets();
   renderPet();
+  renderScene();
 }
 function skipGuest(i){
   if(orderBusy)return;
@@ -1650,6 +1732,7 @@ function tick(){
     }
   }
   petTick(now);                                     // 宠物：心情/捡金币/自言自语
+  if(now-(tick._scene||0)>240){tick._scene=now;sceneTick()}   // 2.5D 场景：机器进度
   if(now-(tick._btn||0)>1500){
     tick._btn=now;
     const ub=$('#btnUpShop'),nb=$('#btnNewShop'),next=SHOPS[state.shopTier+1];
@@ -1999,6 +2082,85 @@ function checkDaily(){
   updateHUD();
 }
 
+/* ================= 2.5D 店铺场景 ================= */
+const MACHINE_SLOTS=[16,29,42,55,68,81];         // 后厨操作台上机器站位（%）
+function renderScene(){
+  const box=document.getElementById('s3Machines');
+  if(!box)return;
+  // ① 后厨机器：每个已解锁商品一台，生产中冒泡+进度条
+  const list=[];
+  state.unlocked.forEach((u,i)=>{if(u&&list.length<6)list.push(i)});
+  const sig=list.join(',');
+  if(box.dataset.sig!==sig){
+    box.dataset.sig=sig;
+    box.innerHTML=list.map((idx,k)=>
+      '<div class="machine" data-i="'+idx+'" style="left:'+MACHINE_SLOTS[k]+'%">'+
+        '<span class="m-body">'+PRODUCTS[idx].e+'</span>'+
+        '<span class="m-bar"><i></i></span>'+
+        '<span class="m-badge hidden" data-badge="'+idx+'">+1</span>'+
+      '</div>').join('');
+  }
+  // ② 服务员 + ③ 客人立牌
+  const act=document.getElementById('s3Actors');
+  if(!act)return;
+  if(!act.dataset.built){
+    act.dataset.built='1';
+    act.innerHTML='<div class="actor s3-waiter" id="s3Waiter" style="--z:1"><span class="sh"></span>'+
+      '<span class="mv"><span class="bd">🧑‍🍳</span><span class="tray">🍽️</span></span></div>';
+  }
+  const spots=[{left:'20%',bottom:'22%',z:0.86},{left:'50%',bottom:'20%',z:0.92},{left:'78%',bottom:'18%',z:1}];
+  state.queue.forEach((g,i)=>{
+    const sp=spots[i]||spots[2];
+    let el=document.getElementById('s3Guest'+i);
+    if(!el){
+      el=document.createElement('div');
+      el.className='actor g';el.id='s3Guest'+i;
+      el.setAttribute('aria-hidden','true');    // 场景立牌是装饰，功能在下方订单卡
+      el.innerHTML='<span class="sh"></span><span class="gp"></span><span class="bd"></span>';
+      act.appendChild(el);
+    }
+    el.style.left=sp.left;el.style.bottom=sp.bottom;el.style.setProperty('--z',sp.z);
+    const has=Object.keys(g.tray).length>0;
+    const cls='actor g'+(g.fx==='happy'?' happy':'')+(g.fx==='paid'?' paid':'');
+    if(el.className!==cls)el.className=cls;
+    const gp=el.querySelector('.gp');
+    const gpTxt=(has?'🍽️ ':'')+'第'+(i+1)+'位';
+    if(gp.textContent!==gpTxt)gp.textContent=gpTxt;
+    gp.classList.toggle('done',has);
+    const bd=el.querySelector('.bd');
+    const face=g.fx==='paid'?FACE_PAID:(g.fx==='happy'?FACE_HAPPY:g.face);
+    if(bd.textContent!==face)bd.textContent=face;
+  });
+  for(let i=state.queue.length;i<6;i++){
+    const el=document.getElementById('s3Guest'+i);
+    if(el)el.remove();
+  }
+  renderPet();
+}
+// 场景低频刷新：机器进度条与生产中动画
+function sceneTick(){
+  const box=document.getElementById('s3Machines');
+  if(!box)return;
+  box.querySelectorAll('.machine').forEach(m=>{
+    const i=+m.dataset.i;
+    const full=state.stock[i]>=STOCK_CAP;
+    m.classList.toggle('cooking',!full);
+    const bar=m.querySelector('.m-bar i');
+    if(bar)bar.style.width=(full?100:(progs[i]||0)*100).toFixed(1)+'%';
+  });
+}
+// 上菜时服务员走到吧台前递菜（状态已即时结算，这里只做表演）
+let waiterBusy=0;
+function waiterServe(){
+  const w=document.getElementById('s3Waiter');
+  if(!w)return;
+  const now=Date.now();
+  if(now-(waiterBusy||0)<900)return;               // 连续上菜不打断走路
+  waiterBusy=now;
+  w.classList.add('serving');
+  setTimeout(()=>w.classList.remove('serving'),1280);
+}
+
 /* ================= 宠物系统 ================= */
 // 成长阶段：投喂货架上做好的菜来长大（等级越高，样子越大、越花哨）
 const PET_STAGES=[
@@ -2268,6 +2430,7 @@ renderChips();
 refreshEggBadge();
 renderTrinkets();
 renderPet();
+renderScene();
 $('#barSign').onclick=signClick;
 $('#btnCombo').onclick=doCombo;
 $('#btnEggs').onclick=()=>{$('#menuModal').classList.add('hidden');renderEggsPanel()};

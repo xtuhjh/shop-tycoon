@@ -337,6 +337,43 @@ body{
 .cell.sel{border-color:#ff5e62;box-shadow:0 0 0 3px rgba(255,94,98,.3);transform:scale(1.06)}
 .cell.pop{animation:pop .3s ease}
 @keyframes pop{0%{transform:scale(.3)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+/* ===== 果冻效果 ===== */
+.cell.jelly{animation:jelly .52s cubic-bezier(.3,1.25,.4,1)}
+.cell.jelly .c-emoji{animation:jelly .52s cubic-bezier(.3,1.25,.4,1)}
+@keyframes jelly{
+  0%{transform:scale(1,1) rotate(0)}
+  22%{transform:scale(1.18,.82) rotate(-3.5deg)}
+  42%{transform:scale(.88,1.14) rotate(2.5deg)}
+  62%{transform:scale(1.08,.93) rotate(-1.5deg)}
+  80%{transform:scale(.97,1.03) rotate(.6deg)}
+  100%{transform:scale(1,1) rotate(0)}
+}
+.cell.filled{cursor:grab;touch-action:none}
+.cell.filled:active{cursor:grabbing}
+/* 拖动中的源格子：掏空感 */
+.cell.drag-src{opacity:.32;border-style:dashed;border-color:#ff5e62;box-shadow:none;transform:scale(.94)}
+/* 拖动悬停目标 */
+.cell.drop-ok{border-color:#43e97b;box-shadow:0 0 0 4px rgba(67,233,123,.38);transform:scale(1.07)}
+.cell.drop-move{border-color:#5b86e5;box-shadow:0 0 0 4px rgba(91,134,229,.32);transform:scale(1.05)}
+.cell.drop-no{border-color:#ff8e8e;box-shadow:0 0 0 4px rgba(255,120,120,.26)}
+.cell.drop-ok .c-emoji{animation:jelly .7s ease-in-out infinite}
+/* 拖到「出货模式」按钮上直接卖掉 */
+#btnShipMode.ship-hover{background:linear-gradient(135deg,#ff5858,#f857a6);color:#fff;transform:scale(1.03);
+  box-shadow:0 0 0 4px rgba(248,87,166,.35),0 5px 18px rgba(248,87,166,.4)}
+/* 跟着手指走的果冻替身 */
+.drag-ghost{position:fixed;z-index:220;pointer-events:none;transform:translate(-50%,-50%)}
+.drag-ghost i{
+  display:block;font-style:normal;font-size:33px;line-height:1;
+  animation:ghostJelly .92s ease-in-out infinite;
+  filter:drop-shadow(0 9px 11px rgba(0,0,0,.3));
+}
+@keyframes ghostJelly{
+  0%,100%{transform:scale(1.18,.88) rotate(-7deg)}
+  50%{transform:scale(.9,1.16) rotate(6deg)}
+}
+/* 拖动玩法提示 */
+.drag-hint{font-size:11px;color:#a08fa6;font-weight:700;text-align:center;margin-top:8px}
+.drag-hint b{color:#9b59b6}
 .cell.hidden-item{border-color:#f5c242}
 .cell.hidden-item::before{
   content:'';position:absolute;inset:0;
@@ -517,6 +554,7 @@ body{
       <div class="merge-head" id="mergeHead"></div>
       <div class="merge-tip" id="mergeTip"></div>
       <div id="grid"></div>
+      <div class="drag-hint">🖐 按住一道菜<b>拖动</b>到同级菜上直接合并 · 拖到空格可移动整理 · 拖到「出货模式」按钮上直接换能量 · 也可以点两下</div>
       <div class="lv-chips" id="lvChips"></div>
       <div class="merge-actions">
         <button class="big-btn" id="btnGen"></button>
@@ -541,7 +579,7 @@ body{
         <li>💰 <b>金币管商店线</b>：升级店铺（卖更快）、<b>开新店</b>（价格随你的收入自动缩放，永远是"攒一会儿"）、金币解锁商品、送走客人</li>
         <li>⚡ <b>能量管合成线</b>：生成产品、升级合成台；出货模式可把产品回收成能量</li>
         <li>🛍️ <b>点击店铺条</b>切换经营的店！小摊⚡翻倍、食堂客人奖励×1.6、白金餐厅稀有钱×2…</li>
-        <li>🔮 <b>合成台</b>：花能量生成产品，点两个<b>相同等级</b>合并升级，首次合出高等级自动上架货架；升级合成台可直生成高等级</li>
+        <li>🔮 <b>合成台</b>：花能量生成产品，<b>拖动</b>一道菜到同级菜上直接合并（点两下也行）；拖到空格可移动整理，拖到「出货模式」按钮上直接换能量</li>
         <li>✨ 合并时小概率蹦出<b>隐藏稀有钱</b> 🍀🌈👑（白金餐厅下出现率翻倍！）</li>
         <li>📦 出货模式：点击合成台里的产品直接换成能量</li>
       </ul>
@@ -1048,7 +1086,61 @@ function rollHidden(){
   }
   return null;
 }
+// 合并/移动的统一执行入口（点击两次与拖动都用它）
+// 返回 {kind:'merge'|'move'|'hidden'|'egg', to, from, level?} 或 null（不可操作）
+function applyMerge(from,to){
+  if(from===to)return null;
+  const a=state.grid[from], b=state.grid[to];
+  if(!a)return null;
+  if(!b){                                   // 空格 → 移动整理
+    state.grid[to]=a;state.grid[from]=null;
+    return {kind:'move',to,from};
+  }
+  if(a.hidden||b.hidden)return null;         // 稀有物不参与合并
+  if(a.level!==b.level)return null;          // 等级不同 → 弹回
+  if(a.level===MAX_LV){
+    state.grid[from]=null;state.grid[to]=null;
+    state.energy+=50000;
+    toast('🏆','两位大厨联手烹出传世珍馐！奖励 50000⚡');
+    floatText($('#grid'),'+5万⚡','#f8b500');
+    return {kind:'egg',to,from};
+  }
+  const hid=rollHidden();
+  if(hid){
+    state.grid[to]={hidden:hid};state.grid[from]=null;
+    unlockHidden(hid);
+    floatText($('#grid'),'✨'+HIDDEN[hid].e,'#e89b0c');
+    return {kind:'hidden',to,from};
+  }
+  state.grid[to]={level:b.level+1};state.grid[from]=null;
+  state.totalMerged++;
+  checkUnlock(b.level+1);
+  return {kind:'merge',to,from,level:b.level+1};
+}
+// 合并后的统一收尾：渲染 + 果冻 + 光环
+function afterMerge(res){
+  if(!res)return false;
+  selIdx=-1;
+  lastMergedIdx=res.to;
+  renderGrid(true);updateHUD();save();
+  jellyEl(cellEls[res.to]);
+  popRing(cellEls[res.to],res.kind==='merge');
+  if(res.kind==='merge'||res.kind==='hidden'||res.kind==='egg'){
+    jellyEl(cellEls[res.from]);
+    popRing(cellEls[res.from]);
+  }
+  if(res.kind==='merge')floatText(cellEls[res.to],'Lv.'+res.level+' 🎉','#9b59b6');
+  return true;
+}
+function jellyEl(el){
+  if(!el)return;
+  el.classList.remove('jelly');
+  void el.offsetWidth;
+  el.classList.add('jelly');
+  setTimeout(()=>el.classList.remove('jelly'),560);
+}
 function cellClick(i){
+  if(Date.now()<suppressClickUntil)return;   // 刚拖动完，忽略这次 click
   const c=state.grid[i];
   if(shipMode){
     if(!c)return;
@@ -1063,35 +1155,9 @@ function cellClick(i){
   if(c.hidden){toast(HIDDEN[c.hidden].e,'稀有物不能合并～可出货换大量⚡，或留着镇店');return}
   if(selIdx===-1){selIdx=i;renderGrid();return}
   if(selIdx===i){selIdx=-1;renderGrid();return}
-  const a=state.grid[selIdx],b=state.grid[i];
-  const fromIdx=selIdx;                       // 记下源格子，用于合并光环
-  if(a&&b&&a.level===b.level){
-    if(a.level===MAX_LV){
-      state.grid[selIdx]=null;state.grid[i]=null;selIdx=-1;
-      state.energy+=50000;
-      toast('🏆','两位大厨联手烹出传世珍馐！奖励 50000⚡');
-      floatText($('#grid'),'+5万⚡','#f8b500');
-      renderGrid();updateHUD();save();
-      popRing(cellEls[i]);popRing(cellEls[fromIdx]);
-      return;
-    }
-    const hid=rollHidden();
-    if(hid){
-      state.grid[i]={hidden:hid};
-      state.grid[selIdx]=null;selIdx=-1;
-      unlockHidden(hid);
-      floatText($('#grid'),'✨'+HIDDEN[hid].e,'#e89b0c');
-    }else{
-      state.grid[i]={level:b.level+1};
-      state.grid[selIdx]=null;selIdx=-1;
-      state.totalMerged++;
-      checkUnlock(b.level+1);
-    }
-    renderGrid(true);updateHUD();save();
-    popRing(cellEls[i]);popRing(cellEls[fromIdx]);
-  }else{
-    selIdx=i;renderGrid();
-  }
+  const from=selIdx;
+  const res=applyMerge(from,i);
+  if(!afterMerge(res)){selIdx=i;renderGrid()}   // 合不了 → 改选中新的这个
 }
 function toggleShip(){
   shipMode=!shipMode;
@@ -1348,10 +1414,12 @@ function renderGrid(popNew){
     for(let i=0;i<GRID_SIZE;i++){
       const d=document.createElement('button');
       d.className='cell';
+      d.dataset.i=i;
       d.setAttribute('aria-label','空格子');
       d.onclick=()=>cellClick(i);
       g.appendChild(d);cellEls.push(d);
     }
+    g.addEventListener('pointerdown',gridPointerDown);
   }
   state.grid.forEach((c,i)=>{
     const d=cellEls[i];
@@ -1447,6 +1515,99 @@ function refreshStockBadges(){
       else{btn.disabled=false;btn.innerHTML='上菜 🍽️<br>剩 '+cur}
     }
   });
+}
+
+/* ================= 拖动合成 ================= */
+let drag=null, suppressClickUntil=0;
+function gridPointerDown(e){
+  if(shipMode)return;                                  // 出货模式保持点击
+  if(e.button!==undefined&&e.button!==0)return;        // 只响应左键/触摸
+  const cell=e.target&&e.target.closest?e.target.closest('.cell'):null;
+  if(!cell||cell.dataset.i===undefined)return;
+  const i=+cell.dataset.i, c=state.grid[i];
+  if(!c)return;
+  if(c.hidden){toast(HIDDEN[c.hidden].e,'稀有物不能拖动～可出货换大量⚡');return}
+  drag={from:i,el:cell,x0:e.clientX,y0:e.clientY,moved:false,ghost:null,over:-1};
+  window.addEventListener('pointermove',gridPointerMove,{passive:false});
+  window.addEventListener('pointerup',gridPointerUp);
+  window.addEventListener('pointercancel',gridPointerUp);
+}
+function gridPointerMove(e){
+  if(!drag)return;
+  if(!drag.moved){
+    const dx=e.clientX-drag.x0, dy=e.clientY-drag.y0;
+    if(dx*dx+dy*dy<64)return;                          // 位移<8px 仍算点击
+    drag.moved=true;
+    drag.el.classList.add('drag-src');
+    jellyEl(drag.el);                                  // 拔出来的果冻感
+    const gh=document.createElement('span');
+    gh.className='drag-ghost';
+    gh.innerHTML='<i>'+PRODUCTS[state.grid[drag.from].level-1].e+'</i>';
+    document.body.appendChild(gh);
+    drag.ghost=gh;
+    if(navigator.vibrate){try{navigator.vibrate(8)}catch(_){}}
+  }
+  e.preventDefault();
+  drag.ghost.style.left=e.clientX+'px';
+  drag.ghost.style.top=e.clientY+'px';
+  const under=document.elementFromPoint(e.clientX,e.clientY);
+  const shipBtn=document.getElementById('btnShipMode');
+  const onShipBtn=!!(under&&shipBtn&&(under===shipBtn||shipBtn.contains(under)));
+  if(onShipBtn!==drag.overShip){
+    drag.overShip=onShipBtn;
+    if(shipBtn)shipBtn.classList.toggle('ship-hover',onShipBtn);
+  }
+  if(onShipBtn){
+    if(drag.over>=0&&cellEls[drag.over])cellEls[drag.over].classList.remove('drop-ok','drop-move','drop-no');
+    drag.over=-1;
+    return;
+  }
+  const cell=under&&under.closest?under.closest('.cell'):null;
+  const to=cell&&cell.dataset.i!==undefined?+cell.dataset.i:-1;
+  if(to===drag.over)return;
+  if(drag.over>=0&&cellEls[drag.over])cellEls[drag.over].classList.remove('drop-ok','drop-move','drop-no');
+  drag.over=to;
+  if(to<0||to===drag.from)return;
+  const a=state.grid[drag.from], b=state.grid[to];
+  let cls='drop-no';
+  if(!b)cls='drop-move';
+  else if(!a.hidden&&!b.hidden&&a.level===b.level)cls='drop-ok';
+  if(cellEls[to])cellEls[to].classList.add(cls);
+}
+function gridPointerUp(){
+  window.removeEventListener('pointermove',gridPointerMove);
+  window.removeEventListener('pointerup',gridPointerUp);
+  window.removeEventListener('pointercancel',gridPointerUp);
+  if(!drag)return;
+  const d=drag;drag=null;
+  if(!d.moved)return;                                  // 没拖动 → 交给 click
+  suppressClickUntil=Date.now()+400;
+  if(d.ghost)d.ghost.remove();
+  d.el.classList.remove('drag-src');
+  const shipBtn=document.getElementById('btnShipMode');
+  if(shipBtn)shipBtn.classList.remove('ship-hover');
+  if(d.over>=0&&cellEls[d.over])cellEls[d.over].classList.remove('drop-ok','drop-move','drop-no');
+  // 拖到「出货模式」按钮 → 直接卖掉换能量
+  if(d.overShip){
+    const c=state.grid[d.from];
+    if(c){
+      const gain=c.hidden?HIDDEN[c.hidden].energy:shipGain(c.level);
+      state.energy+=gain;
+      state.grid[d.from]=null;selIdx=-1;
+      renderGrid();updateHUD();save();
+      jellyEl(cellEls[d.from]);
+      floatText(cellEls[d.from],'+'+fmt(gain)+'⚡','#f5a623');
+      toast('⚡','拖到出货口：+'+fmt(gain)+'⚡');
+    }
+    return;
+  }
+  if(d.over<0||d.over===d.from){jellyEl(d.el);return}  // 丢在空处 → 弹回
+  const res=applyMerge(d.from,d.over);
+  if(!afterMerge(res)){
+    jellyEl(d.el);                                     // 合不了 → 弹回
+    jellyEl(cellEls[d.over]);
+    toast(FACE_NO,'两道菜等级不一样，合不了～');
+  }
 }
 
 /* ================= 事件 ================= */

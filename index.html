@@ -14,7 +14,7 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
 html{height:100%;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{height:100%;overscroll-behavior-y:contain}
-button,.cell,.bguest,.bg-skip,.shop-chip,.chip,.p-btn,.mh-btn{touch-action:manipulation}
+button,.cell,.gb-skip,.shop-chip,.chip,.p-btn,.mh-btn{touch-action:manipulation}
 body{
   font-family:'Segoe UI',system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
   background:linear-gradient(175deg,#8ec5fc 0%,#e0c3fc 55%,#ffd6e8 100%);
@@ -89,20 +89,20 @@ body{
   background:linear-gradient(180deg,#2b2038 0%,#452f42 30%,#7a4a3a 62%,#a8683c 100%);
   box-shadow:0 8px 24px rgba(60,30,20,.3),inset 0 0 0 1px rgba(255,255,255,.08);
 }
-/* 后墙 */
-.s3-wall{position:absolute;left:0;right:0;top:0;height:62%;
+/* 后墙（要足够高，客人头顶的订单气泡得落在墙上） */
+.s3-wall{position:absolute;left:0;right:0;top:0;height:82%;
   background:linear-gradient(180deg,#5a3b4e 0%,#7d4f3d 48%,#a86b45 100%)}
 .s3-wall:after{content:'';position:absolute;inset:0;
   background:repeating-linear-gradient(90deg,rgba(255,225,180,.06) 0 2px,transparent 2px 28px)}
 .s3-lamp{position:absolute;left:50%;top:-8px;width:78%;height:72%;transform:translateX(-50%);
   background:radial-gradient(ellipse at 50% 0%,rgba(255,220,150,.55),transparent 72%);pointer-events:none}
 /* 墙上的菜单板与置物架（填充空洞） */
-.s3-board{position:absolute;left:33%;top:22px;width:32%;height:40px;border-radius:6px;
+.s3-board{position:absolute;left:36%;top:6px;width:32%;height:26px;border-radius:6px;
   background:linear-gradient(180deg,#3b2a24,#261b18);border:2px solid #96713c;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 3px 8px rgba(0,0,0,.3)}
-.s3-board:after{content:'';position:absolute;inset:6px 8px;
-  background:repeating-linear-gradient(180deg,rgba(255,214,140,.55) 0 2px,transparent 2px 9px)}
-.s3-shelf{position:absolute;right:7%;top:70px;width:22%;height:7px;border-radius:3px;
+.s3-board:after{content:'';position:absolute;inset:4px 6px;
+  background:repeating-linear-gradient(180deg,rgba(255,214,140,.55) 0 2px,transparent 2px 7px)}
+.s3-shelf{position:absolute;right:5%;top:8px;width:20%;height:7px;border-radius:3px;
   background:linear-gradient(180deg,#b0773c,#7c5226);box-shadow:0 3px 6px rgba(0,0,0,.35)}
 .s3-shelf:before{content:'🍶 🏺';position:absolute;bottom:5px;left:14%;font-size:12px;letter-spacing:2px}
 /* 墙上招牌 */
@@ -150,7 +150,7 @@ body{
   filter:drop-shadow(0 3px 4px rgba(0,0,0,.35))}
 @keyframes bob{0%,100%{transform:translateY(0) rotate(-2.5deg)}50%{transform:translateY(-3px) rotate(2.5deg)}}
 /* 服务员：在吧台后的厨房过道来回走，上菜时走到吧台前 */
-.s3-waiter{left:44%;bottom:34%}
+.s3-waiter{left:44%;bottom:14%}
 .s3-waiter .mv{animation:walkX 11s ease-in-out infinite}
 @keyframes walkX{0%,100%{transform:translateX(-52px)}50%{transform:translateX(52px)}}
 .s3-waiter.serving .mv{animation:serveRun 1.25s ease-in-out}
@@ -164,15 +164,14 @@ body{
 .s3-waiter .tray{position:absolute;left:50%;top:-9px;transform:translateX(-50%);font-size:13px}
 .s3-waiter.serving .tray{animation:trayUp 1.25s ease-in-out}
 @keyframes trayUp{0%{transform:translateX(-50%) translateY(0)}45%,60%{transform:translateX(-50%) translateY(-4px) scale(1.15)}100%{transform:translateX(-50%) translateY(0)}}
-/* 吧台前的客人（场景里的立牌，与下方订单卡同步） */
-.actor.g{z-index:6}
-.actor.g .gp{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:1px;
-  font-size:8.5px;font-weight:800;color:#5c4300;background:rgba(255,246,224,.92);border-radius:8px;
-  padding:0 4px;white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,.28)}
-.actor.g .gp.done{background:#43e97b;color:#0b3d22}
-.actor.g.happy .bd{animation:gHop .5s cubic-bezier(.2,1.6,.4,1)}
+/* 客人的盘子：只在接到菜后出现（上菜落盘闪白/回弹的作用点） */
+.gslot .gp{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:1px;
+  display:none;font-size:9px;background:rgba(255,246,224,.92);border-radius:7px;padding:0 3px;
+  white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,.28)}
+.gslot .gp.done{display:block;background:#fff}
+.gslot.happy .bd{animation:gHop .5s cubic-bezier(.2,1.6,.4,1)}
 @keyframes gHop{0%{transform:translateY(0)}40%{transform:translateY(-9px) scale(1.1)}100%{transform:translateY(0)}}
-.actor.g.paid .bd{animation:gLeave .9s ease forwards}
+.gslot.paid .bd{animation:gLeave .9s ease forwards}
 @keyframes gLeave{0%{transform:scale(1)}35%{transform:scale(1.12) rotate(-8deg)}100%{transform:translateY(-14px) scale(.7) rotate(14deg);opacity:0}}
 /* 狗子：在前面空地溜达玩耍（范围控制在场景内，避免被裁掉） */
 .bar-pet{position:absolute;left:50%;bottom:5%;z-index:8;display:flex;align-items:flex-end;gap:3px;
@@ -194,60 +193,47 @@ body{
 /* 吧台上的小玩意 */
 .bar-trinkets{position:absolute;right:10px;bottom:31%;display:flex;gap:6px;align-items:flex-end;z-index:7}
 
-/* 吧台前排队等餐的客人（订单卡，与场景里的客人立牌同步） */
-.bar-guests{display:flex;gap:6px;padding:0 2px 9px;align-items:flex-start;margin-top:6px}
-.bguest{
-  flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;
-  background:rgba(255,255,255,.66);border-radius:12px;padding:5px 4px 6px;border:1.5px solid transparent;
-  transition:all .2s;
-}
-.bguest.vip{border-color:#f5c242;background:rgba(255,255,255,.9);box-shadow:0 0 0 2px rgba(245,194,66,.28)}
-.bguest.happy{animation:giPop .35s ease}
-.bguest.paid{animation:paidPop 1.05s ease forwards;border-color:#27ae60}
-.bguest.shake{animation:shake .4s ease}
-.bguest .bg-face{font-size:23px;line-height:1.15}
-.bguest.vip .bg-face{animation:wave 2.2s ease infinite}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+/* 吧台里的客人：立牌 + 头顶订单气泡（气泡本身就是订单，不再单独占一块版面） */
+.s3-guests{position:absolute;left:0;right:0;bottom:27%;z-index:7;display:flex;justify-content:space-around;
+  align-items:flex-end;padding:0 3px;pointer-events:none}
+.gslot{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:auto}
+.gslot .actor{position:relative;left:auto;bottom:auto;transform:none;z-index:1}
+.gslot.enter,.gslot.happy{animation:giPop .35s ease}
+.gslot.paid{animation:paidPop 1.05s ease forwards}
 @keyframes paidPop{0%{transform:scale(1)}25%{transform:scale(1.06)}55%{transform:scale(1.01)}100%{transform:scale(.86);opacity:.15}}
-/* 盘子：像真的盘子（盘沿+内凹），每道菜一个磁贴，右上角标进度 */
-.bg-plate{
-  position:relative;width:100%;min-height:36px;display:flex;flex-wrap:wrap;gap:5px;
-  justify-content:center;align-items:center;padding:6px 8px;
-  background:radial-gradient(ellipse at 50% 28%,#ffffff 0%,#f5f8fc 58%,#e4ebf5 100%);
-  border-radius:15px;
-  box-shadow:inset 0 0 0 2.5px #fdfeff,inset 0 0 0 4px #d7dfea,0 4px 10px rgba(90,70,40,.2);
-}
+@keyframes giPop{0%{transform:scale(.8)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+/* 订单气泡 */
+.gbub{position:relative;display:flex;flex-direction:column;gap:2px;align-items:center;
+  background:rgba(255,255,255,.95);border:1.5px solid #e6dcef;border-radius:11px;padding:3px 5px 4px;
+  box-shadow:0 3px 10px rgba(40,20,10,.34)}
+.gbub:after{content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
+  border:6px solid transparent;border-bottom:0;border-top-color:rgba(255,255,255,.95)}
+.gslot.vip .gbub{border-color:#f5c242;box-shadow:0 0 0 2px rgba(245,194,66,.35),0 3px 10px rgba(40,20,10,.34)}
+.gb-top{display:flex;align-items:center;gap:3px;font-size:9px;font-weight:800;color:#6b5b6e;white-space:nowrap}
+.gb-top em{font-style:normal;color:#d35400}
+.gb-need{display:flex;gap:3px;justify-content:center;flex-wrap:wrap}
+.gb-skip{position:absolute;right:-5px;bottom:-8px;border:1px solid #ecd9ac;background:#fff;border-radius:8px;
+  color:#b09454;font-size:8.5px;font-weight:800;padding:0 4px;line-height:1.6;cursor:pointer;font-family:inherit;
+  white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.22)}
+.gb-skip:active{transform:scale(.94)}
+/* 需求磁贴：没上到=灰、上到一半=橙、够了=绿 */
 .dish{
   position:relative;display:flex;align-items:center;justify-content:center;
-  width:27px;height:27px;border-radius:9px;background:rgba(255,255,255,.92);
-  box-shadow:0 1px 3px rgba(120,130,150,.28);
+  width:22px;height:22px;border-radius:8px;background:rgba(255,255,255,.92);
+  box-shadow:0 1px 3px rgba(120,130,150,.3);
 }
-.dish i{font-style:normal;font-size:16px;line-height:1;transition:filter .3s}
+.dish i{font-style:normal;font-size:13px;line-height:1;transition:filter .3s}
 .dish.none i{filter:grayscale(1) opacity(.28)}
 .dish.part i{filter:grayscale(.3) opacity(.9)}
 .dish.full i{filter:none;animation:dishPop .45s cubic-bezier(.2,1.5,.4,1)}
 .dish b{
-  position:absolute;right:-5px;bottom:-5px;font-size:9px;font-weight:800;line-height:1.45;
-  background:#a3abb8;color:#fff;border-radius:8px;padding:0 4px;
+  position:absolute;right:-4px;bottom:-4px;font-size:8px;font-weight:800;line-height:1.5;
+  background:#a3abb8;color:#fff;border-radius:7px;padding:0 3px;
   box-shadow:0 1px 3px rgba(0,0,0,.16);
 }
 .dish.part b{background:#f0a72b}
 .dish.full b{background:#22a55c}
 @keyframes dishPop{0%{transform:scale(.5) rotate(-12deg)}60%{transform:scale(1.3) rotate(6deg)}100%{transform:scale(1) rotate(0)}}
-/* 排队序号（上菜按这个顺序） */
-.bg-pos{
-  position:absolute;top:-6px;left:50%;transform:translateX(-50%);
-  font-size:9.5px;font-weight:800;color:#8a6d2f;background:#ffeec2;border:1px solid #f2d79a;
-  border-radius:8px;padding:0 6px;line-height:1.5;white-space:nowrap;
-}
-.bguest{position:relative;padding-top:9px}
-@keyframes giPop{0%{transform:scale(.8)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
-.bg-pay{font-size:9.5px;font-weight:800;color:#d35400;text-align:center;line-height:1.3;white-space:nowrap}
-.bg-skip{
-  border:1.5px solid #ecd9ac;background:#fff;border-radius:9px;color:#b09454;
-  font-size:9.5px;font-weight:800;padding:2px 6px;cursor:pointer;font-family:inherit;white-space:nowrap;
-}
-.bg-skip:active{transform:scale(.95)}
 
 /* ===== 上菜动作：接菜 → 端菜 → 落盘回弹 → 客人反应 ===== */
 .fly-emoji{
@@ -317,7 +303,7 @@ body{
 .bump{animation:bump .4s cubic-bezier(.2,1.4,.4,1)}
 @keyframes bump{0%{transform:scale(1)}45%{transform:scale(1.22)}100%{transform:scale(1)}}
 /* 客人进场 / 离场 */
-.bguest.enter{animation:guestIn .5s cubic-bezier(.2,1.4,.4,1)}
+.gslot.enter{animation:guestIn .5s cubic-bezier(.2,1.4,.4,1)}
 @keyframes guestIn{0%{transform:translateY(-16px) scale(.82);opacity:0}70%{opacity:1}100%{transform:none;opacity:1}}
 .bye{
   position:fixed;z-index:215;font-weight:900;font-size:12px;color:#1e8449;pointer-events:none;
@@ -605,8 +591,8 @@ body{
 .lv9{background:#8ea6ff}.lv10{background:#63d8e8}.lv11{background:#6fe09a}
 .lv12{background:linear-gradient(135deg,#fceabb,#f8b500);box-shadow:0 0 12px rgba(248,181,0,.75)}
 
-.cell:focus,.bguest:focus,.shop-chip:focus,.bg-skip:focus{outline:none}
-.cell:focus-visible,.bguest:focus-visible,.shop-chip:focus-visible,.bg-skip:focus-visible{outline:2px solid #ff5e62}
+.cell:focus,.gb-skip:focus,.shop-chip:focus{outline:none}
+.cell:focus-visible,.gb-skip:focus-visible,.shop-chip:focus-visible{outline:2px solid #ff5e62}
 
 /* ===== 飘字 & Toast ===== */
 .float{
@@ -728,34 +714,29 @@ body{
   #shopBadge .lv-tag{font-size:10.5px;padding:0 5px}
   #shopName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:104px}
   #btnMenu{width:28px;height:28px;font-size:14px}
-  #shopBadge{font-size:12.5px}
   .tab{padding:9px 0;font-size:14px}
   .stats-bar{font-size:11.5px;padding:7px 10px;gap:3px}
   .shop-chip{font-size:11px;padding:6px 8px}
   .shop-chip .sc-e{font-size:15px}
-  /* 2.5D 场景在手机上更矮（把空间让给出餐台，菜品要看得全） */
-  .shop3d{height:122px}
+  /* 2.5D 场景：客人连同订单气泡住在吧台里，所以要比原来高一些 */
+  .shop3d{height:182px}
   .bar-pet{bottom:3%}
-  .s3-waiter{bottom:32%}
-  .bar-trinkets{bottom:30%}
+  .s3-waiter{bottom:13%}
+  .bar-trinkets{bottom:24px}
   .s3-hint{display:none}
-  /* 客人卡紧凑化，省出一屏空间 */
-  .bar-guests{gap:5px;padding:0 1px 7px;margin-top:5px}
-  .bguest{padding:4px 3px 5px;border-radius:10px;gap:2px}
-  .bguest .bg-face{font-size:20px}
-  .bg-plate{padding:4px 5px;min-height:30px;gap:3px}
-  .dish{width:22px;height:22px;border-radius:7px}
-  .dish i{font-size:13px}
-  .dish b{font-size:8px;right:-3px;bottom:-3px}
-  .bg-pay{font-size:9px}
-  .bg-skip{font-size:9px;padding:1px 5px}
-  .bg-pos{font-size:8.5px;padding:0 4px}
-  .machine{width:38px}
-  .machine .m-body{font-size:21px}
-  .machine .m-bar{width:28px}
-  .actor .bd{font-size:20px}
-  .s3-board{height:34px;top:20px}
-  .s3-hint{font-size:9px;top:32px}
+  .s3-shelf{display:none}
+  .s3-board{top:4px;height:22px;left:32%;width:36%}
+  .machine{width:36px}
+  .machine .m-body{font-size:20px}
+  .machine .m-bar{width:26px}
+  .actor .bd{font-size:19px}
+  /* 订单气泡紧凑化，3 位客人并排也放得下 */
+  .gbub{padding:2px 4px 3px;border-radius:10px}
+  .gb-top{font-size:8.5px;gap:2px}
+  .dish{width:20px;height:20px;border-radius:7px}
+  .dish i{font-size:12px}
+  .dish b{font-size:7.5px;right:-3px;bottom:-3px;padding:0 2px}
+  .gb-skip{font-size:8px;padding:0 3px;right:-4px;bottom:-7px}
   .card{padding:8px 10px;gap:9px;margin-bottom:7px;border-radius:14px}
   /* 出餐台改双列紧凑卡片：单列时一屏只看得到 2 张，菜品「展示不全」 */
   #paneUp{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:7px;align-content:start}
@@ -878,9 +859,10 @@ body{
       <!-- 2.5D 店铺场景：后厨机器在生产、服务员走动上菜、狗子玩耍 -->
       <div class="shop3d" id="shop3d">
         <div class="s3-wall"><div class="s3-lamp"></div><div class="s3-board"></div><div class="s3-shelf"></div>
-          <div class="s3-ck"></div>
-          <div id="s3Machines"></div>
         </div>
+        <!-- 后厨操作台 + 机器：贴着场景底（是墙的子元素时会贴到墙底，和客人叠在一起） -->
+        <div class="s3-ck"></div>
+        <div id="s3Machines"></div>
         <div class="s3-floor"></div>
         <div class="s3-bar"></div>
         <button class="s3-sign" id="barSign" aria-label="吧台招牌，连点试试看">
@@ -889,10 +871,12 @@ body{
         <span class="s3-night hidden" id="barNight">🌙 深夜赏金 ×3</span>
         <span class="s3-hint">点出餐台的「制作」开火<br>做好后点「上菜」端给客人</span>
         <div id="s3Actors"></div>
+        <!-- 客人直接站在吧台里，头顶气泡就是订单（要什么菜 / 赏金 / 送走） -->
+        <div class="s3-guests" id="s3Guests"></div>
         <div class="bar-trinkets" id="barTrinkets"></div>
         <div class="bar-pet" id="barPet"></div>
       </div>
-      <!-- 出餐台（菜品）：紧贴厨房。自上而下：厨房出餐 → 端出去 → 客人等餐 -->
+      <!-- 出餐台（本店 4 道招牌菜）：紧贴厨房；客人就在上面的吧台里等着上菜 -->
       <div class="shelf-tabs">
         <button class="st-btn active" id="stBtn0" data-tab="0">🍳 出餐台 <em id="stCount0">0</em></button>
         <button class="st-btn" id="stBtn1" data-tab="1">🔒 待解锁 <em id="stCount1">0</em></button>
@@ -904,7 +888,6 @@ body{
           <div class="shelf-pane" id="paneLock"></div>
         </div>
       </div>
-      <div class="bar-guests" id="barGuests"></div>
     </section>
 
     <section id="page-merge" class="page">
@@ -928,15 +911,18 @@ body{
       <h3>📖 玩法说明</h3>
       <ul>
         <li>👨‍🍳 <b>自己做菜</b>：出餐台上每道菜都要点「制作 👨‍🍳」开火，等几秒才出餐（升级店铺能缩短时间）；每样最多囤 5 件</li>
+        <li>🍳 <b>每家有每家的菜单</b>：每家店只卖 4 道自家招牌菜（小摊卖柠檬水糖葫芦、咖啡馆卖拿铁蛋糕…），<b>4 道正好两行，不用上下拉</b></li>
+        <li>🧾 <b>菜单按等级走</b>：每道菜绑定一个等级，售价由等级决定。合成台是中央厨房（按等级出产品），门店负责做成自家招牌——同一个 Lv.5，咖啡馆做成「手冲美式」、深夜食堂做成「炭烤串」</li>
         <li>🏭 <b>稀有菜例外</b>：🍀🌈👑 稀有菜不占玩家操作，会自己慢速补货（每样最多 3 件）</li>
         <li>💰 <b>只有把菜端给客人，才收得到钱</b>：客人付款 = 商品价 × 售价倍率 × 客人数量；能量也是上菜才给</li>
-        <li>🍽️ <b>上菜</b>：客人要的菜会亮起绿色「上菜」，点一下服务员就端过去；凑齐自动结账、客人走人下一位补位</li>
+        <li>🍽️ <b>上菜</b>：客人就在吧台里，头顶气泡写着要什么菜、给多少赏金。客人要的菜会亮起绿色「上菜」，点一下服务员就端过去；凑齐自动结账、客人走人下一位补位</li>
         <li>✨ <b>稀有客人</b>：偶尔有人出天价点名要你那道稀有菜（🍀🌈👑）</li>
-        <li>🚫 队伍里没人点的菜端不出去；点客人脚下的「送走」可花小费换一位客人</li>
-        <li>📋 <b>客人的口味会跟着你成长</b>：合成出新商品后，后续客人的订单里就会出现新菜</li>
+        <li>🚫 队伍里没人点的菜端不出去；点气泡上的「送走」可花小费换一位客人</li>
+        <li>👥 <b>客人不共享</b>：每家店有自己的客人队列和货架库存，切店等于换一批客人；客人只点你在这家店已经上架的菜</li>
+        <li>📋 <b>客人的口味会跟着你成长</b>：合成出更高等级后，卖这个等级的店，客人订单里就会出现新菜</li>
         <li>💰 <b>金币管商店线</b>：升级店铺（卖更快）、<b>开新店</b>（价格随你的收入自动缩放，永远是"攒一会儿"）、金币解锁商品、送走客人</li>
         <li>⚡ <b>能量管合成线</b>：生成产品、升级合成台；出货模式可把产品回收成能量</li>
-        <li>🛍️ <b>点击店铺条</b>切换经营的店！小摊⚡翻倍、食堂客人奖励×1.6、白金餐厅稀有钱×2…</li>
+        <li>🛍️ <b>点击店铺条</b>切换经营的店（换店＝换菜单、换客人、换货架）：小摊⚡翻倍、咖啡馆生产×1.5、食堂客人奖励×1.6、白金餐厅稀有钱×2…</li>
         <li>🏆 <b>成就</b>：36 个长期目标（服务客人数、合并次数、营收、收集…），每达成一个<b>永久提升全场售价</b>，攒满 +84%；在 ⚙️ 里查看进度条</li>
         <li>🌙 <b>离线收益</b>：关掉页面也在营业，回来按 30% 效率结算（最多算 8 小时）</li>
         <li>🐾 <b>宠物</b>：吧台边的小家伙。点它<b>摸头</b>会开心（加心情和亲密度），点饭碗用<b>货架上做好的菜投喂</b>它会长大</li>
@@ -944,7 +930,7 @@ body{
         <li>🔮 <b>合成台</b>：花能量生成产品（<b>每个等级有 3 种口味</b>，随机出，共 36 种可收集）；<b>拖动</b>一道菜到同级菜上合并，拖到空格可移动整理，拖到「出货模式」按钮上直接换能量</li>
         <li>✨ 合并有 10% 概率<b>暴击直接多升一级</b>（Lv.2+Lv.2 可能直接出 Lv.4）</li>
         <li>✨ 合并时小概率蹦出<b>隐藏稀有钱</b> 🍀🌈👑（白金餐厅下出现率翻倍！）</li>
-        <li>📦 出货模式：点击合成台里的产品直接换成能量</li>
+        <li>📦 <b>出货模式</b>：合成台里的产品可点击换成能量</li>
       </ul>
       <div class="m-btns">
         <button class="menu-egg" id="btnAch">🏆 成就 <span id="achCount">0/36</span> · <span id="achBonus">+0%</span></button>
@@ -979,7 +965,7 @@ const PRODUCTS=[
   {e:'🌟',n:'传世珍馐', p:1000000},
 ];
 // 口味变体：每个等级 3 种口味（外形/名字不同，价格与机制完全一致）。
-// PRODUCTS 仍是该等级的"招牌口味"，商店/客人/成就都按等级走，网格里则显示具体口味。
+// PRODUCTS 是该等级的"基础产品"，决定售价与解锁；门店再按自己的菜单把它做成招牌菜（见 SHOPS[].menu）。
 const FLAVORS=[
   [{e:'🍋',n:'柠檬水'},     {e:'🧊',n:'冰镇苏打'},   {e:'🍵',n:'大麦茶'}],
   [{e:'🥤',n:'冰汽水'},     {e:'🧃',n:'鲜果汁盒'},   {e:'🥛',n:'冰镇牛奶'}],
@@ -1004,18 +990,26 @@ const HIDDEN={
   crown:  {e:'👑',n:'黄金招牌',  p:3000000,energy:30000,rate:0.0025},
 };
 // openK：开这家店的价位系数（≈需要攒多少秒的卖货收入），价格随进度自动缩放，不会出现「要么秒买要么挂几小时」
+// menu：每家店自己的 4 道招牌菜。菜绑定一个「等级」——等级决定售价与能否上架（合成台合出该等级才解锁）。
+// 所以合成台是中央厨房（按等级出半成品），门店负责把等级做成自家招牌菜：
+// 同样 Lv.5，咖啡馆做成「手冲美式」、深夜食堂做成「炭烤串」。菜单只 4 道，出餐台两行放得下、不用上下拉。
 const SHOPS=[
-  {e:'🛖',n:'街边小摊',  openK:0,  mult:1,   perk:'energy',perkDesc:'⚡能量获取 ×2'},
-  {e:'🏪',n:'便利店',    openK:20, mult:2.5, perk:'none',  perkDesc:'均衡经营'},
-  {e:'☕',n:'文艺咖啡馆',openK:30, mult:6,   perk:'speed', perkDesc:'🏭生产速度 ×1.5'},
-  {e:'🍽️',n:'深夜食堂',  openK:45, mult:15,  perk:'order', perkDesc:'🍽️客人奖励 ×1.6'},
-  {e:'🏛️',n:'白金餐厅',  openK:60, mult:40,  perk:'lucky', perkDesc:'✨稀有钱出现率 ×2'},
-  {e:'💎',n:'米其林殿堂',openK:90, mult:100, perk:'all',   perkDesc:'全能：⚡×1.5 🏭×1.3 🍽️×1.3 ✨×1.5'},
+  {e:'🛖',n:'街边小摊',  openK:0,  mult:1,   perk:'energy',perkDesc:'⚡能量获取 ×2',
+   menu:[{lv:1,n:'柠檬水',e:'🍋'},{lv:2,n:'糖葫芦',e:'🍡'},{lv:3,n:'烤肠',e:'🌭'},{lv:4,n:'刨冰',e:'🍧'}]},
+  {e:'🏪',n:'便利店',    openK:20, mult:2.5, perk:'none',  perkDesc:'均衡经营',
+   menu:[{lv:3,n:'关东煮',e:'🍢'},{lv:4,n:'茶叶蛋',e:'🥚'},{lv:5,n:'饭团',e:'🍙'},{lv:6,n:'泡面',e:'🍜'}]},
+  {e:'☕',n:'文艺咖啡馆',openK:30, mult:6,   perk:'speed', perkDesc:'🏭生产速度 ×1.5',
+   menu:[{lv:5,n:'手冲美式',e:'☕'},{lv:6,n:'燕麦拿铁',e:'🥛'},{lv:7,n:'冰滴咖啡',e:'🧊'},{lv:8,n:'芝士蛋糕',e:'🍰'}]},
+  {e:'🍽️',n:'深夜食堂',  openK:45, mult:15,  perk:'order', perkDesc:'🍽️客人奖励 ×1.6',
+   menu:[{lv:7,n:'炭烤串',e:'🍢'},{lv:8,n:'豚骨拉面',e:'🍜'},{lv:9,n:'冰镇生啤',e:'🍺'},{lv:10,n:'招牌炒饭',e:'🍚'}]},
+  {e:'🏛️',n:'白金餐厅',  openK:60, mult:40,  perk:'lucky', perkDesc:'✨稀有钱出现率 ×2',
+   menu:[{lv:9,n:'香煎鹅肝',e:'🦆'},{lv:10,n:'松露意面',e:'🍝'},{lv:11,n:'战斧牛排',e:'🥩'},{lv:12,n:'龙虾刺身',e:'🦞'}]},
+  {e:'💎',n:'米其林殿堂',openK:90, mult:100, perk:'all',   perkDesc:'全能：⚡×1.5 🏭×1.3 🍽️×1.3 ✨×1.5',
+   menu:[{lv:9,n:'鱼子酱',e:'🐟'},{lv:10,n:'白松露',e:'🍄'},{lv:11,n:'和牛',e:'🥩'},{lv:12,n:'传世盛宴',e:'🌟'}]},
 ];
 const FACES=['🧑','👩','👴','👵','👦','👧','🧕','👨‍🌾','🧑‍💼','👩‍🎨','🕵️','🧙'];
 const FACE_HAPPY='😋', FACE_PAID='😍', FACE_NO='🙅';
 const MAX_LV=12;
-const GUEST_MAX_LV=6;    // 客人最多点到 Lv.6，避免前期无解
 const GRID_SIZE=20;
 const SAVE_KEY='shopMergeGame_v1';
 const GOLD_BUY={2:300,3:2500};
@@ -1040,15 +1034,16 @@ const defaultState=()=>({
   unlocked:[true,false,false,false,false,false,false,false,false,false,false,false],
   hiddenOwned:{},
   hiddenStock:{},     // 稀有物货架库存 {clover:n,...}
-  stock:PRODUCTS.map(()=>0),
-  cook:PRODUCTS.map(()=>0),      // 每道菜的"制作完成时间戳"（0=没在做）
+  // 每店独立的货架 / 制作进度 / 客人队列（换店不共享，各店有自己的招牌菜和常客）
+  shopStock:SHOPS.map(s=>s.menu.map(()=>0)),
+  shopCook:SHOPS.map(s=>s.menu.map(()=>0)),
+  shopQueue:SHOPS.map(()=>[]),
   grid:Array(GRID_SIZE).fill(null),
   genCount:0,
   bestOwned:1,
   totalMerged:0,
   mergeLevel:1,
   ordersDone:0,
-  queue:[],
   // ---- 彩蛋相关 ----
   eggs:{},            // {sign:true,...}
   signClicks:0,       // 连点招牌次数
@@ -1073,7 +1068,6 @@ const defaultState=()=>({
   },
 });
 let state=defaultState();
-let progs=PRODUCTS.map(()=>0);
 let hidProgs={};
 let selIdx=-1, shipMode=false, genLv=1, lastMergedIdx=-1, orderBusy=false;
 
@@ -1096,6 +1090,21 @@ function fmt(n){
   return n.toExponential(2);
 }
 const shop=()=>SHOPS[state.activeShop];
+/* ---- 每店独立的菜单 / 货架 / 客人 ----
+   菜单按「等级」绑定：等级决定售价与解锁条件（合成台合出该等级才上架），
+   于是合成台=中央厨房（按等级出半成品），门店负责做成自家招牌菜。 */
+const menu=()=>shop().menu;                                   // 当前店的 4 道招牌菜
+const dishAt=i=>menu()[i];
+const slotOfLvIn=(si,lv)=>(SHOPS[si]?SHOPS[si].menu:[]).findIndex(d=>d.lv===lv);
+const slotOfLv=lv=>slotOfLvIn(state.activeShop,lv);           // 该等级在本店是第几档（-1=本店不卖这个等级）
+const dStock=i=>(state.shopStock[state.activeShop]||[])[i]||0;
+const dCook=i=>(state.shopCook[state.activeShop]||[])[i]||0;
+const setStock=(i,v)=>{state.shopStock[state.activeShop][i]=v};
+const setCook=(i,v)=>{state.shopCook[state.activeShop][i]=v};
+const SQ=()=>state.shopQueue[state.activeShop];               // 当前店客人队列（活引用，可直接 push/splice）
+const isDishOpen=i=>!!state.unlocked[dishAt(i).lv-1];         // 该菜是否已上架
+const openSlots=()=>menu().map((d,i)=>i).filter(isDishOpen);  // 本店已上架的档位
+const menuPriceSum=()=>menu().reduce((s,d)=>s+(state.unlocked[d.lv-1]?PRODUCTS[d.lv-1].p:0),0);
 const perkLevel=(k,base,all)=>shop().perk===k?base:(shop().perk==='all'?all:1);
 const mult=()=>shop().mult*(1+petMultBonus()+achBonus());
 const speed=()=>(1+0.35*(state.shopLevel-1))*perkLevel('speed',1.5,1.3);
@@ -1181,12 +1190,12 @@ const PRODUCE_FLIGHT_MAX=3;
 function flyProduce(idx,emoji){
   if(produceFlights>=PRODUCE_FLIGHT_MAX)return;
   const kit=document.querySelector('.machine[data-i="'+idx+'"]');
-  const card=document.getElementById('pcard'+idx);
+  const card=document.getElementById('dcard'+idx);
   if(!kit||!card)return;
   const cr=card.getBoundingClientRect();
   if(cr.bottom<0||cr.top>window.innerHeight)return;   // 卡片不在屏幕里就不飞
   produceFlights++;
-  const el=flyTo(kit,card.querySelector('.p-emoji'),emoji,{mini:true});
+  const el=flyTo(kit,card,emoji,{mini:true});         // 落到卡片上（手机上图标列是隐藏的）
   const badge=kit.querySelector('.m-badge');
   if(badge){
     badge.classList.remove('hidden');badge.classList.add('bump');
@@ -1197,7 +1206,7 @@ function flyProduce(idx,emoji){
   setTimeout(()=>kit.classList.remove('emit'),820);
   setTimeout(()=>{
     produceFlights--;
-    bumpEl(document.querySelector('#pcard'+idx+' .stock-tag'));
+    bumpEl(document.querySelector('#dcard'+idx+' .stock-tag'));
   },640);
 }
 // 客人付钱离场时撒金币
@@ -1267,37 +1276,34 @@ function load(){
       if(!state.stats)state.stats=defaultState().stats;
       else state.stats=Object.assign(defaultState().stats,state.stats);
       if(state.mergeLevel===undefined)state.mergeLevel=1;
-      if(!Array.isArray(state.stock))state.stock=PRODUCTS.map(()=>0);
-      while(state.stock.length<PRODUCTS.length)state.stock.push(0);
-      if(!Array.isArray(state.cook))state.cook=PRODUCTS.map(()=>0);
-      while(state.cook.length<PRODUCTS.length)state.cook.push(0);
-      if(!Array.isArray(state.queue))state.queue=[];
-      // 历史版本：托盘里的菜折算进货架库存
-      state.queue.forEach(g=>{
-        if(!g.tray)g.tray={};
-        Object.keys(g.tray).forEach(lvStr=>{
-          const idx=+lvStr-1;
-          if(idx>=0&&idx<PRODUCTS.length){
-            state.stock[idx]=Math.min(STOCK_CAP,state.stock[idx]+g.tray[lvStr]);
-          }
-        });
-        g.tray={};
-      });
+      // 每店独立货架：老存档是全局按等级的 stock/cook，折算进各店自己的菜单（进度不丢）
+      // 注意：不能只看 shopStock 的形状——defaultState() 已经给了合法形状，必须靠旧字段是否存在来判断
+      const hasOldStock=Array.isArray(s.stock),hasOldCook=Array.isArray(s.cook);
+      if(s.shopStock===undefined||hasOldStock||hasOldCook){
+        const oldStock=hasOldStock?s.stock:[];
+        const oldCook=hasOldCook?s.cook:[];
+        state.shopStock=SHOPS.map(sh=>sh.menu.map(d=>Math.min(STOCK_CAP,oldStock[d.lv-1]||0)));
+        state.shopCook=SHOPS.map(sh=>sh.menu.map(d=>oldCook[d.lv-1]||0));
+      }
+      if(!Array.isArray(state.shopQueue)||state.shopQueue.length!==SHOPS.length)state.shopQueue=SHOPS.map(()=>[]);
+      state.shopQueue=state.shopQueue.map(q=>Array.isArray(q)?q:[]);
+      // 旧队列按等级点单，切店后可能点到本店没有的菜 → 过滤掉，剩下的由 fillQueue 补齐
+      state.shopQueue=state.shopQueue.map((q,si)=>q.filter(g=>g&&Array.isArray(g.items)&&g.items.length
+        &&g.items.every(it=>it.rare||slotOfLvIn(si,it.level)>=0)));
+      delete state.stock;delete state.cook;delete state.queue;
     }
   }catch(e){}
 }
 
 /* ================= 货架生产 & 库存 ================= */
-// 商品只按时间生产（不自动卖钱），钱只在把商品端给客人时进账
-const prodInterval=()=>PROD_SEC/speed();          // 生产 1 件所需秒数
-// 出餐台不再自动产菜：必须玩家点「制作」开火（见 startCook / cookTick）。
+// 出餐台不自动产菜：必须玩家点「制作」开火（见 startCook / cookTick）。
 // 这里只负责稀有菜（它不占玩家操作，按慢速自动补货）与进度条刷新。
 function produceTick(dt,sp){
   let changed=false;
-  state.unlocked.forEach((u,idx)=>{
-    if(!u)return;
-    const bar=document.getElementById('bar'+idx);
-    if(bar)bar.style.width=(isCooking(idx)?cookPct(idx):(state.stock[idx]>=STOCK_CAP?100:0))+'%';
+  menu().forEach((d,idx)=>{
+    if(!isDishOpen(idx))return;
+    const bar=document.getElementById('dbar'+idx);
+    if(bar)bar.style.width=(isCooking(idx)?cookPct(idx):(dStock(idx)>=STOCK_CAP?100:0))+'%';
   });
   Object.keys(state.hiddenOwned).forEach(key=>{
     if(!state.hiddenOwned[key])return;
@@ -1314,27 +1320,37 @@ function produceTick(dt,sp){
   });
   return changed;
 }
-// 库存键：普通商品 'l:等级'，稀有物 'r:key'
+// 库存键：普通商品 'l:等级'（在本店菜单里定位到具体那道菜），稀有物 'r:key'
 const itemKey=it=>it.rare?('r:'+it.rare):('l:'+it.level);
 const keyIsRare=k=>k.charAt(0)==='r';
+// 本店菜单里没有的等级（如稀有客人点名别家的菜）→ 回退到 PRODUCTS 招牌名，保证文案不空
+const dishName=lv=>{const s=slotOfLv(lv);return s<0?PRODUCTS[lv-1].n:menu()[s].n};
+const dishEmoji=lv=>{const s=slotOfLv(lv);return s<0?PRODUCTS[lv-1].e:menu()[s].e};
 const keyName=k=>keyIsRare(k)
   ?HIDDEN[k.slice(2)].e+HIDDEN[k.slice(2)].n
-  :PRODUCTS[+k.slice(2)-1].e+'Lv.'+k.slice(2);
-const keyEmoji=k=>keyIsRare(k)?HIDDEN[k.slice(2)].e:PRODUCTS[+k.slice(2)-1].e;
-const keySrcSel=k=>keyIsRare(k)?('#hcard'+k.slice(2)):('#pcard'+(+k.slice(2)-1));
-const stockOf=k=>keyIsRare(k)?(state.hiddenStock[k.slice(2)]||0):state.stock[+k.slice(2)-1];
+  :dishEmoji(+k.slice(2))+'Lv.'+k.slice(2)+' '+dishName(+k.slice(2));
+const keyEmoji=k=>keyIsRare(k)?HIDDEN[k.slice(2)].e:dishEmoji(+k.slice(2));
+const keySrcSel=k=>keyIsRare(k)?('#hcard'+k.slice(2)):('#dcard'+slotOfLv(+k.slice(2)));
+const stockOf=k=>{
+  if(keyIsRare(k))return state.hiddenStock[k.slice(2)]||0;
+  const s=slotOfLv(+k.slice(2));
+  return s<0?0:dStock(s);
+};
 function takeStock(k){
   if(keyIsRare(k)){const r=k.slice(2);state.hiddenStock[r]=Math.max(0,(state.hiddenStock[r]||0)-1)}
-  else{const i=+k.slice(2)-1;state.stock[i]=Math.max(0,state.stock[i]-1)}
+  else{const s=slotOfLv(+k.slice(2));if(s>=0)setStock(s,Math.max(0,dStock(s)-1))}
 }
 function giveStock(k){
   if(keyIsRare(k)){const r=k.slice(2);state.hiddenStock[r]=Math.min(RARE_CAP,(state.hiddenStock[r]||0)+1)}
-  else{const i=+k.slice(2)-1;state.stock[i]=Math.min(STOCK_CAP,state.stock[i]+1)}
+  else{const s=slotOfLv(+k.slice(2));if(s>=0)setStock(s,Math.min(STOCK_CAP,dStock(s)+1))}
 }
+// 等级解锁：合成台首次合出该等级 → 各店凡是卖这个等级的菜一起上架
 function unlockProduct(idx){
   if(state.unlocked[idx])return;
   state.unlocked[idx]=true;
-  toast('🆕','新商品上架：'+PRODUCTS[idx].e+' '+PRODUCTS[idx].n+'！客人马上会点它');
+  const lv=idx+1;
+  const who=SHOPS.filter(s=>s.menu.some(d=>d.lv===lv)).map(s=>s.e+s.menu.find(d=>d.lv===lv).n);
+  toast('🆕','新菜品上架：'+(who.length?who.join(' / '):PRODUCTS[idx].e+PRODUCTS[idx].n)+'！客人马上会点它');
   renderShop();save();
 }
 function unlockHidden(key){
@@ -1347,8 +1363,14 @@ function unlockHidden(key){
 }
 
 /* ================= 排队客人 ================= */
-function newGuest(){
-  const maxLv=Math.min(state.bestOwned,GUEST_MAX_LV);
+// 生成一位客人（si=哪家店；默认当前店）。只点本店菜单里"已上架"的菜，
+// 所以不会再出现客人点你根本做不出的东西——店的菜单本身就是等级上限。
+function newGuest(si){
+  si=(si===undefined)?state.activeShop:si;
+  const m=(SHOPS[si]||SHOPS[0]).menu;
+  const open=m.map((d,i)=>i).filter(i=>state.unlocked[m[i].lv-1]);
+  if(!open.length)return null;                       // 这家店的菜还没上架
+  const stk=state.shopStock[si]||[];
   const items=[];
   // 稀有客人：你拥有稀有物且有现货时，小概率有人出天价点名要买
   const rareReady=Object.keys(HIDDEN).filter(k=>state.hiddenOwned[k]&&(state.hiddenStock[k]||0)>0);
@@ -1357,18 +1379,18 @@ function newGuest(){
     items.push({rare:rareReady[Math.floor(Math.random()*rareReady.length)],count:1});
   }else{
     const pool=[];
-    for(let lv=1;lv<=maxLv;lv++){
-      const w=state.stock[lv-1]>0?3:1;    // 有现货的更常被点
-      for(let k=0;k<w;k++)pool.push(lv);
-    }
-    const kinds=Math.min(maxLv,1+Math.floor(Math.random()*2)+(Math.random()<0.35?1:0));
+    open.forEach(i=>{
+      const w=(stk[i]||0)>0?3:1;                     // 有现货的更常被点
+      for(let k=0;k<w;k++)pool.push(i);
+    });
+    const kinds=Math.min(open.length,1+Math.floor(Math.random()*2)+(Math.random()<0.35?1:0));
     const used=new Set();
     let guard=0;
     while(items.length<kinds&&guard++<60){
-      const lv=pool[Math.floor(Math.random()*pool.length)];
-      if(used.has(lv))continue;
-      used.add(lv);
-      items.push({level:lv,count:1+Math.floor(Math.random()*3)});
+      const i=pool[Math.floor(Math.random()*pool.length)];
+      if(used.has(i))continue;
+      used.add(i);
+      items.push({level:m[i].lv,count:1+Math.floor(Math.random()*3)});
     }
   }
   let coinBase=0,energyBase=0;
@@ -1394,20 +1416,31 @@ function newGuest(){
     isNew:true,
   };
 }
-function fillQueue(){
-  while(state.queue.length<3)state.queue.push(newGuest());
+function fillQueue(si){
+  si=(si===undefined)?state.activeShop:si;
+  const q=state.shopQueue[si];
+  if(!q)return;
+  let guard=0;
+  while(q.length<3&&guard++<8){
+    const g=newGuest(si);
+    if(!g)break;                       // 本店还没有已上架的菜 → 队列留空（界面给提示）
+    q.push(g);
+  }
 }
-// 新菜品上架后：让还没上菜的客人重新点单，把新商品纳入需求
+// 新菜品上架后：凡是卖这个等级的店，让还没上菜的客人重新点单，把新菜纳入需求
 function refreshGuestsForNewProduct(level){
   if(level<2)return;
   let n=0;
-  state.queue.forEach((g,i)=>{
-    if(Object.keys(g.tray||{}).length)return;           // 已上菜的不动
-    if(g.items.some(it=>it.level>=level))return;        // 已经包含新等级
-    state.queue[i]=newGuest();
-    n++;
+  state.shopQueue.forEach((q,si)=>{
+    if(slotOfLvIn(si,level)<0)return;                 // 这家店不卖这个等级
+    q.forEach((g,i)=>{
+      if(Object.keys(g.tray||{}).length)return;       // 已上菜的不动
+      if(g.items.some(it=>it.rare||it.level>=level))return;
+      const ng=newGuest(si);
+      if(ng){q[i]=ng;n++}
+    });
   });
-  if(n)toast('📋','客人看到新菜品了！订单里开始出现 '+PRODUCTS[level-1].e+PRODUCTS[level-1].n);
+  if(n)toast('📋','客人看到新菜品了！订单里开始出现 '+(PRODUCTS[level-1].e+PRODUCTS[level-1].n)+' 这道等级');
 }
 function trayNeed(g){
   const need={};
@@ -1417,9 +1450,10 @@ function trayNeed(g){
   return need;
 }
 function guestServed(g){return Object.keys(trayNeed(g)).length===0}
+const guestSlotAt=i=>document.querySelectorAll('#s3Guests .gslot')[i]||null;
 function guestElAt(i){
-  const el=document.querySelectorAll('.bguest')[i];
-  return el?el.querySelector('.bg-plate'):null;
+  const el=guestSlotAt(i);
+  return el?el.querySelector('.gp'):null;      // 客人的盘子（在吧台里）
 }
 // 上菜动作编排：接菜入手 → 服务员端着走过去 → 落盘闪白回弹 → 客人反应
 const REACTIONS=['😋 好吃！','👍 上得好','❤️ 谢谢你','🤤 好香','🎉 就是它！'];
@@ -1427,7 +1461,7 @@ function playServe(idx,srcSel,emoji,done){
   const w=document.getElementById('s3Waiter');
   const traySel=w?w.querySelector('.tray'):null;
   const card=document.querySelector(srcSel);
-  // ① 接菜：从货架卡片"接"到服务员手里
+  // ① 接菜：从出餐台卡片"接"到服务员手里
   if(card)traySel?flyTo(card,traySel,emoji,{quick:true}):null;
   flashCard(card);
   // ② 服务员端着菜走到吧台前（托盘换成真菜）
@@ -1443,14 +1477,14 @@ function playServe(idx,srcSel,emoji,done){
       gEl.classList.add('plate-flash','plate-squash');
       popRing(gEl,true);
       if(done){heartAt(gEl,7);return}
-      const card2=document.querySelectorAll('.bguest')[idx];
-      if(!card2)return;
-      const r=card2.getBoundingClientRect();
+      const slot=guestSlotAt(idx);
+      if(!slot)return;
+      const r=slot.getBoundingClientRect();
       const b=document.createElement('span');
       b.className='react';
       b.textContent=REACTIONS[Math.floor(Math.random()*REACTIONS.length)];
       b.style.left=(r.left+r.width/2)+'px';
-      b.style.top=(r.top-2)+'px';
+      b.style.top=(r.top+2)+'px';
       document.body.appendChild(b);
       setTimeout(()=>b.remove(),1150);
     },620);
@@ -1463,15 +1497,16 @@ function serveItem(key){
     toast('🧺','这道菜还没做好～等吧台里的大厨再做一份');
     return;
   }
+  const q=SQ();
   let idx=-1;
-  for(let i=0;i<state.queue.length;i++){
-    if(trayNeed(state.queue[i])[key]){idx=i;break}
+  for(let i=0;i<q.length;i++){
+    if(trayNeed(q[i])[key]){idx=i;break}
   }
   if(idx<0){
     toast(FACE_NO,'队伍里没人点这道菜～');
     return;
   }
-  const g=state.queue[idx];
+  const g=q[idx];
   const srcSel=keySrcSel(key), emoji=keyEmoji(key);
   takeStock(key);
   g.tray[key]=(g.tray[key]||0)+1;
@@ -1491,7 +1526,7 @@ function serveItem(key){
 }
 // 凑齐 → 客人付钱自己走 → 下一位补位
 function completeOrder(i,srcSel,emoji){
-  const g=state.queue[i];
+  const g=SQ()[i];
   state.coins+=g.rewardCoins;
   state.energy+=g.rewardEnergy;
   state.ordersDone++;
@@ -1510,8 +1545,8 @@ function completeOrder(i,srcSel,emoji){
   toast('💰','第'+(i+1)+'位客人付钱走了！+'+fmt(g.rewardCoins)+'💰 +'+fmt(g.rewardEnergy)+'⚡');
   petSay('serve');
   setTimeout(()=>{
-    const k=state.queue.indexOf(g);
-    if(k>=0)state.queue.splice(k,1);
+    const q=SQ(),k=q.indexOf(g);
+    if(k>=0)q.splice(k,1);
     fillQueue();
     orderBusy=false;
     renderBar();renderShop();save();
@@ -1746,41 +1781,13 @@ function renderShopStrip(){
     strip.appendChild(d);
   });
 }
-// 吧台场景渲染：店里的大厨 + 台面上客人手里的盘子
+// 吧台渲染：招牌 + 客人（客人连同订单气泡直接站在吧台里，不再单独占一块版面）
 function renderBar(){
-  const list=$('#barGuests');
-  if(!list)return;
+  if(!document.getElementById('shop3d'))return;
   fillQueue();
   $('#barSignEmoji').textContent=shop().e;
   $('#barSignName').textContent=shop().n;
   $('#barSignLv').textContent='Lv.'+state.shopLevel;
-  list.innerHTML='';
-  state.queue.forEach((g,i)=>{
-    const face=g.fx==='paid'?FACE_PAID:(g.fx==='happy'?FACE_HAPPY:g.face);
-    const orderTxt=g.items.map(it=>it.rare
-      ?(HIDDEN[it.rare].n+'×'+it.count)
-      :(PRODUCTS[it.level-1].n+'Lv'+it.level+'×'+it.count)).join(' ');
-    // 盘子上的菜品磁贴：没上到=灰、上到一半=橙、够了=绿
-    const plate=g.items.map(it=>{
-      const k=itemKey(it), have=g.tray[k]||0;
-      const cls=have>=it.count?'full':(have>0?'part':'none');
-      const mark=have>=it.count?'✓':(have+'/'+it.count);
-      return `<span class="dish ${cls}" title="${keyName(k)} ${have}/${it.count}">
-        <i>${keyEmoji(k)}</i><b>${mark}</b></span>`;
-    }).join('');
-    const d=document.createElement('div');
-    d.className='bguest'+(g.vip?' vip':'')+(g.fx==='paid'?' paid':'')+(g.fx==='happy'?' happy':'')+(g.isNew?' enter':'');
-    g.isNew=false;
-    d.setAttribute('aria-label',`第${i+1}位客人${g.vip?'（稀有客人）':''} 需要 ${orderTxt} 赏金${g.rewardCoins}金币${g.rewardEnergy}能量`);
-    d.innerHTML=
-      `<span class="bg-pos">第 ${i+1} 位</span>`+
-      `<div class="bg-plate">${plate}</div>`+
-      `<div class="bg-face">${face}${g.night?'🌙':''}</div>`+
-      `<div class="bg-pay">${g.night?'<b style="color:#4a4a8a">🌙×3</b> ':''}💰${fmt(g.rewardCoins)} ⚡${fmt(g.rewardEnergy)}</div>`+
-      `<button class="bg-skip" aria-label="送走第${i+1}位客人">送走 ¥${fmt(50*mult())}</button>`;
-    d.querySelector('.bg-skip').onclick=()=>skipGuest(i);
-    list.appendChild(d);
-  });
   renderTrinkets();
   renderPet();
   renderScene();
@@ -1790,36 +1797,37 @@ function skipGuest(i){
   const fee=Math.floor(50*mult());
   if(state.coins<fee){toast('💰','送走客人要 ¥'+fmt(fee)+' 小费，钱不够');return}
   state.coins-=fee;
-  state.queue.splice(i,1);
+  SQ().splice(i,1);
   fillQueue();
   renderBar();renderShop();updateHUD();save();
 }
 /* ================= 手工制作（参考主流餐厅经营：点锅开火 → 等出餐 → 端给客人）================= */
 const cookMs=()=>Math.round(PROD_SEC*1000/speed());     // 一道菜的制作耗时（升级店铺会更快）
-const isCooking=i=>(state.cook[i]||0)>0;
-const cookLeft=i=>Math.max(0,(state.cook[i]||0)-Date.now());
+const isCooking=i=>dCook(i)>0;
+const cookLeft=i=>Math.max(0,dCook(i)-Date.now());
 const cookPct=i=>{
   if(!isCooking(i))return 100;
   const total=cookMs();
   return Math.max(0,Math.min(100,Math.round((1-(cookLeft(i)/total))*100)));
 };
 function startCook(i){
-  if(!state.unlocked[i])return;
+  const d=dishAt(i);
+  if(!d||!isDishOpen(i))return;
   if(isCooking(i))return;
-  if(state.stock[i]>=STOCK_CAP){toast('🧺',PRODUCTS[i].n+'已经满仓了，先端出去');return}
-  state.cook[i]=Date.now()+cookMs();
+  if(dStock(i)>=STOCK_CAP){toast('🧺',d.n+'已经满仓了，先端出去');return}
+  setCook(i,Date.now()+cookMs());
   renderShelf();save();
-  toast('👨‍🍳','开火！'+PRODUCTS[i].e+PRODUCTS[i].n+' '+ (cookMs()/1000).toFixed(1) +' 秒后出餐');
+  toast('👨‍🍳','开火！'+d.e+d.n+' '+(cookMs()/1000).toFixed(1)+' 秒后出餐');
 }
 // 制作完成 → 出货 + 机器冒烟吐菜
 function cookTick(now){
   let changed=false;
-  PRODUCTS.forEach((p,i)=>{
-    if(!state.cook[i]||now<state.cook[i])return;
-    state.cook[i]=0;
-    if(state.stock[i]<STOCK_CAP){
-      state.stock[i]++;
-      flyProduce(i,p.e);                    // 机器吐菜飞向出餐台
+  menu().forEach((d,i)=>{
+    if(!dCook(i)||now<dCook(i))return;
+    setCook(i,0);
+    if(dStock(i)<STOCK_CAP){
+      setStock(i,dStock(i)+1);
+      flyProduce(i,d.e);                    // 机器吐菜飞向出餐台
     }
     changed=true;
   });
@@ -1888,51 +1896,51 @@ function renderShelf(){
   const up=document.getElementById('paneUp'), lock=document.getElementById('paneLock');
   if(!up||!lock)return;
   const wanted=new Set();
-  state.queue.forEach(g=>Object.keys(trayNeed(g)).forEach(k=>wanted.add(k)));
+  SQ().forEach(g=>Object.keys(trayNeed(g)).forEach(k=>wanted.add(k)));
   const upIdx=[],lockIdx=[];
-  PRODUCTS.forEach((p,idx)=>{(state.unlocked[idx]?upIdx:lockIdx).push(idx)});
+  menu().forEach((d,i)=>{(isDishOpen(i)?upIdx:lockIdx).push(i)});
   const keepUpScroll=up.scrollTop, keepLockScroll=lock.scrollTop;   // 重渲染后保留滚动位置
-  // ① 已上架
+  // ① 已上架（本店菜单）
   up.innerHTML='';
   upIdx.forEach(idx=>{
-    const p=PRODUCTS[idx],lv=idx+1;
+    const p=dishAt(idx),lv=p.lv;
     const card=document.createElement('div');
     card.className='card';
-    card.id='pcard'+idx;
-    const stock=state.stock[idx];
+    card.id='dcard'+idx;
+    const stock=dStock(idx);
     const cooking=isCooking(idx);
     const full=stock>=STOCK_CAP;
     const stockTag=`<span class="stock-tag${stock>0?'':' empty'}">${stock}/${STOCK_CAP}</span>`;
-    // 右下角动作区：能上菜就上菜，否则去制作（或显示出餐进度）
+    // 右侧动作区：能上菜就上菜，否则去制作（或显示出餐进度）
     let act='';
     if(cooking){
-      act='<div class="cook-wrap"><div class="cook-bar"><i id="cbar'+idx+'"></i></div>'+
-          '<span class="cook-txt" id="ctxt'+idx+'">出餐中</span></div>';
+      act='<div class="cook-wrap"><div class="cook-bar"><i id="dcbar'+idx+'"></i></div>'+
+          '<span class="cook-txt" id="dctxt'+idx+'">出餐中</span></div>';
     }else{
-      act='<button class="p-btn cook-btn" id="cook'+idx+'" aria-label="制作 '+p.n+'"'+(full?' disabled':'')+'>'+(full?'已满':'制作 👨‍🍳')+'</button>';
+      act='<button class="p-btn cook-btn" id="dcook'+idx+'" aria-label="制作 '+p.n+'"'+(full?' disabled':'')+'>'+(full?'已满':'制作 👨‍🍳')+'</button>';
     }
     let serve='';
     if(wanted.has('l:'+lv)){
       card.classList.add('serving-need');
-      serve='<button class="p-btn serve-btn sm" id="serve'+idx+'" aria-label="上菜 '+p.n+' Lv.'+lv+'"'+(stock>0?'':' disabled')+'>上菜 🍽️</button>';
+      serve='<button class="p-btn serve-btn sm" id="dserve'+idx+'" aria-label="上菜 '+p.n+' Lv.'+lv+'"'+(stock>0?'':' disabled')+'>上菜 🍽️</button>';
     }
     card.innerHTML=
       `<div class="p-emoji">${p.e}</div>`+
       `<div class="p-body">`+
         `<div class="p-name"><span class="p-e-inline">${p.e}</span>${p.n} <span class="lv">Lv.${lv}</span>${stockTag}</div>`+
-        `<div class="p-info">${cooking?('再等 '+(cookLeft(idx)/1000).toFixed(1)+' 秒'):('制作 '+ (cookMs()/1000).toFixed(1) +' 秒 / 份')}</div>`+
-        `<div class="bar"><i id="bar${idx}"></i></div>`+
+        `<div class="p-info">${cooking?('再等 '+(cookLeft(idx)/1000).toFixed(1)+' 秒'):('制作 '+ (cookMs()/1000).toFixed(1) +' 秒 / 份 · ¥'+fmt(PRODUCTS[lv-1].p*mult()))}</div>`+
+        `<div class="bar"><i id="dbar${idx}"></i></div>`+
       `</div>`+
       `<div class="p-acts">${serve}${act}</div>`;
     up.appendChild(card);
     if(wanted.has('l:'+lv)){
-      const sb=document.getElementById('serve'+idx);
+      const sb=document.getElementById('dserve'+idx);
       if(sb)sb.onclick=()=>serveItem('l:'+lv);
     }
-    const cb=document.getElementById('cook'+idx);
+    const cb=document.getElementById('dcook'+idx);
     if(cb)cb.onclick=()=>startCook(idx);
   });
-  // 稀有菜（首次合出后永久上架）
+  // 稀有菜（首次合出后永久上架，不占本店菜单档位）
   Object.keys(HIDDEN).forEach(key=>{
     if(!state.hiddenOwned[key])return;
     const h=HIDDEN[key],cur=state.hiddenStock[key]||0;
@@ -1958,13 +1966,20 @@ function renderShelf(){
       if(btn)btn.onclick=()=>serveItem('r:'+key);
     }
   });
-  if(!upIdx.length&&!Object.keys(state.hiddenOwned).length){
-    up.innerHTML='<div class="lock-item"><span class="li-e">🍋</span><div class="li-body"><div class="li-name">还没有菜品上架</div><div class="li-tip">去合成台生成产品，首次合出就会自动上架</div></div></div>';
+  if(!upIdx.length){
+    const lv0=menu()[0].lv;
+    const hint=document.createElement('div');
+    hint.className='lock-item';
+    hint.innerHTML='<span class="li-e">🍳</span><div class="li-body">'+
+      '<div class="li-name">'+shop().n+'的菜还没上架</div>'+
+      '<div class="li-tip">本店卖 Lv.'+lv0+' 起：去合成台合出 Lv.'+lv0+'，或在「待解锁」里花金币先上架</div>'+
+      '</div>';
+    up.insertBefore(hint,up.firstChild);
   }
-  // ② 待解锁（一行一道菜）
+  // ② 待解锁（本店菜单里还没上架的菜）
   lock.innerHTML='';
   lockIdx.forEach(idx=>{
-    const p=PRODUCTS[idx],lv=idx+1;
+    const p=dishAt(idx),lv=p.lv;
     const buy=GOLD_BUY[lv];
     const row=document.createElement('div');
     row.className='lock-item'+(buy?'':' unknown');
@@ -1981,12 +1996,12 @@ function renderShelf(){
   if(c0)c0.textContent=upIdx.length+Object.keys(state.hiddenOwned).length;
   if(c1)c1.textContent=lockIdx.length;
   up.scrollTop=keepUpScroll; lock.scrollTop=keepLockScroll;
-  Object.keys(GOLD_BUY).forEach(lvStr=>{
-    const idx=lvStr-1;
+  lockIdx.forEach(idx=>{
+    const lv=dishAt(idx).lv;
     const btn=document.getElementById('buy'+idx);
-    if(btn)btn.onclick=()=>{
-      const cost=GOLD_BUY[lvStr];
-      if(state.coins>=cost){state.coins-=cost;unlockProduct(idx);updateHUD()}
+    if(btn&&GOLD_BUY[lv])btn.onclick=()=>{
+      const cost=GOLD_BUY[lv];
+      if(state.coins>=cost){state.coins-=cost;unlockProduct(lv-1);updateHUD()}
       else toast('💰','金币不够～');
     };
   });
@@ -1999,7 +2014,7 @@ function renderShop(){
   renderShopStrip();
   // 队伍里还有人要的菜（已做好的才显示上菜按钮）
   const wanted=new Set();
-  state.queue.forEach(g=>Object.keys(trayNeed(g)).forEach(k=>wanted.add(k)));
+  SQ().forEach(g=>Object.keys(trayNeed(g)).forEach(k=>wanted.add(k)));
   $('#statsBar').innerHTML=
     `<span>👨‍🍳 制作 ${(cookMs()/1000).toFixed(1)} 秒/份</span>`+
     `<span>💰 售价 ×${mult().toFixed(2)}</span>`+
@@ -2122,7 +2137,7 @@ function tick(){
   // 注意：静态的"玩法说明"弹窗常驻 DOM（只有 hidden 类），必须排除，否则这里恒为真、后台刷新会被永久禁用
   const modalOpen=!!document.querySelector('.egg-mask')||!!document.querySelector('.modal-mask:not(.hidden)');
   // 有出餐/正在做菜时刷新徽标与进度条（手工制作时 produced 可能一直是假，必须单独判断）
-  const anyCooking=PRODUCTS.some((p,i)=>state.cook[i]>0);
+  const anyCooking=menu().some((p,i)=>dCook(i)>0);
   if(!modalOpen&&(produced||anyCooking)&&now-(tick._stock||0)>400){
     tick._stock=now;
     refreshStockBadges();
@@ -2173,22 +2188,23 @@ function tick(){
 }
 // 库存徽标 / 上菜按钮 / 出餐进度的低频刷新
 function refreshStockBadges(){
-  PRODUCTS.forEach((p,idx)=>{
-    if(!state.unlocked[idx])return;
-    const tag=document.querySelector('#pcard'+idx+' .stock-tag');
+  menu().forEach((p,idx)=>{
+    if(!isDishOpen(idx))return;
+    const st=dStock(idx);
+    const tag=document.querySelector('#dcard'+idx+' .stock-tag');
     if(tag){
-      tag.textContent=state.stock[idx]+'/'+STOCK_CAP;
-      tag.classList.toggle('empty',state.stock[idx]<=0);
+      tag.textContent=st+'/'+STOCK_CAP;
+      tag.classList.toggle('empty',st<=0);
     }
-    const sb=document.getElementById('serve'+idx);
-    if(sb)sb.disabled=state.stock[idx]<=0;
+    const sb=document.getElementById('dserve'+idx);
+    if(sb)sb.disabled=st<=0;
     // 出餐进度
-    const cbar=document.getElementById('cbar'+idx), ctxt=document.getElementById('ctxt'+idx);
+    const cbar=document.getElementById('dcbar'+idx), ctxt=document.getElementById('dctxt'+idx);
     if(cbar&&isCooking(idx)){
       cbar.style.width=cookPct(idx)+'%';
       if(ctxt)ctxt.textContent='出餐 '+(cookLeft(idx)/1000).toFixed(1)+'s';
     }
-    const info=document.querySelector('#pcard'+idx+' .p-info');
+    const info=document.querySelector('#dcard'+idx+' .p-info');
     if(info&&isCooking(idx))info.textContent='再等 '+(cookLeft(idx)/1000).toFixed(1)+' 秒';
   });
   Object.keys(state.hiddenOwned).forEach(key=>{
@@ -2400,7 +2416,7 @@ function renderAchPanel(){
 
 /* ================= 离线收益 ================= */
 const OFFLINE_RATE=0.30, OFFLINE_CAP=8*3600, OFFLINE_MIN=180;
-const incomePerSec=()=>unlockedPriceSum()*mult()*speed();
+const incomePerSec=()=>menuPriceSum()*mult()*speed();       // 只算本店在卖的菜（别家店的菜不会自己卖出钱）
 const energyPerSec=()=>{let n=0;state.unlocked.forEach((u,i)=>{if(u)n+=(i+1)});return n*energyRate()*speed()};
 function settleOffline(){
   const now=Date.now();
@@ -2767,77 +2783,91 @@ function dogChar(collar,cls){
 }
 
 /* ================= 2.5D 店铺场景 ================= */
-const MACHINE_SLOTS=[16,29,42,55,68,81];         // 后厨操作台上机器站位（%）
+const MACHINE_SLOTS=[14,38,62,86];               // 后厨操作台上机器站位（每店 4 道菜 = 4 台）
 function renderScene(){
   const box=document.getElementById('s3Machines');
   if(!box)return;
-  // ① 后厨机器：每个已解锁商品一台，生产中冒泡+进度条
+  // ① 后厨机器：本店菜单里已上架的菜各一台（生产中冒泡+进度条）
   const list=[];
-  state.unlocked.forEach((u,i)=>{if(u&&list.length<6)list.push(i)});
-  const sig=list.join(',');
+  menu().forEach((d,i)=>{if(isDishOpen(i)&&list.length<6)list.push(i)});
+  const sig=state.activeShop+':'+list.join(',');
   if(box.dataset.sig!==sig){
     box.dataset.sig=sig;
     box.innerHTML=list.map((idx,k)=>
       '<div class="machine" data-i="'+idx+'" style="left:'+MACHINE_SLOTS[k]+'%">'+
         '<span class="m-puff">💨</span>'+
-        '<span class="m-body">'+PRODUCTS[idx].e+'</span>'+
+        '<span class="m-body">'+dishAt(idx).e+'</span>'+
         '<span class="m-bar"><i></i></span>'+
         '<span class="m-badge hidden" data-badge="'+idx+'">+1</span>'+
       '</div>').join('');
   }
-  // ② 服务员 + ③ 客人立牌
+  // ② 服务员（走动上菜）
   const act=document.getElementById('s3Actors');
-  if(!act)return;
-  if(!act.dataset.built){
+  if(act&&!act.dataset.built){
     act.dataset.built='1';
     act.innerHTML='<div class="actor s3-waiter" id="s3Waiter" style="--z:1"><span class="sh"></span>'+
       '<span class="mv"><span class="bd">'+chibiChar({hat:true,apron:true,cloth:'#ffffff',hair:'#4a3328'},'px-waiter')+'</span><span class="tray">🍽️</span></span></div>';
   }
-  const spots=[{left:'20%',bottom:'22%',z:0.86},{left:'50%',bottom:'20%',z:0.92},{left:'78%',bottom:'18%',z:1}];
-  state.queue.forEach((g,i)=>{
-    const sp=spots[i]||spots[2];
+  // ③ 客人：站在吧台前，头顶气泡就是订单（要什么、赏金、送走）
+  const wrap=document.getElementById('s3Guests');
+  if(!wrap)return;
+  const q=SQ();
+  for(let i=0;i<3;i++){
     let el=document.getElementById('s3Guest'+i);
+    const g=q[i];
+    if(!g){if(el)el.remove();continue}
     if(!el){
       el=document.createElement('div');
-      el.className='actor g';el.id='s3Guest'+i;
-      el.setAttribute('aria-hidden','true');    // 场景立牌是装饰，功能在下方订单卡
-      el.innerHTML='<span class="sh"></span><span class="gp"></span><span class="bd"></span>';
-      act.appendChild(el);
+      el.className='gslot';el.id='s3Guest'+i;
+      el.innerHTML='<div class="gbub"></div><div class="actor g"><span class="sh"></span><span class="gp"></span><span class="bd"></span></div>';
+      wrap.appendChild(el);
     }
-    el.style.left=sp.left;el.style.bottom=sp.bottom;el.style.setProperty('--z',sp.z);
-    const has=Object.keys(g.tray).length>0;
-    const cls='actor g'+(g.fx==='happy'?' happy':'')+(g.fx==='paid'?' paid':'');
-    if(el.className!==cls)el.className=cls;
+    const face=g.fx==='paid'?'😍':(g.fx==='happy'?'😋':'');
+    if(el.className!=='gslot'+(g.vip?' vip':'')+(g.fx==='paid'?' paid':'')+(g.fx==='happy'?' happy':'')+(g.isNew?' enter':''))
+      el.className='gslot'+(g.vip?' vip':'')+(g.fx==='paid'?' paid':'')+(g.fx==='happy'?' happy':'')+(g.isNew?' enter':'');
+    g.isNew=false;
+    // 气泡：需求菜单（灰=还没上、橙=上了一半、绿=够了）+ 赏金 + 送走
+    const need=g.items.map(it=>{
+      const k=itemKey(it),have=g.tray[k]||0;
+      const cls=have>=it.count?'full':(have>0?'part':'none');
+      const mark=have>=it.count?'✓':(have+'/'+it.count);
+      return '<span class="dish '+cls+'" title="'+keyName(k)+' '+have+'/'+it.count+'"><i>'+keyEmoji(k)+'</i><b>'+mark+'</b></span>';
+    }).join('');
+    const orderTxt=g.items.map(it=>it.rare
+      ?(HIDDEN[it.rare].n+'×'+it.count)
+      :(dishName(it.level)+'×'+it.count)).join(' ');
+    el.querySelector('.gbub').innerHTML=
+      '<span class="gb-top">第'+(i+1)+'位'+(g.vip?' ✨':'')+(g.night?'🌙':'')+
+        '<em>💰'+fmt(g.rewardCoins)+' ⚡'+fmt(g.rewardEnergy)+'</em></span>'+
+      '<span class="gb-need">'+need+'</span>'+
+      '<button class="gb-skip" aria-label="送走第'+(i+1)+'位客人">送走</button>';
+    el.querySelector('.gb-skip').onclick=()=>skipGuest(i);
+    el.setAttribute('aria-label','第'+(i+1)+'位客人'+(g.vip?'（稀有客人）':'')+' 需要 '+orderTxt+
+      ' 赏金'+g.rewardCoins+'金币'+g.rewardEnergy+'能量');
     const gp=el.querySelector('.gp');
-    const gpTxt=(has?'🍽️ ':'')+'第'+(i+1)+'位';
+    const has=Object.keys(g.tray).length>0;
+    const gpTxt=(has?'🍽️':'')+'第'+(i+1)+'位';
     if(gp.textContent!==gpTxt)gp.textContent=gpTxt;
     gp.classList.toggle('done',has);
     const bd=el.querySelector('.bd');
-    // 客人：Q 版小人（每人固定一套发色/衣服/发型），表情用右上角小图标
-    const pal=CHIBI_PALS[i%CHIBI_PALS.length];
-    const style=CHIBI_STYLES[i%CHIBI_STYLES.length];
+    const pal=CHIBI_PALS[i%CHIBI_PALS.length],style=CHIBI_STYLES[i%CHIBI_STYLES.length];
     const key=pal.hair+pal.cloth+style;
-    const face=g.fx==='paid'?'😍':(g.fx==='happy'?'😋':'');
     const want=chibiChar({hair:pal.hair,cloth:pal.cloth,pants:pal.pants,style:style},'px-guest')+
       (face?'<span class="gfx">'+face+'</span>':'');
     if(bd.dataset.k!==key+face){bd.dataset.k=key+face;bd.innerHTML=want}
-  });
-  for(let i=state.queue.length;i<6;i++){
-    const el=document.getElementById('s3Guest'+i);
-    if(el)el.remove();
   }
   renderPet();
 }
-// 场景低频刷新：机器进度条与生产中动画
+// 场景低频刷新：机器进度条与生产中动画（手工制作后进度=出餐进度）
 function sceneTick(){
   const box=document.getElementById('s3Machines');
   if(!box)return;
   box.querySelectorAll('.machine').forEach(m=>{
     const i=+m.dataset.i;
-    const full=state.stock[i]>=STOCK_CAP;
-    m.classList.toggle('cooking',!full);
+    const cooking=isCooking(i),full=dStock(i)>=STOCK_CAP;
+    m.classList.toggle('cooking',cooking);
     const bar=m.querySelector('.m-bar i');
-    if(bar)bar.style.width=(full?100:(progs[i]||0)*100).toFixed(1)+'%';
+    if(bar)bar.style.width=(cooking?cookPct(i):(full?100:0))+'%';
   });
 }
 // 上菜时服务员走到吧台前递菜（状态已即时结算，这里只做表演）
@@ -2990,11 +3020,13 @@ function petHead(){
   petSay('pet');
   renderPet();save();
 }
-// 投喂：消耗 1 件货架上的菜，等级越高成长越快（成品的价值换成宠物的成长）
+// 投喂：消耗 1 件本店货架上的菜，等级越高成长越快（成品的价值换成宠物的成长）
 function feedPet(idx){
-  if(state.stock[idx]<=0){toast('🥣','这道菜还没做好，等下再喂它');return}
-  state.stock[idx]--;
-  const lv=idx+1;
+  const d=dishAt(idx);
+  if(!d||!isDishOpen(idx))return;
+  if(dStock(idx)<=0){toast('🥣','这道菜还没做好，等下再喂它');return}
+  setStock(idx,dStock(idx)-1);
+  const lv=d.lv;
   const gain=lv*8;
   const p=state.pet;
   p.exp+=gain;p.mood=Math.min(100,p.mood+22);p.fed=(p.fed||0)+1;p.lastFed=Date.now();
@@ -3027,12 +3059,12 @@ function renderPetPanel(){
   const st=petStage(),p=state.pet;
   const need=PET_NEED[p.lv]||0;
   const expPct=need?Math.min(100,Math.round(p.exp/need*100)):100;
-  const foods=PRODUCTS.map((pr,i)=>({pr:pr,i:i})).filter(o=>state.unlocked[o.i]);
+  const foods=menu().map((d,i)=>({d:d,i:i})).filter(o=>isDishOpen(o.i));
   const foodHtml=foods.map(o=>{
-    const s=state.stock[o.i];
+    const s=dStock(o.i);
     return '<button class="pf'+(s>0?'':' empty')+'" data-i="'+o.i+'">'+
-      '<span class="pfe">'+o.pr.e+'</span><b>Lv.'+(o.i+1)+'</b>'+
-      '<span>'+s+' 件 · +'+((o.i+1)*8)+'</span></button>';
+      '<span class="pfe">'+o.d.e+'</span><b>Lv.'+o.d.lv+'</b>'+
+      '<span>'+s+' 件 · +'+(o.d.lv*8)+'</span></button>';
   }).join('');
   const perks=PET_STAGES.slice(1).map(s0=>
     '<span class="'+(p.lv>=s0.lv?'on':'')+'">'+(p.lv>=s0.lv?'✅ ':'🔒 ')+'Lv.'+s0.lv+' '+s0.perk+'</span>'

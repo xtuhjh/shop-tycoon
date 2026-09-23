@@ -1633,7 +1633,8 @@ function fitShelf(){
   if(!view)return;
   const pane=document.getElementById(shelfTab===0?'paneUp':'paneLock');
   if(!pane)return;
-  view.style.height=Math.min(pane.scrollHeight+2,336)+'px';
+  // 加上 view 自身的上下内边距（12px），避免内容被截掉一点点
+  view.style.height=Math.min(pane.scrollHeight+14,336)+'px';
 }
 function shelfPointerDown(e){
   if(e.button!==undefined&&e.button!==0)return;
@@ -1674,6 +1675,7 @@ function renderShelf(){
   state.queue.forEach(g=>Object.keys(trayNeed(g)).forEach(k=>wanted.add(k)));
   const upIdx=[],lockIdx=[];
   PRODUCTS.forEach((p,idx)=>{(state.unlocked[idx]?upIdx:lockIdx).push(idx)});
+  const keepUpScroll=up.scrollTop, keepLockScroll=lock.scrollTop;   // 重渲染后保留滚动位置
   // ① 已上架
   up.innerHTML='';
   upIdx.forEach(idx=>{
@@ -1749,6 +1751,7 @@ function renderShelf(){
   const c0=document.getElementById('stCount0'), c1=document.getElementById('stCount1');
   if(c0)c0.textContent=upIdx.length+Object.keys(state.hiddenOwned).length;
   if(c1)c1.textContent=lockIdx.length;
+  up.scrollTop=keepUpScroll; lock.scrollTop=keepLockScroll;
   Object.keys(GOLD_BUY).forEach(lvStr=>{
     const idx=lvStr-1;
     const btn=document.getElementById('buy'+idx);

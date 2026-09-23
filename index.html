@@ -453,6 +453,68 @@ body{
 .m-danger{background:#ffe3e3;color:#d63031}
 .hidden{display:none!important}
 
+/* ================= 彩蛋：主流手游式呈现 ================= */
+/* 发现彩蛋：全屏金光 + 中央卡（主流"恭喜获得"弹窗） */
+.egg-mask{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:22px;
+  background:radial-gradient(circle at 50% 44%,rgba(255,214,102,.35),rgba(28,18,40,.86));animation:eggIn .3s ease}
+@keyframes eggIn{from{opacity:0}to{opacity:1}}
+.egg-mask .rays{position:absolute;width:150vmax;height:150vmax;pointer-events:none;
+  background:conic-gradient(from 0deg,rgba(255,214,102,.16) 0 6deg,transparent 6deg 18deg);
+  animation:rays 14s linear infinite}
+@keyframes rays{to{transform:rotate(360deg)}}
+.egg-card{position:relative;width:100%;max-width:330px;border-radius:22px;padding:22px 20px 18px;text-align:center;
+  background:linear-gradient(180deg,#fffdf6,#fff3d8);border:2px solid #f5c242;
+  box-shadow:0 20px 46px rgba(60,35,10,.4),0 0 0 6px rgba(255,255,255,.35);
+  animation:eggPop .5s cubic-bezier(.2,1.5,.35,1)}
+@keyframes eggPop{0%{transform:scale(.5) translateY(16px);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+.egg-badge{width:84px;height:84px;margin:-56px auto 8px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:42px;background:radial-gradient(circle at 50% 35%,#fff6d8,#ffd964);
+  border:3px solid #fff;box-shadow:0 8px 20px rgba(200,140,20,.45);animation:badgeFloat 2.2s ease-in-out infinite}
+@keyframes badgeFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.egg-title{font-size:13px;font-weight:800;color:#c8912a;letter-spacing:.5px}
+.egg-name{font-size:20px;font-weight:900;color:#6b4a12;margin:4px 0 6px}
+.egg-desc{font-size:12.5px;color:#8a7346;font-weight:600;line-height:1.6}
+.egg-reward{margin-top:11px;padding:9px 12px;border-radius:12px;background:rgba(255,255,255,.8);
+  font-size:14px;font-weight:900;color:#d35400;border:1.5px dashed #f0d79a}
+.egg-btn{margin-top:13px;width:100%;border:none;border-radius:14px;padding:13px;cursor:pointer;
+  font-size:15px;font-weight:900;color:#6b4a12;letter-spacing:1px;
+  background:linear-gradient(180deg,#ffe27a,#f5b52e);box-shadow:0 5px 0 #c8912a,0 8px 18px rgba(200,140,20,.35)}
+.egg-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #c8912a}
+/* 图鉴面板（收集玩法） */
+.egg-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:10px}
+.egg-item{display:flex;gap:8px;align-items:flex-start;padding:9px;border-radius:13px;background:#fff;
+  border:1.5px solid #efe6f3;text-align:left}
+.egg-item.locked{background:#f7f4f9;border-style:dashed;opacity:.75}
+.egg-item .ei{font-size:21px;filter:grayscale(1) opacity(.45)}
+.egg-item.on .ei{filter:none}
+.egg-item b{display:block;font-size:12.5px;color:#6b5b6e}
+.egg-item span{font-size:10.5px;color:#a08fa6;font-weight:600;line-height:1.45;display:block}
+/* 吧台上的小玩意（招财猫/宝箱） */
+.bar-trinkets{position:absolute;right:10px;top:50px;display:flex;gap:6px;align-items:flex-end;z-index:4}
+.trinket{border:none;background:transparent;font-size:25px;line-height:1;cursor:pointer;padding:2px;
+  filter:drop-shadow(0 3px 5px rgba(120,80,20,.35));animation:trinketIdle 2s ease-in-out infinite}
+.trinket:active{transform:scale(.9)}
+.trinket.chest{animation:chestShake 1.4s ease-in-out infinite}
+@keyframes trinketIdle{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-4px) rotate(3deg)}}
+@keyframes chestShake{0%,72%,100%{transform:rotate(0) scale(1)}78%{transform:rotate(-11deg) scale(1.08)}84%{transform:rotate(9deg) scale(1.08)}90%{transform:rotate(-5deg) scale(1.04)}}
+.trinket.open{animation:chestOpen .6s ease forwards}
+@keyframes chestOpen{0%{transform:scale(1)}40%{transform:scale(1.5) rotate(-12deg)}100%{transform:scale(0) rotate(20deg);opacity:0}}
+.trinket-lv{font-size:9px;font-weight:800;color:#8a6d2f;background:rgba(255,255,255,.85);border-radius:7px;padding:0 4px;
+  position:absolute;transform:translate(-6px,14px)}
+/* 深夜时段角标 */
+.bar-night{font-size:10px;font-weight:800;color:#fff;background:linear-gradient(135deg,#4a4a8a,#20204a);
+  border-radius:8px;padding:3px 7px;white-space:nowrap;box-shadow:0 2px 6px rgba(20,20,60,.35)}
+/* 隐藏套餐提示按钮 */
+.combo-btn{
+  display:none;width:100%;margin-top:9px;border:2px dashed #f5c242;border-radius:13px;padding:9px;cursor:pointer;
+  background:linear-gradient(135deg,#fff8e1,#ffefc0);color:#8a6d2f;font-weight:900;font-size:12.5px;
+  font-family:inherit;animation:comboPulse 1.5s ease-in-out infinite;
+}
+.combo-btn.on{display:block}
+@keyframes comboPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,194,66,.4)}50%{box-shadow:0 0 0 7px rgba(245,194,66,0)}}
+/* 彩蛋入口按钮 */
+.menu-egg{background:linear-gradient(135deg,#ffe27a,#f5b52e);color:#6b4a12}
+
 /* ================= 手机自适应 =================
    断点取 520px（高于内容容器 max-width:480），确保所有手机（320~480）
    都稳定命中，不受滚动条/缩放导致的 1~15px 视口抖动影响 */
@@ -530,7 +592,10 @@ body{
       <div class="shop-strip" id="shopStrip"></div>
       <div class="bar-scene">
         <div class="bar-inside">
-          <span class="bar-sign"><span id="barSignEmoji">🛖</span><span id="barSignName">街边小摊</span><em id="barSignLv">Lv.1</em></span>
+          <button class="bar-sign" id="barSign" aria-label="吧台招牌，连点试试看">
+            <span id="barSignEmoji">🛖</span><span id="barSignName">街边小摊</span><em id="barSignLv">Lv.1</em>
+          </button>
+          <span class="bar-night hidden" id="barNight">🌙 深夜赏金 ×3</span>
           <span class="bar-hint">点下面货架上<b>做好的菜</b><br>自动端给排队的第一位客人</span>
         </div>
         <div class="bar-staff" aria-hidden="true">
@@ -540,6 +605,7 @@ body{
           <span class="st-steam">💨</span>
         </div>
         <div class="bar-surface"></div>
+        <div class="bar-trinkets" id="barTrinkets"></div>
         <div class="bar-guests" id="barGuests"></div>
       </div>
       <div style="font-size:13.5px;font-weight:800;color:#6b5b6e;margin:8px 0 7px">🧺 货架（按时间自动生产，每样最多囤 5 件）</div>
@@ -554,6 +620,7 @@ body{
       <div class="merge-head" id="mergeHead"></div>
       <div class="merge-tip" id="mergeTip"></div>
       <div id="grid"></div>
+      <button class="combo-btn" id="btnCombo" aria-label="触发隐藏套餐彩蛋">🍱 咦…这三样凑齐了？点我试试</button>
       <div class="drag-hint">🖐 按住一道菜<b>拖动</b>到同级菜上直接合并 · 拖到空格可移动整理 · 拖到「出货模式」按钮上直接换能量 · 也可以点两下</div>
       <div class="lv-chips" id="lvChips"></div>
       <div class="merge-actions">
@@ -583,6 +650,9 @@ body{
         <li>✨ 合并时小概率蹦出<b>隐藏稀有钱</b> 🍀🌈👑（白金餐厅下出现率翻倍！）</li>
         <li>📦 出货模式：点击合成台里的产品直接换成能量</li>
       </ul>
+      <div class="m-btns">
+        <button class="menu-egg" id="btnEggs">🥚 彩蛋图鉴 <span id="eggCount">0/6</span></button>
+      </div>
       <div class="m-btns">
         <button class="m-primary" id="btnCloseMenu">继续经营</button>
         <button class="m-danger" id="btnReset">重置存档</button>
@@ -658,6 +728,16 @@ const defaultState=()=>({
   mergeLevel:1,
   ordersDone:0,
   queue:[],
+  // ---- 彩蛋相关 ----
+  eggs:{},            // {sign:true,...}
+  signClicks:0,       // 连点招牌次数
+  catReady:0,         // 招财猫点击冷却
+  catNext:0,          // 下次自动收益时间
+  chest:null,         // 宝箱存在到期时间
+  chestNext:0,        // 下次宝箱出现时间
+  comboNext:0,        // 隐藏套餐冷却
+  comboHinted:false,
+  lastDaily:'',       // 上次领取每日礼的日期
 });
 let state=defaultState();
 let progs=PRODUCTS.map(()=>0);
@@ -920,7 +1000,8 @@ function newGuest(){
   const items=[];
   // 稀有客人：你拥有稀有物且有现货时，小概率有人出天价点名要买
   const rareReady=Object.keys(HIDDEN).filter(k=>state.hiddenOwned[k]&&(state.hiddenStock[k]||0)>0);
-  if(rareReady.length&&Math.random()<VIP_RARE_CHANCE){
+  const night=isNight();
+  if(rareReady.length&&Math.random()<(night?VIP_RARE_CHANCE*2:VIP_RARE_CHANCE)){
     items.push({rare:rareReady[Math.floor(Math.random()*rareReady.length)],count:1});
   }else{
     const pool=[];
@@ -953,8 +1034,9 @@ function newGuest(){
     face:FACES[Math.floor(Math.random()*FACES.length)],
     items,
     vip:items.some(it=>it.rare),
-    rewardCoins:Math.max(30,Math.floor(coinBase*ORDER_COIN_K*mult()*orderMult())),
-    rewardEnergy:Math.max(10,Math.floor(energyBase*ORDER_ENERGY_K*energyRate())),
+    night:night,
+    rewardCoins:Math.max(30,Math.floor(coinBase*ORDER_COIN_K*mult()*orderMult()*(night?3:1))),
+    rewardEnergy:Math.max(10,Math.floor(energyBase*ORDER_ENERGY_K*energyRate()*(night?2:1))),
     tray:{},
     fx:'',
     isNew:true,
@@ -1065,6 +1147,7 @@ function generate(){
   selIdx=-1;
   checkUnlock(genLv);
   renderGrid();updateHUD();save();
+  checkCombo();
 }
 function checkUnlock(level){
   if(level>state.bestOwned){
@@ -1130,6 +1213,7 @@ function afterMerge(res){
     popRing(cellEls[res.from]);
   }
   if(res.kind==='merge')floatText(cellEls[res.to],'Lv.'+res.level+' 🎉','#9b59b6');
+  checkCombo();                                   // 彩蛋④：凑齐套餐？
   return true;
 }
 function jellyEl(el){
@@ -1149,6 +1233,7 @@ function cellClick(i){
     state.grid[i]=null;selIdx=-1;
     floatText($('#grid'),'+'+fmt(g)+'⚡','#f5a623');
     renderGrid();updateHUD();save();
+    checkCombo();
     return;
   }
   if(!c){selIdx=-1;renderGrid();return}
@@ -1255,12 +1340,13 @@ function renderBar(){
     d.innerHTML=
       `<span class="bg-pos">第 ${i+1} 位</span>`+
       `<div class="bg-plate">${plate}</div>`+
-      `<div class="bg-face">${face}</div>`+
-      `<div class="bg-pay">💰${fmt(g.rewardCoins)}<br>⚡${fmt(g.rewardEnergy)}</div>`+
+      `<div class="bg-face">${face}${g.night?'🌙':''}</div>`+
+      `<div class="bg-pay">${g.night?'<b style="color:#4a4a8a">🌙深夜×3</b><br>':''}💰${fmt(g.rewardCoins)}<br>⚡${fmt(g.rewardEnergy)}</div>`+
       `<button class="bg-skip" aria-label="送走第${i+1}位客人">送走 ¥${fmt(50*mult())}</button>`;
     d.querySelector('.bg-skip').onclick=()=>skipGuest(i);
     list.appendChild(d);
   });
+  renderTrinkets();
 }
 function skipGuest(i){
   if(orderBusy)return;
@@ -1478,6 +1564,26 @@ function tick(){
     tick._stock=now;
     refreshStockBadges();
   }
+  // 彩蛋：招财猫自动收益 + 宝箱出现/过期
+  if(state.eggs.cat&&now>=(state.catNext||0)){
+    state.catNext=now+60000;
+    const inc=Math.max(20,Math.round(30*mult()));
+    state.coins+=inc;
+    const cat=document.getElementById('catBtn');
+    if(cat)floatText(cat,'+'+fmt(inc)+'💰','#f0a72b');
+    updateHUD();save();
+  }
+  if(state.chest&&now>state.chest){                 // 宝箱超时收走
+    state.chest=null;renderTrinkets();
+  }
+  if(!state.chest&&now>=(state.chestNext||0)){
+    state.chestNext=now+120000;
+    if(document.querySelector('#page-shop.active')||!document.querySelector('.page.active')){
+      spawnChest();
+    }else{
+      state.chestNext=now+30000;                    // 不在商店页就等一会再刷
+    }
+  }
   if(now-(tick._btn||0)>1500){
     tick._btn=now;
     const ub=$('#btnUpShop'),nb=$('#btnNewShop'),next=SHOPS[state.shopTier+1];
@@ -1610,6 +1716,223 @@ function gridPointerUp(){
   }
 }
 
+/* ================= 隐藏彩蛋 ================= */
+const EGGS=[
+  {k:'sign', e:'🥠', n:'手写菜单',  d:'连点吧台招牌 8 次，老板会翻出一张手写菜单'},
+  {k:'cat',  e:'🐱', n:'招财猫',    d:'菜单里蹦出来的招财猫，每分钟自动帮你赚钱，点它还有额外奖励'},
+  {k:'chest',e:'🎁', n:'神秘宝箱',  d:'吧台上偶尔出现，点开有随机奖励（可能开出稀有菜）'},
+  {k:'combo',e:'🍱', n:'隐藏套餐',  d:'合成台里同时有 Lv.1 + Lv.2 + Lv.3 各一个'},
+  {k:'night',e:'🌙', n:'深夜限定客',d:'现实时间 23:00~02:00 开店，赏金翻 3 倍'},
+  {k:'daily',e:'📅', n:'每日开店礼',d:'每天第一次开店都有红包'},
+];
+const eggOf=k=>EGGS.find(x=>x.k===k);
+const eggCount=()=>EGGS.filter(x=>state.eggs[x.k]).length;
+const isNight=(d)=>{const h=(d||new Date()).getHours();return h>=23||h<2};
+const todayKey=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};
+
+// 主流手游式奖励弹窗：全屏金光 + 中央卡片 + 领取按钮
+function showReward(o){
+  const m=document.createElement('div');
+  m.className='egg-mask';
+  m.innerHTML='<div class="rays"></div><div class="egg-card">'+
+    '<div class="egg-badge">'+o.icon+'</div>'+
+    '<div class="egg-title">'+o.title+'</div>'+
+    (o.name?'<div class="egg-name">'+o.name+'</div>':'')+
+    (o.desc?'<div class="egg-desc">'+o.desc+'</div>':'')+
+    (o.reward?'<div class="egg-reward">'+o.reward+'</div>':'')+
+    '<button class="egg-btn">'+(o.btn||'领取奖励')+'</button>'+
+  '</div>';
+  document.body.appendChild(m);
+  m.querySelector('.egg-btn').onclick=()=>{
+    m.remove();
+    if(o.onClaim)o.onClaim();
+    updateHUD();renderBar();renderShop();save();
+  };
+  return m;
+}
+function unlockEgg(k,silent){
+  if(state.eggs[k])return false;
+  state.eggs[k]=true;
+  refreshEggBadge();save();
+  if(!silent){const eg=eggOf(k);toast(eg.e,'发现隐藏彩蛋：'+eg.n+'！');}
+  return true;
+}
+// 首次发现弹"发现彩蛋"卡，之后再触发就弹普通奖励卡
+function eggReward(k,rewardText,give,againTitle){
+  const first=!state.eggs[k];
+  const eg=eggOf(k);
+  unlockEgg(k,true);
+  showReward({
+    icon:eg.e,
+    title:first?'🎉 发现隐藏彩蛋！':(againTitle||'🎁 好东西！'),
+    name:first?eg.n:'',
+    desc:first?eg.d:'',
+    reward:rewardText,
+    btn:first?'领取奖励':'收下',
+    onClaim:()=>{if(give)give()}
+  });
+}
+function refreshEggBadge(){
+  const el=document.getElementById('eggCount');
+  if(el)el.textContent=eggCount()+'/'+EGGS.length;
+}
+function renderEggsPanel(){
+  const items=EGGS.map(eg=>{
+    const on=!!state.eggs[eg.k];
+    return '<div class="egg-item'+(on?' on':' locked')+'">'+
+      '<span class="ei">'+(on?eg.e:'❔')+'</span>'+
+      '<span><b>'+(on?eg.n:'??? 未发现')+'</b><span>'+(on?eg.d:'继续经营，也许某个操作会触发它')+'</span></span>'+
+    '</div>';
+  }).join('');
+  const m=document.createElement('div');
+  m.className='modal-mask';
+  m.innerHTML='<div class="modal"><h3>🥚 彩蛋图鉴 '+eggCount()+'/'+EGGS.length+'</h3>'+
+    '<p style="font-size:12.5px">这家店藏着 '+EGGS.length+' 个彩蛋，已经发现 '+eggCount()+' 个：</p>'+
+    '<div class="egg-grid">'+items+'</div>'+
+    '<div class="m-btns"><button class="m-primary">继续经营</button></div></div>';
+  document.body.appendChild(m);
+  m.querySelector('.m-primary').onclick=()=>m.remove();
+  m.onclick=e=>{if(e.target===m)m.remove()};
+}
+// ---- 彩蛋①：连点招牌 → 手写菜单 ----
+function signClick(){
+  const sign=document.getElementById('barSign');
+  if(!state.eggs.sign){
+    state.signClicks=(state.signClicks||0)+1;
+    bumpEl(sign);
+    if(state.signClicks%3===0)toast('👀','招牌有点松动…（'+state.signClicks+'/8）');
+    if(state.signClicks>=8){
+      const rc=Math.max(500,Math.round(2000*mult()));
+      eggReward('sign','💰 '+fmt(rc)+' 金币 · 🐱 招财猫',()=>{
+        state.coins+=rc;
+        state.eggs.cat=true;         // 招财猫跟着菜单一起出现
+        state.catNext=Date.now()+60000;
+        refreshEggBadge();
+        setTimeout(()=>toast('🐱','招财猫跳上吧台了！每分钟自动帮你赚钱'),700);
+      });
+      save();
+      return;
+    }
+    save();
+    return;
+  }
+  // 已解锁：点招牌逗猫（无副作用的小反馈）
+  bumpEl(sign);
+}
+// ---- 彩蛋②：招财猫（挂机收益 + 点击奖励） ----
+function renderTrinkets(){
+  const box=document.getElementById('barTrinkets');
+  if(!box)return;
+  let html='';
+  if(state.eggs.cat)html+='<button class="trinket" id="catBtn" aria-label="招财猫：点它领奖励">🐱</button>';
+  if(state.chest)html+='<button class="trinket chest" id="chestBtn" aria-label="神秘宝箱：点它开启">🎁</button>';
+  if(box.innerHTML!==html)box.innerHTML=html;
+  const cat=document.getElementById('catBtn');
+  if(cat)cat.onclick=catClick;
+  const ch=document.getElementById('chestBtn');
+  if(ch)ch.onclick=openChest;
+}
+function catClick(){
+  const now=Date.now();
+  if(now<(state.catReady||0)){
+    toast('🐱','招财猫在打盹，还要等 '+Math.ceil((state.catReady-now)/1000)+' 秒');
+    return;
+  }
+  state.catReady=now+180000;                    // 3 分钟冷却
+  const bonus=Math.max(100,Math.round(600*mult()));
+  const en=Math.max(20,Math.round(60*energyRate()));
+  state.coins+=bonus;state.energy+=en;
+  const cat=document.getElementById('catBtn');
+  if(cat)floatText(cat,'+'+fmt(bonus)+'💰 +'+fmt(en)+'⚡','#d35400');
+  updateHUD();save();
+  toast('🐱','招财猫掏出了私房钱：+'+fmt(bonus)+'💰 +'+fmt(en)+'⚡');
+}
+// ---- 彩蛋③：神秘宝箱 ----
+function spawnChest(){
+  state.chest=Date.now()+90000;                  // 90 秒后自动消失
+  renderTrinkets();
+  toast('🎁','吧台上出现了一个神秘宝箱！');
+}
+function openChest(){
+  const btn=document.getElementById('chestBtn');
+  state.chest=null;
+  if(btn)btn.classList.add('open');
+  state.chestNext=Date.now()+120000+Math.random()*120000;
+  const roll=Math.random();
+  let html='',give=null;
+  const rareKeys=Object.keys(HIDDEN).filter(k=>!state.hiddenOwned[k]);
+  if(roll<0.12&&rareKeys.length){                 // 小概率直接开出稀有菜
+    const key=rareKeys[Math.floor(Math.random()*rareKeys.length)];
+    html=HIDDEN[key].e+' 稀有菜「'+HIDDEN[key].n+'」';
+    give=()=>{state.hiddenOwned[key]=true;state.hiddenStock[key]=Math.max(1,state.hiddenStock[key]||0)};
+  }else if(roll<0.55){
+    const c=Math.max(800,Math.round(3000*mult()));
+    html='💰 '+fmt(c)+' 金币';
+    give=()=>{state.coins+=c};
+  }else{
+    const en=Math.max(150,Math.round(400*energyRate()));
+    html='⚡ '+fmt(en)+' 能量';
+    give=()=>{state.energy+=en};
+  }
+  setTimeout(()=>{
+    eggReward('chest',html,give,'🎁 开箱！');
+    renderTrinkets();
+  },560);
+  save();
+}
+// ---- 彩蛋④：隐藏套餐（Lv.1+2+3 同时在合成台） ----
+function comboReady(){
+  const has=lv=>state.grid.some(c=>c&&c.level===lv);
+  return has(1)&&has(2)&&has(3);
+}
+function checkCombo(){
+  const btn=document.getElementById('btnCombo');
+  if(!btn)return;
+  const ready=comboReady();
+  btn.classList.toggle('on',ready);
+  if(ready&&!state.comboHinted){
+    state.comboHinted=true;
+    toast('🍱','咦…Lv.1、Lv.2、Lv.3 凑齐了？');
+  }
+  if(!ready)state.comboHinted=false;
+}
+function doCombo(){
+  if(!comboReady())return;
+  if(Date.now()<(state.comboNext||0)){
+    toast('🍱','套餐刚做过，等 '+Math.ceil((state.comboNext-Date.now())/1000)+' 秒');
+    return;
+  }
+  const take=lv=>{const i=state.grid.findIndex(c=>c&&c.level===lv);if(i>=0)state.grid[i]=null};
+  take(1);take(2);take(3);
+  state.comboNext=Date.now()+300000;              // 5 分钟冷却
+  const c=Math.max(2000,Math.round(8000*mult()));
+  const en=Math.max(200,Math.round(500*energyRate()));
+  eggReward('combo','💰 '+fmt(c)+' 金币 · ⚡ '+fmt(en)+' 能量',()=>{
+    state.coins+=c;state.energy+=en;
+  },'🍱 套餐又做好了！');
+  renderGrid();checkCombo();save();
+}
+// ---- 彩蛋⑤：深夜限定客（23:00~02:00） ----
+function checkNight(){
+  const on=isNight();
+  const badge=document.getElementById('barNight');
+  if(badge)badge.classList.toggle('hidden',!on);
+  if(on&&!state.eggs.night){
+    eggReward('night','今夜客人赏金 ×3 · 稀有客人更容易出现',()=>{});
+  }
+}
+// ---- 彩蛋⑥：每日开店礼 ----
+function checkDaily(){
+  const t=todayKey();
+  if(state.lastDaily===t)return;
+  state.lastDaily=t;save();
+  const c=Math.max(300,Math.round(1500*mult()));
+  const en=Math.max(50,Math.round(200*energyRate()));
+  state.coins+=c;state.energy+=en;
+  eggReward('daily','💰 '+fmt(c)+' 金币 · ⚡ '+fmt(en)+' 能量',null,'📅 今日开店礼');
+  updateHUD();
+}
+
 /* ================= 事件 ================= */
 document.querySelectorAll('.tab').forEach(t=>{
   t.onclick=()=>{
@@ -1660,8 +1983,16 @@ renderShop();        // 内部已含 renderBar()
 renderMergeHead();
 renderGrid();
 renderChips();
+refreshEggBadge();
+renderTrinkets();
+$('#barSign').onclick=signClick;
+$('#btnCombo').onclick=doCombo;
+$('#btnEggs').onclick=()=>{$('#menuModal').classList.add('hidden');renderEggsPanel()};
+if(!state.chestNext)state.chestNext=Date.now()+45000;
+if(!state.catNext)state.catNext=Date.now()+60000;
 setInterval(tick,200);
 setInterval(save,10000);
+setTimeout(()=>{checkNight();checkDaily();},900);   // 开场彩蛋判定
 if(state.genCount===0&&state.totalMerged===0){
   setTimeout(()=>toast('👋','欢迎开店！点一位客人开始服务，或去合成台生成产品'),600);
 }

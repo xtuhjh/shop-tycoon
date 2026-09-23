@@ -64,9 +64,12 @@ body{
 .stats-bar .perk{color:#27ae60}
 
 /* ===== 店铺条（自动换行，全部可见可点；紧凑两行内）===== */
+/* 店铺切换条：单行横滚（换行会吃掉 100+px 竖向空间，把出餐台挤没） */
 .shop-strip{
-  display:flex;flex-wrap:wrap;gap:4px;padding:0 0 5px;margin-bottom:3px;
+  display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:4px;
+  padding:0 0 4px;margin-bottom:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;
 }
+.shop-strip::-webkit-scrollbar{display:none}
 .shop-chip{
   flex:0 0 auto;background:rgba(255,255,255,.85);border-radius:9px;padding:4px 7px;
   font-size:10.5px;font-weight:700;color:#6b5b6e;display:flex;align-items:center;gap:3px;
@@ -370,6 +373,7 @@ body{
 .card .p-name .rare-tag{font-size:10px;background:linear-gradient(135deg,#f5c242,#e89b0c);color:#fff;border-radius:6px;padding:0 5px;font-weight:800}
 .card .p-name .stock-tag{font-size:10px;background:#e8f8ef;color:#27ae60;border-radius:6px;padding:0 5px;font-weight:800}
 .card .p-name .stock-tag.empty{background:#fdeeee;color:#e74c3c}
+.p-e-inline{display:none}   /* 窄屏把 emoji 收进菜名行，省掉独立图标列 */
 .card .p-info{font-size:11px;color:#8d7a92;margin-top:1px}
 .card .p-info b{color:#f0783c}
 .card .bar{height:4px;background:#f3edf5;border-radius:99px;margin-top:4px;overflow:hidden}
@@ -388,6 +392,14 @@ body{
 }
 /* 只用 transform 呼吸（原来动 box-shadow，会每帧重绘导致掉帧） */
 @keyframes serveBro{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+/* 出餐台：右侧动作列（上菜 / 制作 / 出餐进度） */
+.card .p-acts{display:flex;flex-direction:column;gap:4px;flex-shrink:0;align-items:stretch;min-width:62px}
+.card .p-btn.sm{padding:5px 8px;font-size:11px;border-radius:9px}
+.cook-btn{background:linear-gradient(135deg,#f6a05a,#ef6f4e)}
+.cook-wrap{display:flex;flex-direction:column;gap:2px;align-items:center}
+.cook-bar{width:58px;height:9px;border-radius:99px;background:#f1e9f5;overflow:hidden;box-shadow:inset 0 1px 3px rgba(120,90,140,.16)}
+.cook-bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#ffc46b,#ef6f4e);transition:width .2s linear}
+.cook-txt{font-size:9.5px;font-weight:800;color:#ef6f4e;white-space:nowrap}
 .lock-desc{font-size:11px;color:#a08fa6}
 /* ===== 货架子标签页（左右滑动切换，页面高度不再随菜品增加）===== */
 .shelf-tabs{display:flex;align-items:center;gap:6px;margin:4px 0 5px}
@@ -708,16 +720,25 @@ body{
    都稳定命中，不受滚动条/缩放导致的 1~15px 视口抖动影响 */
 @media (max-width:520px){
   #app{padding:8px 9px 12px}
-  #hud{padding:8px 10px;border-radius:14px}
-  .res{min-width:0;flex:1 1 0;font-size:13.5px;padding:4px 9px;justify-content:center}
-  #btnMenu{width:30px;height:30px;font-size:15px}
+  /* HUD 收成一行：#shopBadge 原来 flex:1 1 100% 强制换行，白吃 40+px */
+  #hud{padding:7px 9px;border-radius:14px;gap:5px}
+  .res{min-width:0;flex:0 1 auto;font-size:12.5px;padding:3px 8px;justify-content:center}
+  .res .ico{font-size:14px}
+  #shopBadge{flex:1 1 auto;min-width:0;font-size:11.5px;margin-top:0;gap:5px}
+  #shopBadge .lv-tag{font-size:10.5px;padding:0 5px}
+  #shopName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:104px}
+  #btnMenu{width:28px;height:28px;font-size:14px}
   #shopBadge{font-size:12.5px}
   .tab{padding:9px 0;font-size:14px}
   .stats-bar{font-size:11.5px;padding:7px 10px;gap:3px}
   .shop-chip{font-size:11px;padding:6px 8px}
   .shop-chip .sc-e{font-size:15px}
-  /* 2.5D 场景在手机上略矮、机器略小 */
-  .shop3d{height:190px}
+  /* 2.5D 场景在手机上更矮（把空间让给出餐台，菜品要看得全） */
+  .shop3d{height:122px}
+  .bar-pet{bottom:3%}
+  .s3-waiter{bottom:32%}
+  .bar-trinkets{bottom:30%}
+  .s3-hint{display:none}
   /* 客人卡紧凑化，省出一屏空间 */
   .bar-guests{gap:5px;padding:0 1px 7px;margin-top:5px}
   .bguest{padding:4px 3px 5px;border-radius:10px;gap:2px}
@@ -735,15 +756,15 @@ body{
   .actor .bd{font-size:20px}
   .s3-board{height:34px;top:20px}
   .s3-hint{font-size:9px;top:32px}
-  .bar-guests{gap:4px;padding:0 5px 8px}
-  .bguest{padding:4px 3px 5px;border-radius:10px;gap:2px}
-  .bguest .bg-face{font-size:21px}
-  .bg-plate{padding:5px 6px;min-height:33px;gap:4px}
-  .dish{width:24px;height:24px;border-radius:8px}
-  .dish i{font-size:14px}
-  .dish b{font-size:8.5px;right:-4px;bottom:-4px}
-  .bg-pos{font-size:9px;padding:0 5px}
   .card{padding:8px 10px;gap:9px;margin-bottom:7px;border-radius:14px}
+  /* 出餐台改双列紧凑卡片：单列时一屏只看得到 2 张，菜品「展示不全」 */
+  #paneUp{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:7px;align-content:start}
+  #paneUp .card{flex-direction:column;align-items:stretch;gap:6px;padding:7px 9px;margin-bottom:0}
+  #paneUp .card .p-emoji{display:none}
+  #paneUp .card .p-e-inline{display:inline;margin-right:2px}
+  #paneUp .card .p-acts{flex-direction:row;min-width:0;gap:5px}
+  #paneUp .card .p-btn{flex:1;min-width:0;padding:6px 4px;font-size:11px;line-height:1.15}
+  #paneUp .card .p-info{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .card .p-emoji{font-size:27px;width:38px}
   .card .p-name{font-size:14px}
   .card .p-info{font-size:11.5px}
@@ -866,14 +887,14 @@ body{
           <span id="barSignEmoji">🛖</span><span id="barSignName">街边小摊</span><em id="barSignLv">Lv.1</em>
         </button>
         <span class="s3-night hidden" id="barNight">🌙 深夜赏金 ×3</span>
-        <span class="s3-hint">点货架上做好的菜<br>服务员会自动端给客人</span>
+        <span class="s3-hint">点出餐台的「制作」开火<br>做好后点「上菜」端给客人</span>
         <div id="s3Actors"></div>
         <div class="bar-trinkets" id="barTrinkets"></div>
         <div class="bar-pet" id="barPet"></div>
       </div>
-      <div class="bar-guests" id="barGuests"></div>
+      <!-- 出餐台（菜品）：紧贴厨房。自上而下：厨房出餐 → 端出去 → 客人等餐 -->
       <div class="shelf-tabs">
-        <button class="st-btn active" id="stBtn0" data-tab="0">🧺 已上架 <em id="stCount0">0</em></button>
+        <button class="st-btn active" id="stBtn0" data-tab="0">🍳 出餐台 <em id="stCount0">0</em></button>
         <button class="st-btn" id="stBtn1" data-tab="1">🔒 待解锁 <em id="stCount1">0</em></button>
         <span class="st-hint">← 左右滑动切换 →</span>
       </div>
@@ -883,6 +904,7 @@ body{
           <div class="shelf-pane" id="paneLock"></div>
         </div>
       </div>
+      <div class="bar-guests" id="barGuests"></div>
     </section>
 
     <section id="page-merge" class="page">
@@ -905,10 +927,10 @@ body{
     <div class="modal">
       <h3>📖 玩法说明</h3>
       <ul>
-        <li>🏭 <b>货架按时间自动生产</b>：每秒慢慢出货到货架（每样最多囤 5 件）—— 但<b>钱不会自己涨</b></li>
-        <li>💰 <b>只有把商品端给客人，才收得到钱</b>：客人付款 = 商品价 × 售价倍率 × 客人数量；能量也是上菜才给</li>
-        <li>🍽️ <b>当服务员</b>：吧台里大厨在做菜，客人端着盘子在台前排队，盘子上的 <b>1/3</b> 就是上菜进度</li>
-        <li>👉 <b>上菜只需点「做好的菜」</b>：自动端给排队顺序里第一个要它的客人，凑齐自动结账、客人走人下一位补位</li>
+        <li>👨‍🍳 <b>自己做菜</b>：出餐台上每道菜都要点「制作 👨‍🍳」开火，等几秒才出餐（升级店铺能缩短时间）；每样最多囤 5 件</li>
+        <li>🏭 <b>稀有菜例外</b>：🍀🌈👑 稀有菜不占玩家操作，会自己慢速补货（每样最多 3 件）</li>
+        <li>💰 <b>只有把菜端给客人，才收得到钱</b>：客人付款 = 商品价 × 售价倍率 × 客人数量；能量也是上菜才给</li>
+        <li>🍽️ <b>上菜</b>：客人要的菜会亮起绿色「上菜」，点一下服务员就端过去；凑齐自动结账、客人走人下一位补位</li>
         <li>✨ <b>稀有客人</b>：偶尔有人出天价点名要你那道稀有菜（🍀🌈👑）</li>
         <li>🚫 队伍里没人点的菜端不出去；点客人脚下的「送走」可花小费换一位客人</li>
         <li>📋 <b>客人的口味会跟着你成长</b>：合成出新商品后，后续客人的订单里就会出现新菜</li>
@@ -916,7 +938,7 @@ body{
         <li>⚡ <b>能量管合成线</b>：生成产品、升级合成台；出货模式可把产品回收成能量</li>
         <li>🛍️ <b>点击店铺条</b>切换经营的店！小摊⚡翻倍、食堂客人奖励×1.6、白金餐厅稀有钱×2…</li>
         <li>🏆 <b>成就</b>：36 个长期目标（服务客人数、合并次数、营收、收集…），每达成一个<b>永久提升全场售价</b>，攒满 +84%；在 ⚙️ 里查看进度条</li>
-        <li>🌙 <b>离线收益</b>：关掉页面吧台也在出餐，回来按 30% 效率结算（最多算 8 小时）</li>
+        <li>🌙 <b>离线收益</b>：关掉页面也在营业，回来按 30% 效率结算（最多算 8 小时）</li>
         <li>🐾 <b>宠物</b>：吧台边的小家伙。点它<b>摸头</b>会开心（加心情和亲密度），点饭碗用<b>货架上做好的菜投喂</b>它会长大</li>
         <li>🥣 宠物长大有回报：Lv.2 帮你捡金币 · Lv.3 全场售价 +5% · Lv.4 客人赏金 +10% · Lv.5 稀有客人翻倍；它也会时不时跟你说话</li>
         <li>🔮 <b>合成台</b>：花能量生成产品（<b>每个等级有 3 种口味</b>，随机出，共 36 种可收集）；<b>拖动</b>一道菜到同级菜上合并，拖到空格可移动整理，拖到「出货模式」按钮上直接换能量</li>
@@ -1019,6 +1041,7 @@ const defaultState=()=>({
   hiddenOwned:{},
   hiddenStock:{},     // 稀有物货架库存 {clover:n,...}
   stock:PRODUCTS.map(()=>0),
+  cook:PRODUCTS.map(()=>0),      // 每道菜的"制作完成时间戳"（0=没在做）
   grid:Array(GRID_SIZE).fill(null),
   genCount:0,
   bestOwned:1,
@@ -1246,6 +1269,8 @@ function load(){
       if(state.mergeLevel===undefined)state.mergeLevel=1;
       if(!Array.isArray(state.stock))state.stock=PRODUCTS.map(()=>0);
       while(state.stock.length<PRODUCTS.length)state.stock.push(0);
+      if(!Array.isArray(state.cook))state.cook=PRODUCTS.map(()=>0);
+      while(state.cook.length<PRODUCTS.length)state.cook.push(0);
       if(!Array.isArray(state.queue))state.queue=[];
       // 历史版本：托盘里的菜折算进货架库存
       state.queue.forEach(g=>{
@@ -1265,23 +1290,14 @@ function load(){
 /* ================= 货架生产 & 库存 ================= */
 // 商品只按时间生产（不自动卖钱），钱只在把商品端给客人时进账
 const prodInterval=()=>PROD_SEC/speed();          // 生产 1 件所需秒数
+// 出餐台不再自动产菜：必须玩家点「制作」开火（见 startCook / cookTick）。
+// 这里只负责稀有菜（它不占玩家操作，按慢速自动补货）与进度条刷新。
 function produceTick(dt,sp){
   let changed=false;
   state.unlocked.forEach((u,idx)=>{
     if(!u)return;
-    if(state.stock[idx]>=STOCK_CAP){progs[idx]=0}
-    else{
-      progs[idx]+=sp*dt/PROD_SEC;
-      while(progs[idx]>=1){
-        progs[idx]-=1;
-        if(state.stock[idx]<STOCK_CAP){
-          state.stock[idx]++;changed=true;
-          flyProduce(idx,PRODUCTS[idx].e);   // 大厨把新菜送到货架
-        }
-      }
-    }
     const bar=document.getElementById('bar'+idx);
-    if(bar)bar.style.width=(state.stock[idx]>=STOCK_CAP?100:progs[idx]*100).toFixed(1)+'%';
+    if(bar)bar.style.width=(isCooking(idx)?cookPct(idx):(state.stock[idx]>=STOCK_CAP?100:0))+'%';
   });
   Object.keys(state.hiddenOwned).forEach(key=>{
     if(!state.hiddenOwned[key])return;
@@ -1778,6 +1794,38 @@ function skipGuest(i){
   fillQueue();
   renderBar();renderShop();updateHUD();save();
 }
+/* ================= 手工制作（参考主流餐厅经营：点锅开火 → 等出餐 → 端给客人）================= */
+const cookMs=()=>Math.round(PROD_SEC*1000/speed());     // 一道菜的制作耗时（升级店铺会更快）
+const isCooking=i=>(state.cook[i]||0)>0;
+const cookLeft=i=>Math.max(0,(state.cook[i]||0)-Date.now());
+const cookPct=i=>{
+  if(!isCooking(i))return 100;
+  const total=cookMs();
+  return Math.max(0,Math.min(100,Math.round((1-(cookLeft(i)/total))*100)));
+};
+function startCook(i){
+  if(!state.unlocked[i])return;
+  if(isCooking(i))return;
+  if(state.stock[i]>=STOCK_CAP){toast('🧺',PRODUCTS[i].n+'已经满仓了，先端出去');return}
+  state.cook[i]=Date.now()+cookMs();
+  renderShelf();save();
+  toast('👨‍🍳','开火！'+PRODUCTS[i].e+PRODUCTS[i].n+' '+ (cookMs()/1000).toFixed(1) +' 秒后出餐');
+}
+// 制作完成 → 出货 + 机器冒烟吐菜
+function cookTick(now){
+  let changed=false;
+  PRODUCTS.forEach((p,i)=>{
+    if(!state.cook[i]||now<state.cook[i])return;
+    state.cook[i]=0;
+    if(state.stock[i]<STOCK_CAP){
+      state.stock[i]++;
+      flyProduce(i,p.e);                    // 机器吐菜飞向出餐台
+    }
+    changed=true;
+  });
+  if(changed){refreshStockBadges();renderShelf();save()}
+}
+
 /* ================= 货架：子标签页（左右滑动） ================= */
 let shelfTab=0, shelfDrag=null;
 function setShelfTab(i,animate){
@@ -1798,10 +1846,10 @@ function fitShelf(){
   const pane=document.getElementById(shelfTab===0?'paneUp':'paneLock');
   if(!pane)return;
   const content=pane.scrollHeight+14;
-  // 自适应：货架窗口吃掉屏幕剩余空间，让整页尽量一屏放下（最小 200、最大 336）
+  // 自适应：优先把菜显示全（双列三行 ≈330px），下限必须给足，否则菜品又被截
   const others=document.documentElement.scrollHeight-view.getBoundingClientRect().height;
   const avail=window.innerHeight-others-10;
-  const cap=Math.max(200,Math.min(336,avail));
+  const cap=Math.max(340,Math.min(440,avail));
   view.style.height=Math.min(content,cap)+'px';
 }
 function shelfPointerDown(e){
@@ -1852,24 +1900,37 @@ function renderShelf(){
     card.className='card';
     card.id='pcard'+idx;
     const stock=state.stock[idx];
-    const stockTag=`<span class="stock-tag${stock>0?'':' empty'}">🧺${stock}/${STOCK_CAP}</span>`;
-    let action='';
+    const cooking=isCooking(idx);
+    const full=stock>=STOCK_CAP;
+    const stockTag=`<span class="stock-tag${stock>0?'':' empty'}">${stock}/${STOCK_CAP}</span>`;
+    // 右下角动作区：能上菜就上菜，否则去制作（或显示出餐进度）
+    let act='';
+    if(cooking){
+      act='<div class="cook-wrap"><div class="cook-bar"><i id="cbar'+idx+'"></i></div>'+
+          '<span class="cook-txt" id="ctxt'+idx+'">出餐中</span></div>';
+    }else{
+      act='<button class="p-btn cook-btn" id="cook'+idx+'" aria-label="制作 '+p.n+'"'+(full?' disabled':'')+'>'+(full?'已满':'制作 👨‍🍳')+'</button>';
+    }
+    let serve='';
     if(wanted.has('l:'+lv)){
       card.classList.add('serving-need');
-      action=`<button class="p-btn serve-btn" id="serve${idx}" aria-label="上菜 ${p.n} Lv.${lv}"${stock>0?'':' disabled'}>上菜 🍽️<br>${stock>0?('剩 '+stock):'已卖完'}</button>`;
+      serve='<button class="p-btn serve-btn sm" id="serve'+idx+'" aria-label="上菜 '+p.n+' Lv.'+lv+'"'+(stock>0?'':' disabled')+'>上菜 🍽️</button>';
     }
     card.innerHTML=
       `<div class="p-emoji">${p.e}</div>`+
       `<div class="p-body">`+
-        `<div class="p-name">${p.n} <span class="lv">Lv.${lv}</span>${stockTag}</div>`+
-        `<div class="p-info">¥${fmt(p.p*mult())}/件 · 上菜 +${Math.round(lv*ORDER_ENERGY_K*energyRate())}⚡</div>`+
+        `<div class="p-name"><span class="p-e-inline">${p.e}</span>${p.n} <span class="lv">Lv.${lv}</span>${stockTag}</div>`+
+        `<div class="p-info">${cooking?('再等 '+(cookLeft(idx)/1000).toFixed(1)+' 秒'):('制作 '+ (cookMs()/1000).toFixed(1) +' 秒 / 份')}</div>`+
         `<div class="bar"><i id="bar${idx}"></i></div>`+
-      `</div>`+action;
+      `</div>`+
+      `<div class="p-acts">${serve}${act}</div>`;
     up.appendChild(card);
     if(wanted.has('l:'+lv)){
-      const btn=document.getElementById('serve'+idx);
-      if(btn)btn.onclick=()=>serveItem('l:'+lv);
+      const sb=document.getElementById('serve'+idx);
+      if(sb)sb.onclick=()=>serveItem('l:'+lv);
     }
+    const cb=document.getElementById('cook'+idx);
+    if(cb)cb.onclick=()=>startCook(idx);
   });
   // 稀有菜（首次合出后永久上架）
   Object.keys(HIDDEN).forEach(key=>{
@@ -1886,7 +1947,7 @@ function renderShelf(){
     card.innerHTML=
       `<div class="p-emoji">${h.e}</div>`+
       `<div class="p-body">`+
-        `<div class="p-name">${h.n} <span class="rare-tag">✨稀有</span>`+
+        `<div class="p-name"><span class="p-e-inline">${h.e}</span>${h.n} <span class="rare-tag">✨稀有</span>`+
           `<span class="stock-tag${cur>0?'':' empty'}" id="hstock${key}">🧺${cur}/${RARE_CAP}</span></div>`+
         `<div class="p-info">¥${fmt(h.p*mult())}/件 · 偶尔有客人点名要它</div>`+
         `<div class="bar rare"><i id="hbar${key}"></i></div>`+
@@ -1940,7 +2001,7 @@ function renderShop(){
   const wanted=new Set();
   state.queue.forEach(g=>Object.keys(trayNeed(g)).forEach(k=>wanted.add(k)));
   $('#statsBar').innerHTML=
-    `<span>🏭 生产 ${prodInterval().toFixed(1)} 秒/件</span>`+
+    `<span>👨‍🍳 制作 ${(cookMs()/1000).toFixed(1)} 秒/份</span>`+
     `<span>💰 售价 ×${mult().toFixed(2)}</span>`+
     `<span>⚡ 上菜能量 ×${Math.round(energyRate())}</span>`+
     `<span class="perk">${shop().perkDesc}</span>`+
@@ -2057,8 +2118,12 @@ function renderGrid(popNew){
 function tick(){
   const dt=0.2,sp=speed(),now=Date.now();
   const produced=produceTick(dt,sp);
-  const modalOpen=!!document.querySelector('.egg-mask,.modal-mask');
-  if(produced&&!modalOpen&&now-(tick._stock||0)>800){
+  // 弹窗打开时暂停后台 DOM 刷新，避免和弹窗入场动画抢帧。
+  // 注意：静态的"玩法说明"弹窗常驻 DOM（只有 hidden 类），必须排除，否则这里恒为真、后台刷新会被永久禁用
+  const modalOpen=!!document.querySelector('.egg-mask')||!!document.querySelector('.modal-mask:not(.hidden)');
+  // 有出餐/正在做菜时刷新徽标与进度条（手工制作时 produced 可能一直是假，必须单独判断）
+  const anyCooking=PRODUCTS.some((p,i)=>state.cook[i]>0);
+  if(!modalOpen&&(produced||anyCooking)&&now-(tick._stock||0)>400){
     tick._stock=now;
     refreshStockBadges();
   }
@@ -2087,6 +2152,8 @@ function tick(){
   if(!modalOpen){
     if(now-(tick._scene||0)>240){tick._scene=now;sceneTick()}   // 2.5D 场景：机器进度
   }
+  // 手工制作：到点了出餐
+  if(!modalOpen)cookTick(now);
   if(now-(tick._ach||0)>2000){tick._ach=now;checkAch()}       // 成就判定（低频）
   // 数值精度保护：超过 Number 精确整数上限后，继续累加会静默失真，这里封顶并提示一次
   if(state.coins>NUM_SAFE||state.energy>NUM_SAFE){
@@ -2104,21 +2171,25 @@ function tick(){
     if(nb&&next)nb.disabled=state.coins<openCostCoins(state.shopTier+1);
   }
 }
-// 库存徽标 / 上菜按钮的低频刷新
+// 库存徽标 / 上菜按钮 / 出餐进度的低频刷新
 function refreshStockBadges(){
   PRODUCTS.forEach((p,idx)=>{
     if(!state.unlocked[idx])return;
     const tag=document.querySelector('#pcard'+idx+' .stock-tag');
     if(tag){
-      tag.textContent='🧺'+state.stock[idx]+'/'+STOCK_CAP;
+      tag.textContent=state.stock[idx]+'/'+STOCK_CAP;
       tag.classList.toggle('empty',state.stock[idx]<=0);
     }
     const sb=document.getElementById('serve'+idx);
-    if(sb){
-      // 做完了才给上菜按钮；卖光了就撤掉（等再做好）
-      if(state.stock[idx]<=0){sb.disabled=true;sb.innerHTML='上菜 🍽️<br>已卖完'}
-      else{sb.disabled=false;sb.innerHTML='上菜 🍽️<br>剩 '+state.stock[idx]}
+    if(sb)sb.disabled=state.stock[idx]<=0;
+    // 出餐进度
+    const cbar=document.getElementById('cbar'+idx), ctxt=document.getElementById('ctxt'+idx);
+    if(cbar&&isCooking(idx)){
+      cbar.style.width=cookPct(idx)+'%';
+      if(ctxt)ctxt.textContent='出餐 '+(cookLeft(idx)/1000).toFixed(1)+'s';
     }
+    const info=document.querySelector('#pcard'+idx+' .p-info');
+    if(info&&isCooking(idx))info.textContent='再等 '+(cookLeft(idx)/1000).toFixed(1)+' 秒';
   });
   Object.keys(state.hiddenOwned).forEach(key=>{
     if(!state.hiddenOwned[key])return;
@@ -2348,7 +2419,7 @@ function settleOffline(){
   showReward({
     icon:'🌙',title:'欢迎回来，老板！',
     name:'离开 '+away+(capped?'（收益按 8 小时上限结算）':''),
-    desc:'吧台在你不在的时候也在出餐，帮你攒了一笔',
+    desc:'店员在你不在的时候接着做生意，帮你攒了一笔',
     reward:'💰 '+fmt(coins)+' · ⚡ '+fmt(energy),
     btn:'收下',
     onClaim:()=>{state.coins+=coins;state.energy+=energy;state.stats.earned+=coins}

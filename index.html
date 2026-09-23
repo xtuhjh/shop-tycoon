@@ -726,6 +726,8 @@ body{
   box-shadow:0 20px 46px rgba(60,35,10,.4),0 0 0 6px rgba(255,255,255,.35);
   animation:eggPop .42s cubic-bezier(.2,1.5,.35,1)}
 @keyframes eggPop{0%{transform:scale(.6) translateY(14px);opacity:0}60%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}
+.egg-queue{margin-top:9px;font-size:10.5px;font-weight:800;color:#b09454;opacity:.9}
+.egg-queue:empty{display:none}
 .egg-badge{width:84px;height:84px;margin:-56px auto 8px;border-radius:50%;display:flex;align-items:center;justify-content:center;
   font-size:42px;background:radial-gradient(circle at 50% 35%,#fff6d8,#ffd964);
   border:3px solid #fff;box-shadow:0 8px 20px rgba(200,140,20,.45);animation:badgeFloat 2.4s ease-in-out infinite}
@@ -1096,7 +1098,7 @@ body{
         <li>⚡ <b>能量管合成线</b>：生成产品、升级合成台；出货模式可把产品回收成能量</li>
         <li>🛍️ <b>点击店铺条</b>切换经营的店（换店＝换菜单、换客人、换货架）：小摊⚡翻倍、咖啡馆生产×1.5、食堂客人奖励×1.6、白金餐厅稀有钱×2…</li>
         <li>🏆 <b>成就</b>：36 个长期目标（服务客人数、合并次数、营收、收集…），每达成一个<b>永久提升全场售价</b>，攒满 +84%；在 ⚙️ 里查看进度条</li>
-        <li>🌙 <b>离线收益</b>：关掉页面也在营业，回来按 30% 效率结算（最多算 8 小时）</li>
+        <li>🌙 <b>离线收益</b>：关掉页面店员会替你接待客人，回来一次结算（比手动玩慢很多，所以自己招呼客人永远更划算；最多算 8 小时）</li>
         <li>🐾 <b>宠物图鉴</b>：8 个品种（🐶小奶狗 🐱巷口猫 🐰团子兔 🦊偷吃小狐 🐼熊猫团子 🐧围裙企鹅 🐲灶王小青龙 🦄星光独角兽）。在 ⚙️ 里看图鉴，点亮的随时换它出勤</li>
         <li>🥣 <b>养它</b>：点它<b>摸头</b>涨心情与亲密度；用当前店做好的菜<b>投喂</b>涨成长。每只独立成长到 5 阶（会长大，还会解锁项圈→围巾→星环）</li>
         <li>🔧 <b>每只技能不一样</b>：狗捡金币 · 猫上菜小费 · 兔制作提速 · 狐抬售价 · 熊猫抬赏金 · 企鹅离线收益 · 龙稀有菜与稀有客人 · 独角兽全能。<b>只有出勤的那只生效</b>，换宠物＝换加成</li>
@@ -2894,10 +2896,25 @@ function renderAchPanel(){
   m.onclick=e=>{if(e.target===m)m.remove()};
 }
 
-/* ================= 离线收益 ================= */
+/* ================= 离线收益 =================
+   旧算法 = 菜单总价 × 售价倍率 × 速度，等于假设"每道菜都在满速卖出"，
+   而手动玩受做菜/上菜节奏限制（一单要 20~40 秒），所以挂机反而比手动划算一个量级。
+   现在改成"模拟店员接待客人"：按当前店菜单估一单赏金，再按接待节奏 × 折扣算收益。 */
 const OFFLINE_RATE=0.30, OFFLINE_CAP=8*3600, OFFLINE_MIN=180;
-const incomePerSec=()=>menuPriceSum()*mult()*speed();       // 只算本店在卖的菜（别家店的菜不会自己卖出钱）
-const energyPerSec=()=>{let n=0;state.unlocked.forEach((u,i)=>{if(u)n+=(i+1)});return n*energyRate()*speed()};
+const OFFLINE_ORDER_SEC=75;                    // 店员平均 75 秒接待一位客人（含做菜/上菜时间）
+// 一单的赏金：菜单均价 × 约 2 道/单，套用和真实订单一样的公式
+const orderCoinEst=()=>{
+  const m=menu();
+  const avg=m.reduce((s,d)=>s+PRODUCTS[d.lv-1].p,0)/Math.max(1,m.length);
+  return avg*2*ORDER_COIN_K*mult()*orderMult();
+};
+const orderEnergyEst=()=>{
+  const lvSum=menu().reduce((s,d)=>s+d.lv,0);
+  return lvSum*1.6*ORDER_ENERGY_K*energyRate();
+};
+const incomePerSec=()=>orderCoinEst()/OFFLINE_ORDER_SEC;
+const energyPerSec=()=>orderEnergyEst()/OFFLINE_ORDER_SEC;
+let offlineJustSettled=0;                      // 刚结算过离线收益 → 那段时间内的宠物礼物改用 toast，别连弹两张卡
 function settleOffline(){
   const now=Date.now();
   const last=state.lastSeen||0;
@@ -2913,10 +2930,11 @@ function settleOffline(){
   if(coins<10&&energy<10)return;
   const hh=Math.floor(sec/3600), mm=Math.floor(sec%3600/60);
   const away=(hh?hh+' 小时 ':'')+mm+' 分钟';
+  offlineJustSettled=now;
   showReward({
     icon:'🌙',title:'欢迎回来，老板！',
     name:'离开 '+away+(capped?'（收益按 8 小时上限结算）':''),
-    desc:'店员在你不在的时候接着做生意，帮你攒了一笔',
+    desc:'店员接着做了几单生意（比你自己招呼客人慢一些）',
     reward:'💰 '+fmt(coins)+' · ⚡ '+fmt(energy),
     btn:'收下',
     onClaim:()=>{state.coins+=coins;state.energy+=energy;state.stats.earned+=coins}
@@ -2938,9 +2956,22 @@ const isNight=(d)=>{const h=(d||new Date()).getHours();return h>=23||h<2};
 const todayKey=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};
 
 // 主流手游式奖励弹窗：全屏金光 + 中央卡片 + 领取按钮
+// 用队列串起来：一次只开一张，关掉自动弹下一张（不再两个叠一起、也不会一次连出一堆）
+const rewardQueue=[];
 function showReward(o){
-  // 已经有一个奖励弹窗开着 → 排队等它关掉再弹，避免两个弹窗叠在一起
-  if(document.querySelector('.egg-mask')){setTimeout(()=>showReward(o),1200);return null}
+  rewardQueue.push(o);
+  if(document.querySelector('.egg-mask'))updateQueueHint();   // 已经开着一张 → 只更新"还有几个在排队"
+  else drainRewards();
+  return null;
+}
+function updateQueueHint(){
+  const el=document.querySelector('.egg-queue');
+  if(el)el.textContent=rewardQueue.length?('还有 '+rewardQueue.length+' 个奖励在排队'):'';
+}
+function drainRewards(){
+  if(document.querySelector('.egg-mask'))return;      // 已经有一张开着
+  const o=rewardQueue.shift();
+  if(!o)return;
   const m=document.createElement('div');
   m.className='egg-mask';
   m.innerHTML='<div class="rays"></div><div class="egg-card">'+
@@ -2950,14 +2981,15 @@ function showReward(o){
     (o.desc?'<div class="egg-desc">'+o.desc+'</div>':'')+
     (o.reward?'<div class="egg-reward">'+o.reward+'</div>':'')+
     '<button class="egg-btn">'+(o.btn||'领取奖励')+'</button>'+
+    '<div class="egg-queue">'+(rewardQueue.length?('还有 '+rewardQueue.length+' 个奖励在排队'):'')+'</div>'+
   '</div>';
   document.body.appendChild(m);
   m.querySelector('.egg-btn').onclick=()=>{
     m.remove();
     if(o.onClaim)o.onClaim();
     updateHUD();renderBar();renderShop();save();
+    if(rewardQueue.length)setTimeout(drainRewards,220);
   };
-  return m;
 }
 function unlockEgg(k,silent){
   if(state.eggs[k])return false;
@@ -3139,10 +3171,16 @@ function checkDaily(){
   }
   if(state.lastDaily===t)return;
   state.lastDaily=t;save();
+  const firstTime=!state.eggs.daily;             // 只有第一次发现这个彩蛋才弹卡，之后每天用 toast
   const c=Math.max(300,Math.round(1500*mult()));
   const en=Math.max(50,Math.round(200*energyRate()));
   state.coins+=c;state.energy+=en;
-  eggReward('daily','💰 '+fmt(c)+' 金币 · ⚡ '+fmt(en)+' 能量',null,'📅 今日开店礼');
+  if(firstTime){
+    eggReward('daily','💰 '+fmt(c)+' 金币 · ⚡ '+fmt(en)+' 能量',null,'📅 今日开店礼');
+  }else{
+    unlockEgg('daily',true);
+    toast('📅','今日开店礼：💰'+fmt(c)+' · ⚡'+fmt(en));
+  }
   updateHUD();
 }
 
@@ -3807,6 +3845,15 @@ function returnFromTrip(p){
   }
   const extra='　成长 +'+gainExp+(lvUp?'　🎉 升到 Lv.'+p.lv:'');
   save();renderPet();
+  // 刚结算过离线收益（也就是"待机回来"那一刻）→ 用 toast 报一下，别连弹两张卡
+  if(Date.now()-(offlineJustSettled||0)<15000){
+    if(co)state.coins+=co;
+    if(en)state.energy+=en;
+    state.stats.earned+=co;
+    updateHUD();
+    toast(cfg.e,'宠物回来了：'+(co?('💰'+fmt(co)):(en?('⚡'+fmt(en)):reward))+'（成长 +'+gainExp+'）');
+    return;
+  }
   showReward({icon:cfg.e,title:'🐾 '+state.pet.name+'回来了！',name:name,desc:desc+extra,
     reward:reward,btn:'收下',
     onClaim:()=>{

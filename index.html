@@ -82,6 +82,7 @@ body{
 .shop-chip.switchable .sc-tag{background:#e8f8ef;color:#27ae60}
 .shop-chip.locked{opacity:.5;background:rgba(255,255,255,.4);cursor:not-allowed}
 .shop-chip .sc-tag{background:#f1e7f5;color:#9b59b6;border-radius:6px;padding:1px 5px;font-size:10px;font-weight:800}
+.shop-chip .sc-tag.shrine{background:linear-gradient(135deg,#ffe9a8,#f5c242);color:#5c3a00}
 
 /* ===== 2.5D 店铺场景 ===== */
 .shop3d{
@@ -117,6 +118,12 @@ body{
 .s3-night{position:absolute;right:9px;top:10px;z-index:6;font-size:10px;font-weight:800;color:#fff;
   background:linear-gradient(135deg,#4a4a8a,#20204a);border-radius:8px;padding:3px 7px;white-space:nowrap;
   box-shadow:0 2px 6px rgba(0,0,0,.4)}
+/* 镇店之宝：墙上的挂符（供奉的稀有物） */
+.s3-shrine{position:absolute;right:8px;top:34px;z-index:6;font-size:15px;line-height:1;
+  padding:3px 6px;border-radius:9px;background:linear-gradient(180deg,rgba(255,233,168,.96),rgba(245,194,66,.9));
+  border:2px solid #a9761c;box-shadow:0 3px 10px rgba(0,0,0,.35),0 0 12px rgba(245,194,66,.5);
+  animation:shrineGlow 2.6s ease-in-out infinite}
+@keyframes shrineGlow{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 /* 后厨操作台 + 生产机器 */
 .s3-ck{position:absolute;left:4%;right:4%;bottom:0;height:26px;border-radius:5px 5px 0 0;
   background:linear-gradient(180deg,#d3a067,#9c6a34 70%);box-shadow:0 3px 0 #7c5226,0 8px 16px rgba(0,0,0,.35)}
@@ -387,6 +394,13 @@ body{
 }
 /* 只用 transform 呼吸（原来动 box-shadow，会每帧重绘导致掉帧） */
 @keyframes serveBro{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+/* 供奉镇店：稀有物第一次有"不卖"的选择 */
+.card .p-btn.shrine-btn{background:linear-gradient(135deg,#ffe08a,#f5a623);color:#5c3a00;
+  box-shadow:0 3px 12px rgba(245,166,35,.45)}
+.card .p-btn.shrine-btn:disabled{background:#f1e9f5;color:#a08fa6;box-shadow:none}
+.card.rare.enshrined{border-color:#f5c242;box-shadow:0 4px 16px rgba(245,194,66,.35)}
+.shrine-tag{font-size:10px;font-weight:800;color:#5c3a00;background:linear-gradient(135deg,#ffe9a8,#f5c242);
+  border:1px solid #d9a52a;border-radius:9px;padding:3px 7px;text-align:center;white-space:nowrap}
 /* 出餐台：右侧动作列（上菜 / 制作 / 出餐进度） */
 .card .p-acts{display:flex;flex-direction:column;gap:4px;flex-shrink:0;align-items:stretch;min-width:62px}
 .card .p-btn.sm{padding:5px 8px;font-size:11px;border-radius:9px}
@@ -768,6 +782,8 @@ body{
   #paneUp .card .p-acts{flex-direction:row;min-width:0;gap:5px}
   #paneUp .card .p-btn{flex:1;min-width:0;padding:6px 4px;font-size:11px;line-height:1.15}
   #paneUp .card .p-info{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* 稀有卡的信息要能看全（卖价 + 镇店收益），允许两行 */
+  #paneUp .card.rare .p-info{white-space:normal;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;line-height:1.35}
   .card .p-emoji{font-size:27px;width:38px}
   .card .p-name{font-size:14px}
   .card .p-info{font-size:11.5px}
@@ -897,6 +913,8 @@ body{
 .pf.empty{opacity:.45;cursor:not-allowed}
 .pf.like{border-color:#f5c242;background:linear-gradient(180deg,#fffdf4,#fff)}
 .pf.like:after{content:'❤';position:absolute;top:2px;right:5px;font-size:9px;color:#ff6b9d}
+.pf.rare{border-color:#f5c242;background:linear-gradient(180deg,#fff8e6,#fff)}
+.pf.rare b{color:#a9761c}
 
 </style>
 </head>
@@ -936,6 +954,8 @@ body{
           <span id="barSignEmoji">🛖</span><span id="barSignName">街边小摊</span><em id="barSignLv">Lv.1</em>
         </button>
         <span class="s3-night hidden" id="barNight">🌙 深夜赏金 ×3</span>
+        <!-- 镇店之宝：供奉的稀有物挂在墙上 -->
+        <span class="s3-shrine hidden" id="s3Shrine"></span>
         <span class="s3-hint">点出餐台的「制作」开火<br>做好后点「上菜」端给客人</span>
         <div id="s3Actors"></div>
         <!-- 客人直接站在吧台里，头顶气泡就是订单（要什么菜 / 赏金 / 送走） -->
@@ -984,6 +1004,8 @@ body{
         <li>💰 <b>只有把菜端给客人，才收得到钱</b>：客人付款 = 商品价 × 售价倍率 × 客人数量；能量也是上菜才给</li>
         <li>🍽️ <b>上菜</b>：客人就在吧台里，头顶气泡写着要什么菜、给多少赏金。客人要的菜会亮起绿色「上菜」，点一下服务员就端过去；凑齐自动结账、客人走人下一位补位</li>
         <li>✨ <b>稀有客人</b>：偶尔有人出天价点名要你那道稀有菜（🍀🌈👑）</li>
+        <li>🏮 <b>稀有物不止能卖</b>：点稀有菜卡片上的「🏮 镇店」把它<b>供奉给这家店当镇店之宝</b>（消耗 1 件现货，之后会自己补）→ 该店<b>永久加成</b>：🍀 售价+10% · 🌈 售价+20% 赏金+10% · 👑 售价+35% 赏金+20% 生产+15%，<b>只对那一家店生效</b>，店铺条上会挂 🏮</li>
+        <li>✨ <b>稀有物也能喂宠物</b>：成长远超菜品（🍀+220 / 🌈+700 / 👑+2400）、心情直接拉满，还有 30% 概率把传说伙伴（🐲灶王小青龙 / 🦄星光独角兽）引来</li>
         <li>🚫 队伍里没人点的菜端不出去；点气泡上的「送走」可花小费换一位客人</li>
         <li>👥 <b>客人不共享</b>：每家店有自己的客人队列和货架库存，切店等于换一批客人；客人只点你在这家店已经上架的菜</li>
         <li>📋 <b>客人的口味会跟着你成长</b>：合成出更高等级后，卖这个等级的店，客人订单里就会出现新菜</li>
@@ -1058,9 +1080,14 @@ const flavorTotal=()=>FLAVORS.reduce((s,a)=>s+a.length,0);
 const flavorSeen=()=>Object.keys(state.flavors||{}).length;
 const flav=(lv,v)=>FLAVORS[lv-1][(v|0)%3]||PRODUCTS[lv-1];
 const HIDDEN={
-  clover: {e:'🍀',n:'幸运三叶草',p:6000,   energy:800,  rate:0.05},
-  rainbow:{e:'🌈',n:'彩虹圣代',  p:150000, energy:8000, rate:0.012},
-  crown:  {e:'👑',n:'黄金招牌',  p:3000000,energy:30000,rate:0.0025},
+  // shrine：供奉到某家店当"镇店之宝"时给的永久加成（只对该店生效）
+  // exp：当宠物饲料时给的成长值（远高于菜品）
+  clover: {e:'🍀',n:'幸运三叶草',p:6000,   energy:800,  rate:0.05,  exp:220,
+           shrine:{price:.10, order:0,   cook:0,   desc:'该店售价 +10%'}},
+  rainbow:{e:'🌈',n:'彩虹圣代',  p:150000, energy:8000, rate:0.012, exp:700,
+           shrine:{price:.20, order:.10, cook:0,   desc:'该店售价 +20% · 客人赏金 +10%'}},
+  crown:  {e:'👑',n:'黄金招牌',  p:3000000,energy:30000,rate:0.0025,exp:2400,
+           shrine:{price:.35, order:.20, cook:.15, desc:'该店售价 +35% · 赏金 +20% · 生产 +15%'}},
 };
 // openK：开这家店的价位系数（≈需要攒多少秒的卖货收入），价格随进度自动缩放，不会出现「要么秒买要么挂几小时」
 // menu：每家店自己的 4 道招牌菜。菜绑定一个「等级」——等级决定售价与能否上架（合成台合出该等级才解锁）。
@@ -1111,6 +1138,7 @@ const defaultState=()=>({
   shopStock:SHOPS.map(s=>s.menu.map(()=>0)),
   shopCook:SHOPS.map(s=>s.menu.map(()=>0)),
   shopQueue:SHOPS.map(()=>[]),
+  shrine:SHOPS.map(()=>null),        // 每店一个供奉位：稀有物"镇店"给该店永久加成
   grid:Array(GRID_SIZE).fill(null),
   genCount:0,
   bestOwned:1,
@@ -1172,17 +1200,30 @@ const dCook=i=>(state.shopCook[state.activeShop]||[])[i]||0;
 const setStock=(i,v)=>{state.shopStock[state.activeShop][i]=v};
 const setCook=(i,v)=>{state.shopCook[state.activeShop][i]=v};
 const SQ=()=>state.shopQueue[state.activeShop];               // 当前店客人队列（活引用，可直接 push/splice）
+/* ---- 镇店供奉：稀有物供在某家店，给这家店永久加成（只影响这一家） ---- */
+const shrineKey=()=>(state.shrine&&state.shrine[state.activeShop])||null;
+const shrineHas=k=>!!(state.shrine&&state.shrine[state.activeShop]===k);
+const shrineBonus=k=>{const key=shrineKey();return key?(HIDDEN[key].shrine[k]||0):0};
+const shrineDesc=()=>{const key=shrineKey();return key?HIDDEN[key].shrine.desc:''};
+// 紧凑版加成文案（卡片上只有两行位置）
+const shrineShort=k=>{
+  const s=HIDDEN[k].shrine,a=[];
+  if(s.price)a.push('售价+'+Math.round(s.price*100)+'%');
+  if(s.order)a.push('赏金+'+Math.round(s.order*100)+'%');
+  if(s.cook)a.push('生产+'+Math.round(s.cook*100)+'%');
+  return a.join(' · ');
+};
 const isDishOpen=i=>!!state.unlocked[dishAt(i).lv-1];         // 该菜是否已上架
 const openSlots=()=>menu().map((d,i)=>i).filter(isDishOpen);  // 本店已上架的档位
 const menuPriceSum=()=>menu().reduce((s,d)=>s+(state.unlocked[d.lv-1]?PRODUCTS[d.lv-1].p:0),0);
 const perkLevel=(k,base,all)=>shop().perk===k?base:(shop().perk==='all'?all:1);
-const mult=()=>shop().mult*(1+petMultBonus()+achBonus());
-const speed=()=>(1+0.35*(state.shopLevel-1))*perkLevel('speed',1.5,1.3)*(1+skillOf('cook'));
+const mult=()=>shop().mult*(1+petMultBonus()+achBonus()+shrineBonus('price'));
+const speed=()=>(1+0.35*(state.shopLevel-1))*perkLevel('speed',1.5,1.3)*(1+skillOf('cook'))*(1+shrineBonus('cook'));
 const energyRate=()=>(state.shopTier+1)*perkLevel('energy',2,1.5)*(1+achBonus()*0.5);
 // 升级成本：1.35^L（原来 1.6^L）。指数曲线放缓后，唯一的无限成长轴能多撑一倍，
 // 且数值不会过早撞上 Number 精度上限
 const upCost=()=>Math.floor(50*Math.pow(1.35,state.shopLevel-1));
-const orderMult=()=>perkLevel('order',1.6,1.3);
+const orderMult=()=>perkLevel('order',1.6,1.3)*(1+shrineBonus('order'));
 const luckyMult=()=>perkLevel('lucky',2,1.5);
 const genCost=()=>Math.min(50000,Math.floor(8*Math.pow(1.012,state.genCount)));
 const genCostAt=lv=>Math.floor(genCost()*Math.pow(3,lv-1));
@@ -1356,7 +1397,10 @@ function load(){
         state.shopStock=SHOPS.map(sh=>sh.menu.map(d=>Math.min(STOCK_CAP,oldStock[d.lv-1]||0)));
         state.shopCook=SHOPS.map(sh=>sh.menu.map(d=>oldCook[d.lv-1]||0));
       }
-      if(!Array.isArray(state.shopQueue)||state.shopQueue.length!==SHOPS.length)state.shopQueue=SHOPS.map(()=>[]);
+      if(!state.shopQueue||state.shopQueue.length!==SHOPS.length)state.shopQueue=SHOPS.map(()=>[]);
+      if(!Array.isArray(state.shrine))state.shrine=SHOPS.map(()=>null);
+      state.shrine.length=SHOPS.length;
+      state.shrine=state.shrine.map(k=>(k&&HIDDEN[k])?k:null);      // 只留合法的稀有物 key
       state.shopQueue=state.shopQueue.map(q=>Array.isArray(q)?q:[]);
       // 旧队列按等级点单，切店后可能点到本店没有的菜 → 过滤掉，剩下的由 fillQueue 补齐
       state.shopQueue=state.shopQueue.map((q,si)=>q.filter(g=>g&&Array.isArray(g.items)&&g.items.length
@@ -1432,6 +1476,26 @@ function unlockHidden(key){
   state.hiddenStock[key]=Math.max(1,state.hiddenStock[key]||0);
   const h=HIDDEN[key];
   toast(h.e,'✨ 稀有发现！「'+h.n+'」加入货架，会有客人出天价点名要它！',true);
+  renderShop();save();
+}
+/* ---- 镇店供奉：消耗 1 件现货，把稀有物供在这家店，永久给这家店加成 ----
+   "卖钱" 还是 "留着镇店"，这是稀有物第一次有非经济的选择。 */
+function enshrine(key){
+  const h=HIDDEN[key];
+  if(!state.hiddenOwned[key])return;
+  if(state.shrine[state.activeShop]){
+    toast('🏮',shop().n+' 已经供着 '+HIDDEN[state.shrine[state.activeShop]].n+' 了');
+    return;
+  }
+  if((state.hiddenStock[key]||0)<1){toast('🧺',h.n+'现在没现货，等它补一件再来供');return}
+  state.hiddenStock[key]--;
+  state.shrine[state.activeShop]=key;
+  save();
+  showReward({icon:'🏮',title:'镇店之宝已就位！',name:h.e+h.n+' → '+shop().e+shop().n,
+    desc:'它不再只换一次钱，而是让这家店永久变强（供奉消耗的那一件会自己慢慢补回来）',
+    reward:h.shrine.desc,btn:'去看看吧',
+    onClaim:()=>{renderShop();renderPet();}});
+  toast('🏮','「'+h.n+'」开始为 '+shop().n+' 镇店：'+h.shrine.desc);
   renderShop();save();
 }
 
@@ -1896,23 +1960,36 @@ function renderShopStrip(){
     // 徽章文案精简：经营中=✓、下一家可开的显示价格、其余只显示锁
     const isNext=(i===state.shopTier+1);
     d.innerHTML=unlocked
-      ?`<span class="sc-e">${s.e}</span>${s.n}${i===state.activeShop?'<span class="sc-tag">✓</span>':''}`
+      ?`<span class="sc-e">${s.e}</span>${s.n}${state.shrine&&state.shrine[i]?'<span class="sc-tag shrine">🏮</span>':''}${i===state.activeShop?'<span class="sc-tag">✓</span>':''}`
       :`<span class="sc-e">${s.e}</span>${s.n}<span class="sc-tag">${isNext?('¥'+fmt(openCostCoins(i))):'🔒'}</span>`;
     d.setAttribute('aria-label','切换经营 '+s.n+' 售价×'+s.mult+' '+s.perkDesc+(unlocked?'':'（未解锁，需要 ¥'+fmt(openCostCoins(i))+'）'));
     if(unlocked)d.onclick=()=>switchShop(i);
     strip.appendChild(d);
   });
 }
-// 吧台渲染：招牌 + 客人（客人连同订单气泡直接站在吧台里，不再单独占一块版面）
+// 吧台渲染：招牌 + 镇店之宝 + 客人（客人连同订单气泡直接站在吧台里，不再单独占一块版面）
 function renderBar(){
   if(!document.getElementById('shop3d'))return;
   fillQueue();
   $('#barSignEmoji').textContent=shop().e;
   $('#barSignName').textContent=shop().n;
   $('#barSignLv').textContent='Lv.'+state.shopLevel;
+  renderShrine();
   renderTrinkets();
   renderPet();
   renderScene();
+}
+// 镇店之宝：这家店供着的稀有物挂在墙上（有它是常驻的永久加成）
+function renderShrine(){
+  const el=document.getElementById('s3Shrine');
+  if(!el)return;
+  const key=shrineKey();
+  if(!key){el.classList.add('hidden');el.textContent='';return}
+  const h=HIDDEN[key];
+  el.classList.remove('hidden');
+  el.textContent=h.e;
+  el.title='镇店之宝：'+h.n+'　'+h.shrine.desc;
+  el.setAttribute('aria-label','镇店之宝 '+h.n+'：'+h.shrine.desc);
 }
 function skipGuest(i){
   if(orderBusy)return;
@@ -2070,31 +2147,44 @@ function renderShelf(){
     const cb=document.getElementById('dcook'+idx);
     if(cb)cb.onclick=()=>startCook(idx);
   });
-  // 稀有菜（首次合出后永久上架，不占本店菜单档位）
+  // 稀有菜（首次合出后永久上架，不占本店菜单档位；可卖给稀有客人，也可供奉给这家店镇店）
   Object.keys(HIDDEN).forEach(key=>{
     if(!state.hiddenOwned[key])return;
     const h=HIDDEN[key],cur=state.hiddenStock[key]||0;
+    const here=shrineHas(key);                     // 本店供的就是它
+    const shrineOther=!!shrineKey()&&!here;        // 本店已供了别的
     const card=document.createElement('div');
-    card.className='card rare';
+    card.className='card rare'+(here?' enshrined':'');
     card.id='hcard'+key;
-    let action='';
+    let act='';
     if(wanted.has('r:'+key)){
       card.classList.add('serving-need');
-      action=`<button class="p-btn serve-btn" id="hserve${key}" aria-label="上菜 ${h.n}"${cur>0?'':' disabled'}>上菜 🍽️<br>${cur>0?('剩 '+cur):'已卖完'}</button>`;
+      act+=`<button class="p-btn serve-btn sm" id="hserve${key}" aria-label="上菜 ${h.n}"${cur>0?'':' disabled'}>上菜 🍽️</button>`;
+    }
+    if(here){
+      act+='<span class="shrine-tag">🏮 镇店中</span>';
+    }else if(!shrineOther){
+      act+=`<button class="p-btn shrine-btn" id="hshrine${key}" aria-label="供奉 ${h.n} 镇店"${cur>0?'':' disabled'}>`+
+        (cur>0?'🏮 镇店':'缺现货')+`</button>`;
     }
     card.innerHTML=
       `<div class="p-emoji">${h.e}</div>`+
       `<div class="p-body">`+
         `<div class="p-name"><span class="p-e-inline">${h.e}</span>${h.n} <span class="rare-tag">✨稀有</span>`+
           `<span class="stock-tag${cur>0?'':' empty'}" id="hstock${key}">🧺${cur}/${RARE_CAP}</span></div>`+
-        `<div class="p-info">¥${fmt(h.p*mult())}/件 · 偶尔有客人点名要它</div>`+
+        `<div class="p-info">${here?('🏮 镇店中：'+shrineShort(key))
+          :(shrineOther?('卖 ¥'+fmt(h.p*mult())+'/件 · 本店已供 '+HIDDEN[shrineKey()].e)
+          :('卖 ¥'+fmt(h.p*mult())+'/件 · 可🏮镇店：'+shrineShort(key)))}</div>`+
         `<div class="bar rare"><i id="hbar${key}"></i></div>`+
-      `</div>`+action;
+      `</div>`+
+      `<div class="p-acts">${act}</div>`;
     up.appendChild(card);
     if(wanted.has('r:'+key)){
       const btn=document.getElementById('hserve'+key);
       if(btn)btn.onclick=()=>serveItem('r:'+key);
     }
+    const sb=document.getElementById('hshrine'+key);
+    if(sb)sb.onclick=()=>enshrine(key);
   });
   if(!upIdx.length){
     const lv0=menu()[0].lv;
@@ -2150,6 +2240,7 @@ function renderShop(){
     `<span>💰 售价 ×${mult().toFixed(2)}</span>`+
     `<span>⚡ 上菜能量 ×${Math.round(energyRate())}</span>`+
     `<span class="perk">${shop().perkDesc}</span>`+
+    (shrineKey()?`<span class="shrine-tag">🏮 镇店之宝 ${HIDDEN[shrineKey()].e}</span>`:'')+
     (achBonus()>0?`<span class="ach-tag">🏆 成就 +${Math.round(achBonus()*100)}%</span>`:'');
   renderShelf();
   const ub=$('#btnUpShop');
@@ -2374,8 +2465,13 @@ function refreshStockBadges(){
     }
     const btn=document.getElementById('hserve'+key);
     if(btn){
-      if(cur<=0){btn.disabled=true;btn.innerHTML='上菜 🍽️<br>已卖完'}
-      else{btn.disabled=false;btn.innerHTML='上菜 🍽️<br>剩 '+cur}
+      if(cur<=0){btn.disabled=true;btn.innerHTML='上菜 🍽️'}
+      else{btn.disabled=false;btn.innerHTML='上菜 🍽️'}
+    }
+    const sb2=document.getElementById('hshrine'+key);      // 补货后供奉按钮要跟着可用
+    if(sb2){
+      sb2.disabled=cur<=0;
+      sb2.textContent=cur>0?'🏮 镇店':'缺现货';
     }
   });
 }
@@ -3464,6 +3560,41 @@ function returnFromTrip(p){
       renderPet();renderShop();updateHUD();
     }});
 }
+/* ===== 稀有物当宠物饲料：成长远超菜品，还能把传说宠物引来（稀有物的第二个非经济用途）===== */
+const RARE_ATTRACT=0.30;                             // 用稀有物投喂时引来传说宠物的概率
+function feedRareToPet(key){
+  const h=HIDDEN[key];
+  if(!state.hiddenOwned[key])return;
+  if((state.hiddenStock[key]||0)<1){toast('🧺',h.n+'没有现货，等它补一件再喂');return}
+  if(petAway()){toast('🐾',state.pet.name+'出门了，等它回来再喂吧');return}
+  state.hiddenStock[key]--;
+  const p=P();
+  const gain=h.exp||200;
+  p.exp+=gain;p.mood=100;p.fed=(p.fed||0)+1;p.lastFed=Date.now();p.face=FACE_HAPPY;
+  const pe=document.getElementById('petTap');
+  if(pe){pe.classList.remove('chew');void pe.offsetWidth;pe.classList.add('chew')}
+  heartAt(document.querySelector('.pet-face-el')||pe,6);
+  let lvUp=0;
+  while(p.lv<PET_MAX&&p.exp>=PET_NEED[p.lv]){p.exp-=PET_NEED[p.lv];p.lv++;lvUp++}
+  petSay('feed');
+  toast(h.e,state.pet.name+'吃下了 '+h.n+'！成长 +'+gain+'，心情拉满');
+  // 传说宠物只有它能引来（青龙/独角兽）
+  const legs=PET_KEYS.filter(k=>PETS[k].rar===3&&!petStateOf(k).owned);
+  if(legs.length&&Math.random()<RARE_ATTRACT){
+    const k=legs[Math.floor(Math.random()*legs.length)];
+    setTimeout(()=>offerAdopt(k),700);
+  }
+  if(lvUp){
+    setTimeout(()=>{
+      popRing(pe,true);heartAt(pe,7);petSay('levelup');
+      const st=petStage(),cfg=petCfg(state.pet.kind);
+      showReward({icon:cfg.e,title:'🐾 宠物长大了！',name:'Lv.'+st.lv+' '+st.n,desc:st.tip,
+        reward:'技能：'+cfg.skill.n+' → '+petSkillNow(),btn:'好耶'});
+    },420);
+  }
+  save();renderPet();updateHUD();
+  if(petPanelOpen)renderPetPanel();
+}
 function petTick(now){
   const p=P();
   if(!p.lastMood){p.lastMood=now;p.lastFed=now;return}
@@ -3501,6 +3632,19 @@ function petTick(now){
 }
 let petPanelOpen=false;
 function openPetPanel(){petPanelOpen=true;renderPetPanel();}
+// 稀有物饲料行（有稀有物才显示）
+function rareFoodHtml(){
+  const owned=Object.keys(HIDDEN).filter(k=>state.hiddenOwned[k]);
+  if(!owned.length)return '';
+  const tiles=owned.map(k=>{
+    const h=HIDDEN[k],s=state.hiddenStock[k]||0;
+    return '<button class="pf rare'+(s>0?'':' empty')+'" data-rare="'+k+'" title="'+h.n+'：成长 +'+h.exp+'，且有机会引来传说宠物">'+
+      '<span class="pfe">'+h.e+'</span><b>'+h.n.slice(0,3)+'</b>'+
+      '<span>'+s+' 件 · +'+h.exp+'</span></button>';
+  }).join('');
+  return '<div class="pet-bar-lab" style="margin-top:8px"><span>✨ 稀有物投喂（成长远超菜品，心情拉满，还有机会引来传说伙伴）</span></div>'+
+    '<div class="pet-foods" id="petRareFoods">'+tiles+'</div>';
+}
 function renderPetPanel(){
   const st=petStage(),p=P(),cfg=petCfg(state.pet.kind);
   const need=PET_NEED[p.lv]||0;
@@ -3556,6 +3700,7 @@ function renderPetPanel(){
     '<div class="pet-say">“'+(p.line||st.tip)+'”</div>'+
     '<div class="pet-bar-lab" style="margin-top:10px"><span>🥣 投喂（用当前店的菜，等级越高长得越快；它爱吃的菜更容易引来新伙伴）</span></div>'+
     '<div class="pet-foods" id="petFoods">'+foodHtml+'</div>'+
+    rareFoodHtml()+
     '<div class="pet-bar-lab" style="margin-top:10px"><span>📖 图鉴（点亮后点一下换它出勤，出勤的那只才给加成）</span></div>'+
     '<div class="pet-dex">'+dex+'</div>'+
     '<div class="m-btns"><button class="m-plain" id="petHeadBtn">摸摸头</button>'+
@@ -3563,6 +3708,7 @@ function renderPetPanel(){
   '</div>';
   document.body.appendChild(m);
   m.querySelectorAll('.pf').forEach(b=>{b.onclick=()=>feedPet(+b.dataset.i)});
+  m.querySelectorAll('.pf.rare[data-rare]').forEach(b=>{b.onclick=()=>feedRareToPet(b.dataset.rare)});
   m.querySelectorAll('.dex-c[data-k]').forEach(b=>{
     b.onclick=()=>{
       const k=b.dataset.k;

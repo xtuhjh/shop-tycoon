@@ -67,10 +67,16 @@ body{
 /* 店铺切换条：单行横滚（换行会吃掉 100+px 竖向空间，把出餐台挤没） */
 .shop-strip{
   display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:4px;
-  padding:0 0 4px;margin-bottom:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;
-  touch-action:pan-x;
+  padding:0 0 4px;margin-bottom:2px;-webkit-overflow-scrolling:touch;
+  touch-action:pan-x;cursor:grab;
 }
-.shop-strip::-webkit-scrollbar{display:none}
+.shop-strip.dragging{cursor:grabbing}
+/* 滚动条要留着：手机上是滑动，桌面上得靠它（之前隐藏了，电脑上就没法滚了） */
+.shop-strip::-webkit-scrollbar{height:5px}
+.shop-strip::-webkit-scrollbar-track{background:rgba(255,255,255,.35);border-radius:9px}
+.shop-strip::-webkit-scrollbar-thumb{background:#c9b8d4;border-radius:9px}
+.shop-strip::-webkit-scrollbar-thumb:hover{background:#b09fc0}
+.shop-strip{scrollbar-width:thin;scrollbar-color:#c9b8d4 rgba(255,255,255,.35)}
 .shop-chip{
   flex:0 0 auto;background:rgba(255,255,255,.85);border-radius:9px;padding:4px 7px;
   font-size:10.5px;font-weight:700;color:#6b5b6e;display:flex;align-items:center;gap:3px;
@@ -2059,8 +2065,51 @@ function updateHUD(){
   $('#shopName').textContent=shop().n;
   $('#shopLvTag').textContent='Lv.'+state.shopLevel;
 }
+/* ================= 店铺条：鼠标也能拖着滚（触屏用原生滑动） =================
+   桌面上没有触摸，滚动条又容易看不见，所以补一个"按住拖动"的平移：
+   拖超过 6px 就当成滚动、并且抑制这一次的点击（不然会误切店铺）。 */
+let stripDrag=null;
+function stripPointerDown(e){
+  const strip=e.currentTarget;
+  if(e.pointerType&&e.pointerType!=='mouse')return;          // 触屏交给原生滑动（touch-action:pan-x），不抢
+  if(e.button!==0)return;
+  if(strip.scrollWidth<=strip.clientWidth+1)return;          // 不需要滚就不接管
+  stripDrag={strip:strip,x:e.clientX,left:strip.scrollLeft,moved:0};
+  strip.classList.add('dragging');
+  if(strip.setPointerCapture)try{strip.setPointerCapture(e.pointerId)}catch(err){}
+}
+function stripPointerMove(e){
+  if(!stripDrag)return;
+  const dx=e.clientX-stripDrag.x;
+  stripDrag.moved=Math.max(stripDrag.moved,Math.abs(dx));
+  if(stripDrag.moved>6){
+    e.preventDefault();
+    stripDrag.strip.scrollLeft=stripDrag.left-dx;
+  }
+}
+function stripPointerUp(e){
+  if(!stripDrag)return;
+  const d=stripDrag;stripDrag=null;
+  d.strip.classList.remove('dragging');
+  if(d.moved>6)d.strip._sup=Date.now();                      // 抑制紧随其后的 click
+}
+function bindStripDrag(strip){
+  if(strip._dragBound)return;
+  strip._dragBound=true;
+  strip.addEventListener('pointerdown',stripPointerDown);
+  strip.addEventListener('pointermove',stripPointerMove,{passive:false});
+  strip.addEventListener('pointerup',stripPointerUp);
+  strip.addEventListener('pointercancel',stripPointerUp);
+  // 拖动刚结束的那一下点击，只拦"落在店铺条里的"，不影响同时去点别的地方
+  document.addEventListener('click',e=>{
+    if(strip._sup&&Date.now()-strip._sup<350&&strip.contains(e.target)){
+      e.stopPropagation();e.preventDefault();
+    }
+  },true);
+}
 function renderShopStrip(){
   const strip=$('#shopStrip');
+  bindStripDrag(strip);
   // 内容没变就不重建：以前每次 renderShop 都重建，会把玩家手动滑到的位置顶回 0，感觉"滑不动"
   const sig=state.activeShop+'|'+state.shopTier+'|'+((state.shrine||[]).join(','));
   if(strip.dataset.sig===sig)return;
@@ -2076,7 +2125,10 @@ function renderShopStrip(){
       ?`<span class="sc-e">${s.e}</span>${s.n}${state.shrine&&state.shrine[i]?'<span class="sc-tag shrine">🏮</span>':''}${i===state.activeShop?'<span class="sc-tag">✓</span>':''}`
       :`<span class="sc-e">${s.e}</span>${s.n}<span class="sc-tag lock">🔒¥${fmt(openCostCoins(i))}</span>`;
     d.setAttribute('aria-label',(unlocked?'切换经营 ':'未解锁（需要 ¥'+fmt(openCostCoins(i))+'）：')+s.n+' 售价×'+s.mult+' '+s.perkDesc+'，点开看详情');
-    d.onclick=unlocked?(()=>switchShop(i)):(()=>shopPreview(i));
+    d.onclick=e=>{
+      if(strip._sup&&Date.now()-strip._sup<350){e.preventDefault();return}   // 刚拖动过 → 不当成点击
+      if(unlocked)switchShop(i);else shopPreview(i);
+    };
     strip.appendChild(d);
   });
   strip.scrollLeft=keep;

@@ -80,7 +80,25 @@ body{
 .shop-chip.active-shop .sc-tag{background:#ff5e62;color:#fff}
 .shop-chip.switchable{background:#fff;border-color:#b8e6c9}
 .shop-chip.switchable .sc-tag{background:#e8f8ef;color:#27ae60}
-.shop-chip.locked{opacity:.5;background:rgba(255,255,255,.4);cursor:not-allowed}
+.shop-chip.locked{opacity:.78;background:rgba(255,255,255,.55);cursor:pointer}
+.shop-chip.locked:active{transform:scale(.97)}
+.shop-chip .sc-tag.lock{background:#efe6f3;color:#7a6b8a}
+/* 未解锁店铺预览 */
+.sp-rate{font-size:12.5px;font-weight:800;color:#6b5b6e;margin-top:2px}
+.sp-rate b{color:#ff5e62}
+.sp-menu{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.sp-dish{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:800;color:#8d7a92;
+  background:#f6f2f9;border:1.5px solid #ece3f2;border-radius:10px;padding:4px 8px}
+.sp-dish.on{color:#1e8449;background:#eefaf2;border-color:#bfe8cf}
+.sp-dish em{font-style:normal;font-size:10px;font-weight:800;color:#a08fa6}
+.sp-dish.on em{color:#22a55c}
+.sp-cost{margin-top:10px;font-size:12.5px;font-weight:800;color:#6b5b6e;background:#fff7e6;
+  border:1.5px solid #f5dfae;border-radius:12px;padding:8px 10px;line-height:1.5}
+.sp-cost b{color:#d35400;font-size:14px}
+.sp-cost.ok{background:#eefaf2;border-color:#bfe8cf;color:#1e8449}
+.sp-cost.ok b{color:#157347}
+.sp-warn{font-size:11px;color:#b0562b;font-weight:700}
+.sp-note{font-size:10.5px;font-weight:700;color:#a08fa6;margin-top:8px;line-height:1.5}
 .shop-chip .sc-tag{background:#f1e7f5;color:#9b59b6;border-radius:6px;padding:1px 5px;font-size:10px;font-weight:800}
 .shop-chip .sc-tag.shrine{background:linear-gradient(135deg,#ffe9a8,#f5c242);color:#5c3a00}
 
@@ -2048,15 +2066,60 @@ function renderShopStrip(){
     const d=document.createElement('button');
     const unlocked=i<=state.shopTier;
     d.className='shop-chip'+(i===state.activeShop?' active-shop':'')+(unlocked?(i===state.activeShop?'':' switchable'):' locked');
-    // 徽章文案精简：经营中=✓、下一家可开的显示价格、其余只显示锁
-    const isNext=(i===state.shopTier+1);
+    // 未解锁的店也把解锁价标出来（价格会随收入缩放，所以只是个"当前报价"），点一下能看详情
     d.innerHTML=unlocked
       ?`<span class="sc-e">${s.e}</span>${s.n}${state.shrine&&state.shrine[i]?'<span class="sc-tag shrine">🏮</span>':''}${i===state.activeShop?'<span class="sc-tag">✓</span>':''}`
-      :`<span class="sc-e">${s.e}</span>${s.n}<span class="sc-tag">${isNext?('¥'+fmt(openCostCoins(i))):'🔒'}</span>`;
-    d.setAttribute('aria-label','切换经营 '+s.n+' 售价×'+s.mult+' '+s.perkDesc+(unlocked?'':'（未解锁，需要 ¥'+fmt(openCostCoins(i))+'）'));
-    if(unlocked)d.onclick=()=>switchShop(i);
+      :`<span class="sc-e">${s.e}</span>${s.n}<span class="sc-tag lock">🔒¥${fmt(openCostCoins(i))}</span>`;
+    d.setAttribute('aria-label',(unlocked?'切换经营 ':'未解锁（需要 ¥'+fmt(openCostCoins(i))+'）：')+s.n+' 售价×'+s.mult+' '+s.perkDesc+'，点开看详情');
+    d.onclick=unlocked?(()=>switchShop(i)):(()=>shopPreview(i));
     strip.appendChild(d);
   });
+  // 让"当前店 + 下一家要开的店"自动露出来，不然窄屏看不到解锁价
+  const key=state.activeShop+'|'+state.shopTier;
+  if(strip._key!==key){
+    strip._key=key;
+    const show=Math.min(state.shopTier+1,SHOPS.length-1);
+    const chip=strip.children[show]||strip.children[state.activeShop];
+    if(chip){
+      // 注意：offsetLeft 是相对已定位的 #app 算的，不是相对 strip，所以用 rect 差值来滚
+      const sr=strip.getBoundingClientRect(), cr=chip.getBoundingClientRect();
+      strip.scrollLeft=Math.max(0,strip.scrollLeft+(cr.right-sr.right)+8);   // 只横滚，不动页面
+    }
+  }
+}
+// 未解锁店铺预览：能开/不能开、要多少钱、这家店卖什么、加成是什么
+function shopPreview(i){
+  const s=SHOPS[i];
+  const cost=openCostCoins(i);
+  const isNext=(i===state.shopTier+1);
+  const canOpen=isNext&&state.coins>=cost;
+  const prev=SHOPS[state.shopTier];
+  const old=document.getElementById('shopMask');if(old)old.remove();
+  const m=document.createElement('div');
+  m.className='modal-mask';m.id='shopMask';
+  const menuHtml=(s.menu||[]).map(d=>
+    '<span class="sp-dish'+(state.unlocked[d.lv-1]?' on':'')+'">'+d.e+d.n+
+    '<em>Lv.'+d.lv+(state.unlocked[d.lv-1]?' ✓':' 🔒')+'</em></span>').join('');
+  const lockedDishes=(s.menu||[]).filter(d=>!state.unlocked[d.lv-1]).map(d=>d.lv);
+  m.innerHTML='<div class="modal"><h3>'+s.e+' '+s.n+'</h3>'+
+    '<div class="sp-rate">售价倍率 <b>×'+s.mult+'</b> · '+s.perkDesc+'</div>'+
+    '<div class="pet-bar-lab" style="margin-top:10px"><span>这家店的招牌菜</span><span>'+
+      (lockedDishes.length?('还需解锁 Lv.'+lockedDishes.join('/')):'全部可卖 ✓')+'</span></div>'+
+    '<div class="sp-menu">'+menuHtml+'</div>'+
+    '<div class="sp-cost'+(canOpen?' ok':'')+'">'+
+      (isNext
+        ? ('解锁需要 <b>¥'+fmt(cost)+'</b>'+(canOpen?'　✅ 现在就能开！':'　还差 ¥'+fmt(cost-state.coins)))
+        : ('解锁需要 <b>¥'+fmt(cost)+'</b><br><span class="sp-warn">要先开「'+prev.n+'」才能开这家</span>'))+
+    '</div>'+
+    '<div class="sp-note">价格是按你现在的收入自动缩放的（≈攒 '+s.openK+' 秒的卖货收入），收入涨了它也会跟着涨，所以这只是"当前报价"。</div>'+
+    '<div class="m-btns"><button class="m-plain" id="spClose">知道了</button>'+
+      (canOpen?'<button class="m-primary" id="spOpen">🏪 现在就开（¥'+fmt(cost)+'）</button>':'')+
+    '</div></div>';
+  document.body.appendChild(m);
+  document.getElementById('spClose').onclick=()=>m.remove();
+  const ob=document.getElementById('spOpen');
+  if(ob)ob.onclick=()=>{m.remove();openNewShop()};
+  m.onclick=e=>{if(e.target===m)m.remove()};
 }
 // 吧台渲染：招牌 + 镇店之宝 + 客人（客人连同订单气泡直接站在吧台里，不再单独占一块版面）
 function renderBar(){
@@ -3903,9 +3966,10 @@ $('#btnUpShop').onclick=()=>{
   toast('⬆️',shop().n+' 升到 Lv.'+state.shopLevel+'！货架生产更快');
   renderShop();save();
 };
-$('#btnNewShop').onclick=()=>{
+// 开店逻辑抽出来：底部按钮和"店铺预览"里的「现在就开」都走它（避免按钮 disabled 状态陈旧时点了没反应）
+function openNewShop(){
   const next=SHOPS[state.shopTier+1];
-  if(!next)return;
+  if(!next){toast('🏆','全部店铺都已开业');return}
   const oc=openCostCoins(state.shopTier+1);
   if(state.coins<oc){toast('💰','金币不够！还差 ¥'+fmt(oc-state.coins));return}
   state.coins-=oc;
@@ -3915,7 +3979,8 @@ $('#btnNewShop').onclick=()=>{
   celebrate(next);
   toast(next.e,'新店开业：'+next.n+'！现在经营这家（可随时切回旧店）');
   renderShop();save();
-};
+}
+$('#btnNewShop').onclick=openNewShop;
 $('#btnGen').onclick=generate;
 $('#btnShipMode').onclick=toggleShip;
 $('#btnMenu').onclick=()=>$('#menuModal').classList.remove('hidden');

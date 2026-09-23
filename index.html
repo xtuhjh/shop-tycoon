@@ -578,15 +578,6 @@ body{
 .chip.on{border-color:#27ae60;color:#27ae60;background:#eafaf1;transform:translateY(-1px)}
 .chip.lockchip{opacity:.5;background:rgba(255,255,255,.4)}
 
-/* 合成台工具条（主流 QoL：一键合并 / 整理） */
-.merge-tools{display:flex;gap:7px;margin-top:8px}
-.mt-btn{
-  flex:1;border:none;border-radius:11px;padding:9px;cursor:pointer;font-family:inherit;
-  font-size:12.5px;font-weight:800;color:#0c4633;
-  background:linear-gradient(135deg,#9ff5c4,#5fe0b0);box-shadow:0 3px 9px rgba(56,200,160,.3);
-}
-.mt-btn.ghost{background:rgba(255,255,255,.7);color:#7a6b8a;box-shadow:none;border:1.5px solid #e3d5ea}
-.mt-btn:active{transform:scale(.96)}
 /* 合并暴击特效 */
 .crit-burst{position:fixed;z-index:210;font-weight:900;font-size:14px;color:#c8912a;pointer-events:none;
   text-shadow:0 1px 3px rgba(255,255,255,.9);animation:critUp 1.1s ease-out forwards}
@@ -766,10 +757,8 @@ body{
   .merge-tip{font-size:11.5px;padding:6px 9px}
   .merge-tip .goal-sub{margin-top:3px}
   .goal-bar{margin-top:5px;height:7px}
-  .merge-tools{margin-top:6px}
-  .mt-btn{padding:8px;font-size:12px}
-  /* 手机端 20 格改为 5 列 × 4 行：更宽更矮，整页能一屏放下（无需滚动就能点生成） */
-  #grid{grid-template-columns:repeat(5,1fr);max-width:332px;margin:0 auto}
+  /* 手机端 20 格改为 5 列 × 4 行：更宽更矮，整页一屏放下 */
+  #grid{grid-template-columns:repeat(5,1fr);max-width:400px;margin:0 auto}
   .cell .c-emoji{font-size:25px}
   .cell .c-lv{font-size:9.5px;bottom:3px;right:4px}
   .chip{font-size:11.5px;padding:5px 11px}
@@ -903,9 +892,6 @@ body{
       <button class="combo-btn" id="btnCombo" aria-label="触发隐藏套餐彩蛋">🍱 咦…这三样凑齐了？点我试试</button>
       <div class="drag-hint">🖐 按住一道菜<b>拖动</b>到同级菜上直接合并 · 拖到空格可移动整理 · 拖到「出货模式」按钮上直接换能量 · 也可以点两下</div>
       <div class="lv-chips" id="lvChips"></div>
-      <div class="merge-tools">
-        <button class="mt-btn ghost" id="btnSort">🔀 整理（同级归类）</button>
-      </div>
       <div class="merge-actions">
         <button class="big-btn" id="btnGen"></button>
         <button class="big-btn" id="btnShipMode">📦 出货模式：关</button>
@@ -934,7 +920,7 @@ body{
         <li>🐾 <b>宠物</b>：吧台边的小家伙。点它<b>摸头</b>会开心（加心情和亲密度），点饭碗用<b>货架上做好的菜投喂</b>它会长大</li>
         <li>🥣 宠物长大有回报：Lv.2 帮你捡金币 · Lv.3 全场售价 +5% · Lv.4 客人赏金 +10% · Lv.5 稀有客人翻倍；它也会时不时跟你说话</li>
         <li>🔮 <b>合成台</b>：花能量生成产品（<b>每个等级有 3 种口味</b>，随机出，共 36 种可收集）；<b>拖动</b>一道菜到同级菜上合并，拖到空格可移动整理，拖到「出货模式」按钮上直接换能量</li>
-        <li>⚡ 合成台还有 <b>一键合并</b>（自动把所有能合的合掉）和 <b>整理</b>（按等级排好），合并时有 10% 概率<b>暴击直接多升一级</b></li>
+        <li>✨ 合并有 10% 概率<b>暴击直接多升一级</b>（Lv.2+Lv.2 可能直接出 Lv.4）</li>
         <li>✨ 合并时小概率蹦出<b>隐藏稀有钱</b> 🍀🌈👑（白金餐厅下出现率翻倍！）</li>
         <li>📦 出货模式：点击合成台里的产品直接换成能量</li>
       </ul>
@@ -1578,14 +1564,6 @@ function rollHidden(){
 // 合并暴击：小概率多升一级（主流合成游戏的"暴击"手感）
 const CRIT_RATE=0.10;
 function critRoll(){return Math.random()<CRIT_RATE}
-// 整理：按等级排序，把同级凑到一起（纯粹的整理，不代替玩家做合并决定）
-function sortGrid(){
-  const items=state.grid.filter(c=>c);
-  items.sort((a,b)=>(a.level||99)-(b.level||99));
-  for(let i=0;i<GRID_SIZE;i++)state.grid[i]=items[i]||null;
-  renderGrid();checkCombo();save();
-  toast('🔀','已按等级整理');
-}
 // 合并/移动的统一执行入口（点击两次与拖动都用它）
 // 返回 {kind:'merge'|'move'|'hidden'|'egg', to, from, level?} 或 null（不可操作）
 function applyMerge(from,to){
@@ -3106,7 +3084,6 @@ renderPet();
 renderScene();
 $('#barSign').onclick=signClick;
 $('#btnCombo').onclick=doCombo;
-$('#btnSort').onclick=sortGrid;
 $('#btnEggs').onclick=()=>{$('#menuModal').classList.add('hidden');renderEggsPanel()};
 $('#btnPet').onclick=()=>{$('#menuModal').classList.add('hidden');openPetPanel()};
 $('#btnAch').onclick=()=>{$('#menuModal').classList.add('hidden');renderAchPanel()};

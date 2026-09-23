@@ -484,6 +484,21 @@ body{
 .cell.sel{border-color:#ff5e62;box-shadow:0 0 0 3px rgba(255,94,98,.3);transform:scale(1.06)}
 .cell.pop{animation:pop .3s ease}
 @keyframes pop{0%{transform:scale(.3)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+/* ===== 成就面板 ===== */
+.ach-tag{background:linear-gradient(135deg,#ffe27a,#f5b52e);color:#6b4a12 !important;border-radius:7px;padding:1px 6px;font-weight:800}
+.ach-group h4{margin:12px 0 6px;font-size:13px;color:#6b5b6e;border-left:3px solid #f5c242;padding-left:7px}
+.ach-item{display:flex;gap:9px;align-items:flex-start;padding:8px 10px;border-radius:12px;
+  background:#faf7fc;border:1.5px solid #efe6f3;margin-bottom:6px}
+.ach-item.on{background:linear-gradient(135deg,#fffdf3,#fff3d6);border-color:#f5c242}
+.ach-item .ai-e{font-size:20px;width:24px;text-align:center;flex-shrink:0;filter:grayscale(1) opacity(.5)}
+.ach-item.on .ai-e{filter:none}
+.ach-item .ai-body{flex:1;min-width:0}
+.ach-item .ai-name{font-size:12.5px;font-weight:800;color:#6b5b6e;display:flex;align-items:center;gap:5px}
+.ach-item .ai-name em{font-style:normal;font-size:10.5px;background:#e8f8ef;color:#1e8449;border-radius:6px;padding:0 5px;font-weight:800}
+.ach-item .ai-desc{font-size:10.5px;color:#a08fa6;font-weight:600;margin-top:1px}
+.ach-bar{height:4px;border-radius:99px;background:#efe6f3;overflow:hidden;margin-top:5px}
+.ach-bar i{display:block;height:100%;background:linear-gradient(90deg,#ffc46b,#ef6f4e);border-radius:99px}
+.ach-prog{font-size:9.5px;color:#b0a2b8;font-weight:700;margin-top:3px;text-align:right}
 /* ===== 果冻效果 ===== */
 .cell.jelly{animation:jelly .52s cubic-bezier(.3,1.25,.4,1)}
 .cell.jelly .c-emoji{animation:jelly .52s cubic-bezier(.3,1.25,.4,1)}
@@ -857,12 +872,17 @@ body{
         <li>💰 <b>金币管商店线</b>：升级店铺（卖更快）、<b>开新店</b>（价格随你的收入自动缩放，永远是"攒一会儿"）、金币解锁商品、送走客人</li>
         <li>⚡ <b>能量管合成线</b>：生成产品、升级合成台；出货模式可把产品回收成能量</li>
         <li>🛍️ <b>点击店铺条</b>切换经营的店！小摊⚡翻倍、食堂客人奖励×1.6、白金餐厅稀有钱×2…</li>
+        <li>🏆 <b>成就</b>：36 个长期目标（服务客人数、合并次数、营收、收集…），每达成一个<b>永久提升全场售价</b>，攒满 +84%；在 ⚙️ 里查看进度条</li>
+        <li>🌙 <b>离线收益</b>：关掉页面吧台也在出餐，回来按 30% 效率结算（最多算 8 小时）</li>
         <li>🐾 <b>宠物</b>：吧台边的小家伙。点它<b>摸头</b>会开心（加心情和亲密度），点饭碗用<b>货架上做好的菜投喂</b>它会长大</li>
         <li>🥣 宠物长大有回报：Lv.2 帮你捡金币 · Lv.3 全场售价 +5% · Lv.4 客人赏金 +10% · Lv.5 稀有客人翻倍；它也会时不时跟你说话</li>
         <li>🔮 <b>合成台</b>：花能量生成产品，<b>拖动</b>一道菜到同级菜上直接合并（点两下也行）；拖到空格可移动整理，拖到「出货模式」按钮上直接换能量</li>
         <li>✨ 合并时小概率蹦出<b>隐藏稀有钱</b> 🍀🌈👑（白金餐厅下出现率翻倍！）</li>
         <li>📦 出货模式：点击合成台里的产品直接换成能量</li>
       </ul>
+      <div class="m-btns">
+        <button class="menu-egg" id="btnAch">🏆 成就 <span id="achCount">0/36</span> · <span id="achBonus">+0%</span></button>
+      </div>
       <div class="m-btns">
         <button class="menu-egg" id="btnPet">🐾 宠物 <span id="petMenuInfo">Lv.1</span></button>
         <button class="menu-egg" id="btnEggs">🥚 彩蛋图鉴 <span id="eggCount">0/6</span></button>
@@ -952,6 +972,11 @@ const defaultState=()=>({
   comboNext:0,        // 隐藏套餐冷却
   comboHinted:false,
   lastDaily:'',       // 上次领取每日礼的日期
+  // ---- 成就与长期统计 ----
+  ach:{},             // {成就key:true}
+  stats:{earned:0,bestOrder:0,bestCombo:0,days:0,dayKey:''},
+  lastSeen:0,         // 上次在线时间（离线收益用）
+  warnedNum:false,    // 是否已提示过数值上限
   // ---- 宠物 ----
   pet:{
     name:'豆豆', lv:1, exp:0, bond:0, mood:80,
@@ -966,21 +991,32 @@ let selIdx=-1, shipMode=false, genLv=1, lastMergedIdx=-1, orderBusy=false;
 
 /* ================= 工具 & 加成 ================= */
 const $=s=>document.querySelector(s);
+// 数值单位（长期玩数字会很大，逐级换单位；超出所有单位用科学计数）
+const NUM_UNITS=[[1e48,'极'],[1e44,'载'],[1e40,'正'],[1e36,'涧'],[1e32,'沟'],[1e28,'穰'],
+                 [1e24,'秭'],[1e20,'垓'],[1e16,'京'],[1e12,'万亿'],[1e8,'亿'],[1e4,'万']];
+const NUM_SAFE=9e15;                   // Number 可精确表示的整数上限（2^53）
 function fmt(n){
   n=Math.floor(n);
+  if(!isFinite(n))return '∞';
+  if(n<0)return '-'+fmt(-n);
   if(n<1e4)return n.toString();
-  if(n<1e8)return (n/1e4).toFixed(n<1e6?2:1)+'万';
-  if(n<1e12)return (n/1e8).toFixed(2)+'亿';
-  return (n/1e12).toFixed(2)+'万亿';
+  if(n>=1e52)return n.toExponential(2);   // 超出所有单位就上科学计数
+  for(let i=0;i<NUM_UNITS.length;i++){
+    const [v,u]=NUM_UNITS[i];
+    if(n>=v)return (n/v).toFixed(2)+u;
+  }
+  return n.toExponential(2);
 }
 const shop=()=>SHOPS[state.activeShop];
 const perkLevel=(k,base,all)=>shop().perk===k?base:(shop().perk==='all'?all:1);
-const mult=()=>shop().mult*(1+petMultBonus());
+const mult=()=>shop().mult*(1+petMultBonus()+achBonus());
 const speed=()=>(1+0.35*(state.shopLevel-1))*perkLevel('speed',1.5,1.3);
-const energyRate=()=>(state.shopTier+1)*perkLevel('energy',2,1.5);
+const energyRate=()=>(state.shopTier+1)*perkLevel('energy',2,1.5)*(1+achBonus()*0.5);
+// 升级成本：1.35^L（原来 1.6^L）。指数曲线放缓后，唯一的无限成长轴能多撑一倍，
+// 且数值不会过早撞上 Number 精度上限
+const upCost=()=>Math.floor(50*Math.pow(1.35,state.shopLevel-1));
 const orderMult=()=>perkLevel('order',1.6,1.3);
 const luckyMult=()=>perkLevel('lucky',2,1.5);
-const upCost=()=>Math.floor(50*Math.pow(1.6,state.shopLevel-1));
 const genCost=()=>Math.min(50000,Math.floor(8*Math.pow(1.012,state.genCount)));
 const genCostAt=lv=>Math.floor(genCost()*Math.pow(3,lv-1));
 const shipGain=lv=>Math.floor(6*Math.pow(2,lv-1));
@@ -1114,6 +1150,7 @@ function shakeGuest(el){
 
 /* ================= 存档 ================= */
 function save(){
+  state.lastSeen=Date.now();                        // 记录在线时间（离线收益用）
   try{localStorage.setItem(SAVE_KEY,JSON.stringify(state))}catch(e){}
 }
 function load(){
@@ -1134,7 +1171,10 @@ function load(){
       if(!state.hiddenStock)state.hiddenStock={};
       if(!state.pet)state.pet=defaultState().pet;
       else state.pet=Object.assign(defaultState().pet,state.pet);
-      if(!state.mergeLevel)state.mergeLevel=1;
+      if(!state.ach)state.ach={};
+      if(!state.stats)state.stats=defaultState().stats;
+      else state.stats=Object.assign(defaultState().stats,state.stats);
+      if(state.mergeLevel===undefined)state.mergeLevel=1;
       if(!Array.isArray(state.stock))state.stock=PRODUCTS.map(()=>0);
       while(state.stock.length<PRODUCTS.length)state.stock.push(0);
       if(!Array.isArray(state.queue))state.queue=[];
@@ -1370,6 +1410,8 @@ function completeOrder(i,srcSel,emoji){
   state.coins+=g.rewardCoins;
   state.energy+=g.rewardEnergy;
   state.ordersDone++;
+  state.stats.earned+=g.rewardCoins;                       // 长期统计：累计营收
+  if(g.rewardCoins>state.stats.bestOrder)state.stats.bestOrder=g.rewardCoins;
   g.fx='paid';
   orderBusy=true;
   save();
@@ -1779,10 +1821,10 @@ function renderShop(){
   state.queue.forEach(g=>Object.keys(trayNeed(g)).forEach(k=>wanted.add(k)));
   $('#statsBar').innerHTML=
     `<span>🏭 生产 ${prodInterval().toFixed(1)} 秒/件</span>`+
-    `<span>💰 售价 ×${mult()}</span>`+
+    `<span>💰 售价 ×${mult().toFixed(2)}</span>`+
     `<span>⚡ 上菜能量 ×${Math.round(energyRate())}</span>`+
     `<span class="perk">${shop().perkDesc}</span>`+
-    `<span style="color:#ff5e62">🍽️ 点做好的菜自动上给排队客人</span>`;
+    (achBonus()>0?`<span class="ach-tag">🏆 成就 +${Math.round(achBonus()*100)}%</span>`:'');
   renderShelf();
   const ub=$('#btnUpShop');
   ub.innerHTML=`⬆️ 升级 <b>¥${fmt(upCost())}</b>`;
@@ -1920,6 +1962,16 @@ function tick(){
   }
   petTick(now);                                     // 宠物：心情/捡金币/自言自语
   if(now-(tick._scene||0)>240){tick._scene=now;sceneTick()}   // 2.5D 场景：机器进度
+  if(now-(tick._ach||0)>2000){tick._ach=now;checkAch()}       // 成就判定（低频）
+  // 数值精度保护：超过 Number 精确整数上限后，继续累加会静默失真，这里封顶并提示一次
+  if(state.coins>NUM_SAFE||state.energy>NUM_SAFE){
+    state.coins=Math.min(state.coins,NUM_SAFE);
+    state.energy=Math.min(state.energy,NUM_SAFE);
+    if(!state.warnedNum){
+      state.warnedNum=true;save();
+      toast('⚠️','数值已达安全上限，已自动封顶以防数据失真');
+    }
+  }
   if(now-(tick._btn||0)>1500){
     tick._btn=now;
     const ub=$('#btnUpShop'),nb=$('#btnNewShop'),next=SHOPS[state.shopTier+1];
@@ -2052,6 +2104,130 @@ function gridPointerUp(){
   }
 }
 
+/* ================= 成就系统（长期目标） ================= */
+// c(state) 判定是否达成；p(state) 返回 [当前, 目标] 用于显示进度；b 为永久加成
+const ACHS=[
+  // —— 服务客人 ——
+  {g:'服务',k:'s10', e:'🧑‍🍳',n:'开张大吉',  d:'服务 10 位客人',  b:0.01,c:s=>s.ordersDone>=10,      p:s=>[s.ordersDone,10]},
+  {g:'服务',k:'s100',e:'🍽️',n:'熟练跑堂',  d:'服务 100 位客人', b:0.02,c:s=>s.ordersDone>=100,     p:s=>[s.ordersDone,100]},
+  {g:'服务',k:'s1k', e:'🏃',n:'金牌服务',  d:'服务 1000 位客人',b:0.03,c:s=>s.ordersDone>=1000,    p:s=>[s.ordersDone,1000]},
+  {g:'服务',k:'s5k', e:'👑',n:'传说店员',  d:'服务 5000 位客人',b:0.04,c:s=>s.ordersDone>=5000,    p:s=>[s.ordersDone,5000]},
+  {g:'服务',k:'big4',e:'💸',n:'大单来了',  d:'单笔订单赏金 ≥10 万',b:0.02,c:s=>s.stats.bestOrder>=1e5, p:s=>[Math.floor(s.stats.bestOrder),1e5]},
+  {g:'服务',k:'cmb', e:'🔥',n:'手速惊人',  d:'上菜连击达到 ×10',  b:0.02,c:s=>s.stats.bestCombo>=10, p:s=>[s.stats.bestCombo,10]},
+  // —— 合成台 ——
+  {g:'合成',k:'m50', e:'🔮',n:'初通合并',  d:'合并 50 次',   b:0.01,c:s=>s.totalMerged>=50,   p:s=>[s.totalMerged,50]},
+  {g:'合成',k:'m500',e:'✨',n:'合并熟手',  d:'合并 500 次',  b:0.02,c:s=>s.totalMerged>=500,  p:s=>[s.totalMerged,500]},
+  {g:'合成',k:'m5k', e:'🌀',n:'合并大师',  d:'合并 5000 次', b:0.03,c:s=>s.totalMerged>=5000, p:s=>[s.totalMerged,5000]},
+  {g:'合成',k:'g100',e:'🎲',n:'开始量产',  d:'生成 100 个产品',  b:0.01,c:s=>s.genCount>=100,   p:s=>[s.genCount,100]},
+  {g:'合成',k:'g1k', e:'⚙️',n:'流水线',    d:'生成 1000 个产品', b:0.02,c:s=>s.genCount>=1000,  p:s=>[s.genCount,1000]},
+  {g:'合成',k:'g10k',e:'🏭',n:'工厂级产能',d:'生成 10000 个产品',b:0.03,c:s=>s.genCount>=10000, p:s=>[s.genCount,10000]},
+  {g:'合成',k:'ml4', e:'💠',n:'顶级合成台',d:'合成台升到 Lv.4',  b:0.03,c:s=>s.mergeLevel>=4},
+  // —— 店铺 ——
+  {g:'店铺',k:'sp2', e:'🏪',n:'第二家店',  d:'开业 2 家店铺',b:0.01,c:s=>s.shopTier>=1, p:s=>[Math.min(s.shopTier+1,2),2]},
+  {g:'店铺',k:'sp4', e:'🍽️',n:'连锁起步',  d:'开业 4 家店铺',b:0.02,c:s=>s.shopTier>=3, p:s=>[Math.min(s.shopTier+1,4),4]},
+  {g:'店铺',k:'sp6', e:'💎',n:'全线布局',  d:'开业全部 6 家店铺',b:0.04,c:s=>s.shopTier>=5, p:s=>[Math.min(s.shopTier+1,6),6]},
+  {g:'店铺',k:'lv10',e:'⬆️',n:'十级老店',  d:'店铺等级到 Lv.10',b:0.01,c:s=>s.shopLevel>=10, p:s=>[s.shopLevel,10]},
+  {g:'店铺',k:'lv25',e:'📈',n:'二十五级',  d:'店铺等级到 Lv.25',b:0.02,c:s=>s.shopLevel>=25, p:s=>[s.shopLevel,25]},
+  {g:'店铺',k:'lv40',e:'🚀',n:'四十级规模',d:'店铺等级到 Lv.40',b:0.03,c:s=>s.shopLevel>=40, p:s=>[s.shopLevel,40]},
+  // —— 收集 ——
+  {g:'收集',k:'u3', e:'🍹',n:'三个招牌',  d:'解锁 3 道菜',  b:0.01,c:s=>s.unlocked.filter(Boolean).length>=3,  p:s=>[s.unlocked.filter(Boolean).length,3]},
+  {g:'收集',k:'u6', e:'🧋',n:'六个招牌',  d:'解锁 6 道菜',  b:0.02,c:s=>s.unlocked.filter(Boolean).length>=6,  p:s=>[s.unlocked.filter(Boolean).length,6]},
+  {g:'收集',k:'u12',e:'🌟',n:'满汉全席',  d:'解锁全部 12 道菜',b:0.04,c:s=>s.unlocked.every(Boolean), p:s=>[s.unlocked.filter(Boolean).length,12]},
+  {g:'收集',k:'r1', e:'🍀',n:'意外收获',  d:'合出 1 种稀有菜',b:0.02,c:s=>Object.keys(s.hiddenOwned).length>=1, p:s=>[Object.keys(s.hiddenOwned).length,1]},
+  {g:'收集',k:'r3', e:'🌈',n:'稀有全收',  d:'集齐 3 种稀有菜',b:0.04,c:s=>Object.keys(s.hiddenOwned).length>=3, p:s=>[Object.keys(s.hiddenOwned).length,3]},
+  {g:'收集',k:'e3', e:'🥚',n:'彩蛋猎人',  d:'发现 3 个彩蛋',b:0.02,c:s=>Object.keys(s.eggs||{}).filter(k=>s.eggs[k]).length>=3, p:s=>[Object.keys(s.eggs||{}).filter(k=>s.eggs[k]).length,3]},
+  {g:'收集',k:'e6', e:'🎁',n:'彩蛋全收',  d:'发现全部 6 个彩蛋',b:0.04,c:s=>Object.keys(s.eggs||{}).filter(k=>s.eggs[k]).length>=6, p:s=>[Object.keys(s.eggs||{}).filter(k=>s.eggs[k]).length,6]},
+  // —— 宠物 ——
+  {g:'宠物',k:'p5', e:'🐕',n:'最好的伙伴',d:'宠物养到 Lv.5',b:0.03,c:s=>s.pet.lv>=5, p:s=>[s.pet.lv,5]},
+  {g:'宠物',k:'f100',e:'🥣',n:'称职铲屎官',d:'投喂 100 次',  b:0.01,c:s=>s.pet.fed>=100, p:s=>[s.pet.fed,100]},
+  {g:'宠物',k:'f500',e:'🍖',n:'投喂达人',  d:'投喂 500 次',  b:0.02,c:s=>s.pet.fed>=500, p:s=>[s.pet.fed,500]},
+  {g:'宠物',k:'b100',e:'❤️',n:'形影不离',  d:'亲密度到 100',b:0.02,c:s=>(s.pet.bond||0)>=100, p:s=>[s.pet.bond||0,100]},
+  {g:'宠物',k:'b500',e:'💖',n:'家人一样',  d:'亲密度到 500',b:0.03,c:s=>(s.pet.bond||0)>=500, p:s=>[s.pet.bond||0,500]},
+  // —— 经营 ——
+  {g:'经营',k:'c1m', e:'💰',n:'第一桶金',  d:'累计营收 100 万',b:0.01,c:s=>s.stats.earned>=1e6, p:s=>[Math.floor(s.stats.earned),1e6]},
+  {g:'经营',k:'c1e', e:'🏦',n:'日进斗金',  d:'累计营收 1 亿',  b:0.02,c:s=>s.stats.earned>=1e8, p:s=>[Math.floor(s.stats.earned),1e8]},
+  {g:'经营',k:'c1t', e:'🎖️',n:'富可敌国',  d:'累计营收 1 万亿',b:0.04,c:s=>s.stats.earned>=1e12,p:s=>[Math.floor(s.stats.earned),1e12]},
+  {g:'经营',k:'d3',  e:'📅',n:'常客老板',  d:'累计开店 3 天',  b:0.02,c:s=>s.stats.days>=3, p:s=>[s.stats.days,3]},
+  {g:'经营',k:'d7',  e:'🗓️',n:'一周老店',  d:'累计开店 7 天',  b:0.03,c:s=>s.stats.days>=7, p:s=>[s.stats.days,7]},
+];
+const achOf=k=>ACHS.find(x=>x.k===k);
+const achCount=()=>ACHS.filter(x=>state.ach[x.k]).length;
+const achBonus=()=>ACHS.reduce((a,x)=>a+(state.ach[x.k]?x.b:0),0);
+function checkAch(){
+  let got=[];
+  ACHS.forEach(a=>{
+    if(state.ach[a.k])return;
+    if(a.c(state)){state.ach[a.k]=true;got.push(a)}
+  });
+  if(!got.length)return;
+  if(got.length<=2)got.forEach(a=>toast(a.e,'成就达成「'+a.n+'」· 全局售价 +'+Math.round(a.b*100)+'%'));
+  else toast('🏆','一口气达成 '+got.length+' 个成就！全局售价 +'+Math.round(got.reduce((s,a)=>s+a.b,0)*100)+'%');
+  refreshAchBadge();renderShop();updateHUD();save();
+}
+function refreshAchBadge(){
+  const el=document.getElementById('achCount');
+  if(el)el.textContent=achCount()+'/'+ACHS.length;
+  const el2=document.getElementById('achBonus');
+  if(el2)el2.textContent='+'+Math.round(achBonus()*100)+'%';
+}
+function renderAchPanel(){
+  const groups={};
+  ACHS.forEach(a=>{(groups[a.g]=groups[a.g]||[]).push(a)});
+  const html=Object.keys(groups).map(g=>{
+    const rows=groups[g].map(a=>{
+      const on=!!state.ach[a.k];
+      let prog='';
+      if(!on&&a.p){
+        const [cur,need]=a.p(state);
+        const pct=Math.min(100,Math.round(cur/need*100));
+        prog='<div class="ach-bar"><i style="width:'+pct+'%"></i></div><div class="ach-prog">'+fmt(cur)+' / '+fmt(need)+'</div>';
+      }
+      return '<div class="ach-item'+(on?' on':'')+'">'+
+        '<span class="ai-e">'+(on?a.e:'🔒')+'</span>'+
+        '<div class="ai-body"><div class="ai-name">'+a.n+(on?' <em>+'+Math.round(a.b*100)+'%</em>':'')+'</div>'+
+        '<div class="ai-desc">'+a.d+'</div>'+prog+'</div></div>';
+    }).join('');
+    return '<div class="ach-group"><h4>'+g+'</h4>'+rows+'</div>';
+  }).join('');
+  const m=document.createElement('div');
+  m.className='modal-mask';
+  m.innerHTML='<div class="modal"><h3>🏆 成就 '+achCount()+'/'+ACHS.length+' · 全局售价 +'+Math.round(achBonus()*100)+'%</h3>'+
+    '<p style="font-size:12.5px">每达成一个成就都会永久提升全场售价，是长期玩的主要成长线。</p>'+
+    html+
+    '<div class="m-btns"><button class="m-primary">继续经营</button></div></div>';
+  document.body.appendChild(m);
+  m.querySelector('.m-primary').onclick=()=>m.remove();
+  m.onclick=e=>{if(e.target===m)m.remove()};
+}
+
+/* ================= 离线收益 ================= */
+const OFFLINE_RATE=0.30, OFFLINE_CAP=8*3600, OFFLINE_MIN=180;
+const incomePerSec=()=>unlockedPriceSum()*mult()*speed();
+const energyPerSec=()=>{let n=0;state.unlocked.forEach((u,i)=>{if(u)n+=(i+1)});return n*energyRate()*speed()};
+function settleOffline(){
+  const now=Date.now();
+  const last=state.lastSeen||0;
+  state.lastSeen=now;
+  if(!last)return;
+  let sec=Math.floor((now-last)/1000);
+  if(sec<OFFLINE_MIN)return;                          // 离开太短不结算
+  const capped=sec>OFFLINE_CAP;
+  sec=Math.min(sec,OFFLINE_CAP);
+  const coins=Math.floor(incomePerSec()*sec*OFFLINE_RATE);
+  const energy=Math.floor(energyPerSec()*sec*OFFLINE_RATE);
+  if(coins<10&&energy<10)return;
+  const hh=Math.floor(sec/3600), mm=Math.floor(sec%3600/60);
+  const away=(hh?hh+' 小时 ':'')+mm+' 分钟';
+  showReward({
+    icon:'🌙',title:'欢迎回来，老板！',
+    name:'离开 '+away+(capped?'（收益按 8 小时上限结算）':''),
+    desc:'吧台在你不在的时候也在出餐，帮你攒了一笔',
+    reward:'💰 '+fmt(coins)+' · ⚡ '+fmt(energy),
+    btn:'收下',
+    onClaim:()=>{state.coins+=coins;state.energy+=energy;state.stats.earned+=coins}
+  });
+}
+
 /* ================= 隐藏彩蛋 ================= */
 const EGGS=[
   {k:'sign', e:'🥠', n:'手写菜单',  d:'连点吧台招牌 8 次，老板会翻出一张手写菜单'},
@@ -2068,6 +2244,8 @@ const todayKey=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+
 
 // 主流手游式奖励弹窗：全屏金光 + 中央卡片 + 领取按钮
 function showReward(o){
+  // 已经有一个奖励弹窗开着 → 排队等它关掉再弹，避免两个弹窗叠在一起
+  if(document.querySelector('.egg-mask')){setTimeout(()=>showReward(o),1200);return null}
   const m=document.createElement('div');
   m.className='egg-mask';
   m.innerHTML='<div class="rays"></div><div class="egg-card">'+
@@ -2260,6 +2438,10 @@ function checkNight(){
 // ---- 彩蛋⑥：每日开店礼 ----
 function checkDaily(){
   const t=todayKey();
+  if(state.stats.dayKey!==t){                    // 长期统计：累计开店天数
+    state.stats.dayKey=t;
+    state.stats.days=(state.stats.days||0)+1;
+  }
   if(state.lastDaily===t)return;
   state.lastDaily=t;save();
   const c=Math.max(300,Math.round(1500*mult()));
@@ -2355,6 +2537,7 @@ function bumpCombo(){
   const now=Date.now();
   comboCount=(now-comboTimer<6000)?comboCount+1:1;
   comboTimer=now;
+  if(comboCount>state.stats.bestCombo)state.stats.bestCombo=comboCount;   // 长期统计：最高连击
   if(comboCount<2)return comboCount;
   const scene=document.getElementById('shop3d');
   if(!scene)return comboCount;
@@ -2638,8 +2821,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
 
 /* ================= 启动 ================= */
 load();
-fillQueue();
-renderShop();        // 内部已含 renderBar()
+fillQueue();renderShop();        // 内部已含 renderBar()
 renderMergeHead();
 renderGrid();
 renderChips();
@@ -2651,6 +2833,7 @@ $('#barSign').onclick=signClick;
 $('#btnCombo').onclick=doCombo;
 $('#btnEggs').onclick=()=>{$('#menuModal').classList.add('hidden');renderEggsPanel()};
 $('#btnPet').onclick=()=>{$('#menuModal').classList.add('hidden');openPetPanel()};
+$('#btnAch').onclick=()=>{$('#menuModal').classList.add('hidden');renderAchPanel()};
 // 货架子标签页：点按钮切换 + 面板上左右滑动
 $('#stBtn0').onclick=()=>setShelfTab(0);
 $('#stBtn1').onclick=()=>setShelfTab(1);
@@ -2667,6 +2850,9 @@ $('#stBtn1').onclick=()=>setShelfTab(1);
 })();
 if(!state.chestNext)state.chestNext=Date.now()+45000;
 if(!state.catNext)state.catNext=Date.now()+60000;
+refreshAchBadge();
+settleOffline();                                   // 先结算离线收益（它读 lastSeen）
+checkAch();                                        // 再判定成就——顺序不能反：checkAch 会 save() 覆盖 lastSeen
 setInterval(tick,200);
 setInterval(save,10000);
 setTimeout(()=>{checkNight();checkDaily();},900);   // 开场彩蛋判定

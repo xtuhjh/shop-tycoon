@@ -425,8 +425,8 @@ body{
   position:relative;overflow:hidden;border-radius:14px;background:rgba(255,255,255,.34);
   padding:6px;box-shadow:inset 0 2px 10px rgba(120,90,140,.1);transition:height .25s ease;
 }
-.shelf-track{display:flex;height:100%;width:200%;transition:transform .32s cubic-bezier(.3,.9,.35,1);will-change:transform}
-.shelf-pane{width:50%;height:100%;overflow-y:auto;overflow-x:hidden;padding-right:3px;touch-action:pan-y}
+.shelf-track{display:flex;height:100%;width:300%;transition:transform .32s cubic-bezier(.3,.9,.35,1);will-change:transform}
+.shelf-pane{width:33.3333%;height:100%;overflow-y:auto;overflow-x:hidden;padding-right:3px;touch-action:pan-y}
 .shelf-pane::-webkit-scrollbar{width:4px}
 .shelf-pane::-webkit-scrollbar-thumb{background:#d8c9e0;border-radius:9px}
 /* 待解锁：一行一道菜，紧凑不占地 */
@@ -775,15 +775,15 @@ body{
   .gb-skip{font-size:8px;padding:0 3px}
   .card{padding:8px 10px;gap:9px;margin-bottom:7px;border-radius:14px}
   /* 出餐台改双列紧凑卡片：单列时一屏只看得到 2 张，菜品「展示不全」 */
-  #paneUp{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:7px;align-content:start}
-  #paneUp .card{flex-direction:column;align-items:stretch;gap:6px;padding:7px 9px;margin-bottom:0}
-  #paneUp .card .p-emoji{display:none}
-  #paneUp .card .p-e-inline{display:inline;margin-right:2px}
-  #paneUp .card .p-acts{flex-direction:row;min-width:0;gap:5px}
-  #paneUp .card .p-btn{flex:1;min-width:0;padding:6px 4px;font-size:11px;line-height:1.15}
-  #paneUp .card .p-info{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #paneUp,#paneRare{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:7px;align-content:start}
+  #paneUp,#paneRare .card{flex-direction:column;align-items:stretch;gap:6px;padding:7px 9px;margin-bottom:0}
+  #paneUp,#paneRare .card .p-emoji{display:none}
+  #paneUp,#paneRare .card .p-e-inline{display:inline;margin-right:2px}
+  #paneUp,#paneRare .card .p-acts{flex-direction:row;min-width:0;gap:5px}
+  #paneUp,#paneRare .card .p-btn{flex:1;min-width:0;padding:6px 4px;font-size:11px;line-height:1.15}
+  #paneUp,#paneRare .card .p-info{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   /* 稀有卡的信息要能看全（卖价 + 镇店收益），允许两行 */
-  #paneUp .card.rare .p-info{white-space:normal;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;line-height:1.35}
+  #paneUp,#paneRare .card.rare .p-info{white-space:normal;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;line-height:1.35}
   .card .p-emoji{font-size:27px;width:38px}
   .card .p-name{font-size:14px}
   .card .p-info{font-size:11.5px}
@@ -887,6 +887,11 @@ body{
 .pet-bar-lab{display:flex;justify-content:space-between;font-size:10.5px;font-weight:800;color:#8d7a92;margin-top:6px}
 .pet-say{margin-top:11px;padding:9px 11px;border-radius:12px;background:#fffaf0;border:1.5px dashed #f0d79a;
   font-size:12.5px;font-weight:700;color:#8a6d2f;text-align:center}
+.pet-say.pop-love{animation:lovePop .5s cubic-bezier(.2,1.6,.4,1);
+  background:linear-gradient(135deg,#fff5fa,#ffeef6);border-color:#ffc2dd;color:#c2185b}
+@keyframes lovePop{0%{transform:scale(.9)}55%{transform:scale(1.05)}100%{transform:scale(1)}}
+/* 说情话时宠物气泡变粉 */
+.pet-bubble.love{background:linear-gradient(135deg,#fff5fa,#ffe4f1);color:#c2185b;border-color:#ffc2dd}
 .pet-perks{margin-top:9px;font-size:11px;color:#7a6b8a;font-weight:700;line-height:1.65}
 .pet-perks span{display:inline-block;background:#f4f0f8;border-radius:7px;padding:1px 7px;margin:2px 3px 0 0}
 .pet-perks span.on{background:#e8f8ef;color:#1e8449}
@@ -904,6 +909,48 @@ body{
 .adopt-skill{font-size:11.5px;font-weight:800;color:#7a4fa8;background:#f6efFD;border-radius:10px;padding:6px 9px;margin-top:8px}
 /* 出门中的占位 */
 .pet-sprite.pet-away{font-size:22px;opacity:.75;animation:petIdle 3.4s ease-in-out infinite}
+/* ===== 登录界面 ===== */
+.login-mask{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;padding:16px;
+  background:linear-gradient(160deg,#ffe6ef 0%,#ffeadd 40%,#fff6e6 100%);overflow-y:auto}
+.login-mask.hidden{display:none}
+.login-card{width:100%;max-width:340px;background:#fff;border-radius:22px;padding:20px 18px 16px;text-align:center;
+  box-shadow:0 18px 44px rgba(214,120,140,.28),inset 0 0 0 1px rgba(255,255,255,.8)}
+.login-logo{font-size:44px;line-height:1;animation:petIdle 3s ease-in-out infinite}
+.login-title{font-size:22px;font-weight:900;color:#e2566d;margin-top:6px;letter-spacing:1px}
+.login-sub{font-size:12.5px;font-weight:800;color:#c98a9c;margin-top:4px}
+.login-list{display:flex;flex-direction:column;gap:7px;margin-top:14px;max-height:190px;overflow-y:auto}
+.acc-chip{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1.5px solid #ffe0e8;
+  background:linear-gradient(180deg,#fff8fa,#fff);border-radius:13px;padding:9px 12px;cursor:pointer;font-family:inherit}
+.acc-chip:active{transform:scale(.98)}
+.acc-chip b{font-size:14px;font-weight:900;color:#5b4a63}
+.acc-chip span{font-size:10.5px;font-weight:700;color:#b9a3ad}
+.acc-empty{font-size:12px;font-weight:700;color:#c0aeb8;padding:10px 0}
+.login-in{width:100%;margin-top:12px;border:1.5px solid #ffd7e2;border-radius:13px;padding:11px 13px;
+  font-size:14.5px;font-weight:800;color:#5b4a63;font-family:inherit;background:#fff;
+  -webkit-user-select:text;user-select:text;text-align:center}
+.login-in:focus{outline:none;border-color:#ff8fa8;box-shadow:0 0 0 3px rgba(255,143,168,.18)}
+.login-legacy{font-size:11px;font-weight:700;color:#a98b98;margin-top:8px;line-height:1.5}
+.login-btn{width:100%;margin-top:12px;border:none;border-radius:14px;padding:13px 0;cursor:pointer;font-family:inherit;
+  font-size:15.5px;font-weight:900;color:#fff;background:linear-gradient(135deg,#ff8fa8,#e2566d);
+  box-shadow:0 8px 20px rgba(226,86,109,.35)}
+.login-btn:active{transform:scale(.98)}
+.login-foot{font-size:10.5px;font-weight:700;color:#c0aeb8;margin-top:12px;line-height:1.5}
+/* ===== 账号面板 ===== */
+.acc-note{font-size:11.5px;font-weight:700;color:#9a8aa2;line-height:1.5;margin:2px 0 8px}
+.acc-list{display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto}
+.acc-row{display:flex;align-items:center;gap:6px;border:1.5px solid #f0e8f5;border-radius:12px;padding:7px 10px;background:#fff}
+.acc-row.on{border-color:#f5c242;background:linear-gradient(180deg,#fffdf2,#fff)}
+.acc-n{flex:1;min-width:0;font-size:13px;font-weight:900;color:#5b4a63;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acc-t{font-size:10px;font-weight:700;color:#b9a3ad;white-space:nowrap}
+.acc-cur{font-size:10px;font-weight:900;color:#a9761c;background:#ffeec2;border-radius:7px;padding:1px 6px}
+.acc-go{border:1px solid #e6d8f7;background:#f6efFD;color:#7a4fa8;border-radius:8px;font-size:11px;font-weight:800;
+  padding:3px 9px;cursor:pointer;font-family:inherit}
+.acc-del{border:none;background:transparent;color:#d9c8d2;font-size:13px;font-weight:900;cursor:pointer;padding:0 2px}
+.acc-del:active{color:#e2566d}
+.acc-code{width:100%;border:1.5px solid #efe6f3;border-radius:11px;padding:8px 10px;font-size:10.5px;line-height:1.4;
+  font-family:ui-monospace,Menlo,Consolas,monospace;color:#6b5b6e;background:#fbf9fc;resize:vertical;
+  -webkit-user-select:text;user-select:text;word-break:break-all}
+.acc-code:focus{outline:none;border-color:#f5c242}
 .pf{position:relative;border:1.5px solid #efe6f3;background:#fff;border-radius:12px;padding:7px 4px;cursor:pointer;font-family:inherit;
   display:flex;flex-direction:column;align-items:center;gap:2px}
 .pf:active{transform:scale(.94)}
@@ -963,16 +1010,18 @@ body{
         <div class="bar-trinkets" id="barTrinkets"></div>
         <div class="bar-pet" id="barPet"></div>
       </div>
-      <!-- 出餐台（本店 4 道招牌菜）：紧贴厨房；客人就在上面的吧台里等着上菜 -->
+      <!-- 出餐台（本店 4 道招牌菜）：紧贴厨房；稀有物单独一页，避免把出餐台撑到要上下拉 -->
       <div class="shelf-tabs">
         <button class="st-btn active" id="stBtn0" data-tab="0">🍳 出餐台 <em id="stCount0">0</em></button>
         <button class="st-btn" id="stBtn1" data-tab="1">🔒 待解锁 <em id="stCount1">0</em></button>
+        <button class="st-btn hidden" id="stBtn2" data-tab="2">✨ 稀有 <em id="stCount2">0</em></button>
         <span class="st-hint">← 左右滑动切换 →</span>
       </div>
       <div class="shelf-view" id="shelfView">
         <div class="shelf-track" id="shelfTrack">
           <div class="shelf-pane" id="paneUp"></div>
           <div class="shelf-pane" id="paneLock"></div>
+          <div class="shelf-pane" id="paneRare"></div>
         </div>
       </div>
     </section>
@@ -1000,7 +1049,7 @@ body{
         <li>👨‍🍳 <b>自己做菜</b>：出餐台上每道菜都要点「制作 👨‍🍳」开火，等几秒才出餐（升级店铺能缩短时间）；每样最多囤 5 件</li>
         <li>🍳 <b>每家有每家的菜单</b>：每家店只卖 4 道自家招牌菜（小摊卖柠檬水糖葫芦、咖啡馆卖拿铁蛋糕…），<b>4 道正好两行，不用上下拉</b></li>
         <li>🧾 <b>菜单按等级走</b>：每道菜绑定一个等级，售价由等级决定。合成台是中央厨房（按等级出产品），门店负责做成自家招牌——同一个 Lv.5，咖啡馆做成「手冲美式」、深夜食堂做成「炭烤串」</li>
-        <li>🏭 <b>稀有菜例外</b>：🍀🌈👑 稀有菜不占玩家操作，会自己慢速补货（每样最多 3 件）</li>
+        <li>🏭 <b>稀有菜例外</b>：🍀🎐🌈🧧👑💎 六种稀有菜不占玩家操作，会自己慢速补货（每样最多 3 件），单独住在「✨ 稀有」那一页</li>
         <li>💰 <b>只有把菜端给客人，才收得到钱</b>：客人付款 = 商品价 × 售价倍率 × 客人数量；能量也是上菜才给</li>
         <li>🍽️ <b>上菜</b>：客人就在吧台里，头顶气泡写着要什么菜、给多少赏金。客人要的菜会亮起绿色「上菜」，点一下服务员就端过去；凑齐自动结账、客人走人下一位补位</li>
         <li>✨ <b>稀有客人</b>：偶尔有人出天价点名要你那道稀有菜（🍀🌈👑）</li>
@@ -1020,11 +1069,13 @@ body{
         <li>💗 <b>心情影响发挥</b>：心情 ≥70 多给 10%，低于 30 只发挥一半——记得喂它</li>
         <li>🎁 <b>它会自己出门溜达</b>，过一会儿叼着特产回来（金币 / 能量 / 顺手带一道菜上架）；关着页面也算，回来就有惊喜</li>
         <li>✨ <b>怎么遇到新伙伴</b>：用某只<b>爱吃的等级</b>的菜投喂（图鉴里写了它爱吃什么），有概率把它引来；也可以在图鉴里花金币直接招募</li>
+        <li>💌 <b>它还会说情话</b>：摸头时、心情好时偶尔会蹦一句甜的；在宠物面板点「💌 听它说句话」随时能听——每只品种都有自己的几句</li>
+        <li>👤 <b>账号</b>：进店时输入昵称就是账号，进度按账号分开存在这台设备上；切换/新建在 ⚙️ →「账号」里。换设备用那里的<b>存档码</b>导出/导入</li>
         <li>🔮 <b>合成台</b>：花能量生成产品（<b>每个等级有 3 种口味</b>，随机出，共 36 种可收集）；<b>拖动</b>一道菜到同级菜上合并，拖到空格可移动整理，拖到「出货模式」按钮上直接换能量</li>
         <li>✨ 合并有 10% 概率<b>暴击直接多升一级</b>（Lv.2+Lv.2 可能直接出 Lv.4）</li>
         <li>🔥 <b>连击</b>：6 秒内连续合并不停手，连击越猛——×2 起每合一手额外送能量，×3 暴击率 +15%，×5 必暴击，×8 稀有物出现率 ×3</li>
         <li>🧺 <b>同级加成</b>：同一等级在棋盘上<b>攒够 3 个再合</b>暴击率 +15%，<b>攒够 5 个再合必暴击</b>（攒着合比分批合更赚，这是取舍）</li>
-        <li>✨ 合并时小概率蹦出<b>隐藏稀有钱</b> 🍀🌈👑（白金餐厅下出现率翻倍！）</li>
+        <li>✨ 合并时<b>很小概率</b>蹦出隐藏稀有物 🍀🎐🌈🧧👑💎（约 0.7%，第一次遇到前有 3 倍保底；白金餐厅下出现率翻倍，连击 ×8 时再 ×3）</li>
         <li>📦 <b>出货模式</b>：合成台里的产品可点击换成能量</li>
       </ul>
       <div class="m-btns">
@@ -1033,12 +1084,27 @@ body{
       <div class="m-btns">
         <button class="menu-egg" id="btnPet">🐾 宠物 <span id="petMenuInfo">Lv.1</span></button>
         <button class="menu-egg" id="btnEggs">🥚 彩蛋图鉴 <span id="eggCount">0/6</span></button>
+        <button class="menu-egg" id="btnAcc">👤 账号：未登录</button>
       </div>
       <div class="m-btns">
         <button class="m-primary" id="btnCloseMenu">继续经营</button>
         <button class="m-danger" id="btnReset">重置存档</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- 登录界面（首次进店 / 退出后） -->
+<div class="login-mask hidden" id="loginMask">
+  <div class="login-card">
+    <div class="login-logo">🏪</div>
+    <div class="login-title">小店大亨</div>
+    <div class="login-sub">💕 给最爱的人开的小店</div>
+    <div class="login-list" id="loginList"></div>
+    <input class="login-in" id="loginName" maxlength="12" placeholder="输入昵称，开一家新店" autocomplete="off">
+    <div class="login-legacy" id="loginLegacy"></div>
+    <button class="login-btn" id="loginGo">进入小店</button>
+    <div class="login-foot">进度按账号存在这台设备上 · 换设备用 ⚙️ 里的「存档码」</div>
   </div>
 </div>
 
@@ -1082,13 +1148,21 @@ const flav=(lv,v)=>FLAVORS[lv-1][(v|0)%3]||PRODUCTS[lv-1];
 const HIDDEN={
   // shrine：供奉到某家店当"镇店之宝"时给的永久加成（只对该店生效）
   // exp：当宠物饲料时给的成长值（远高于菜品）
-  clover: {e:'🍀',n:'幸运三叶草',p:6000,   energy:800,  rate:0.05,  exp:220,
+  // rate：每次合并的出货概率。六种加起来约 0.7%（第一次还没拥有任何稀有物时有 3 倍保底）
+  clover: {e:'🍀',n:'幸运三叶草',p:6000,     energy:800,   rate:0.0040, exp:220,
            shrine:{price:.10, order:0,   cook:0,   desc:'该店售价 +10%'}},
-  rainbow:{e:'🌈',n:'彩虹圣代',  p:150000, energy:8000, rate:0.012, exp:700,
+  bell:   {e:'🎐',n:'招财风铃',  p:30000,    energy:2400,  rate:0.0014, exp:420,
+           shrine:{price:0,   order:.15, cook:0,   desc:'该店客人赏金 +15%'}},
+  rainbow:{e:'🌈',n:'彩虹圣代',  p:150000,   energy:8000,  rate:0.0008, exp:700,
            shrine:{price:.20, order:.10, cook:0,   desc:'该店售价 +20% · 客人赏金 +10%'}},
-  crown:  {e:'👑',n:'黄金招牌',  p:3000000,energy:30000,rate:0.0025,exp:2400,
+  redpack:{e:'🧧',n:'好运红包',  p:600000,   energy:18000, rate:0.0004, exp:1100,
+           shrine:{price:.15, order:0,   cook:.20, desc:'该店售价 +15% · 生产 +20%'}},
+  crown:  {e:'👑',n:'黄金招牌',  p:3000000,  energy:30000, rate:0.0002, exp:2400,
            shrine:{price:.35, order:.20, cook:.15, desc:'该店售价 +35% · 赏金 +20% · 生产 +15%'}},
+  gem:    {e:'💎',n:'秘藏钻石',  p:20000000, energy:120000,rate:0.00008,exp:5000,
+           shrine:{price:.50, order:.25, cook:.30, desc:'该店售价 +50% · 赏金 +25% · 生产 +30%'}},
 };
+const HIDDEN_KEYS=Object.keys(HIDDEN);
 // openK：开这家店的价位系数（≈需要攒多少秒的卖货收入），价格随进度自动缩放，不会出现「要么秒买要么挂几小时」
 // menu：每家店自己的 4 道招牌菜。菜绑定一个「等级」——等级决定售价与能否上架（合成台合出该等级才解锁）。
 // 所以合成台是中央厨房（按等级出半成品），门店负责把等级做成自家招牌菜：
@@ -1360,13 +1434,19 @@ function shakeGuest(el){
 }
 
 /* ================= 存档 ================= */
+// 当前账号名单独存一个变量：state 会被 Object.assign(defaultState(),s) 整体替换，
+// 把账号挂在上面的会被丢掉（那样存档会写回公共 key，账号隔离就失效了）
+let accName='';
+const saveKeyOf=()=>accName?accSaveKey(accName):SAVE_KEY;
 function save(){
+  if(!accName)return;                               // 没登录不写盘，避免污染公共 key
+  state.account=accName;
   state.lastSeen=Date.now();                        // 记录在线时间（离线收益用）
-  try{localStorage.setItem(SAVE_KEY,JSON.stringify(state))}catch(e){}
+  try{localStorage.setItem(saveKeyOf(),JSON.stringify(state))}catch(e){}
 }
 function load(){
   try{
-    const raw=localStorage.getItem(SAVE_KEY);
+    const raw=localStorage.getItem(saveKeyOf());
     if(!raw)return;
     const s=JSON.parse(raw);
     if(s&&Array.isArray(s.unlocked)&&Array.isArray(s.grid)){
@@ -1422,7 +1502,7 @@ function produceTick(dt,sp){
     const bar=document.getElementById('dbar'+idx);
     if(bar)bar.style.width=Math.min(100,Math.round(dStock(idx)/STOCK_CAP*100))+'%';
   });
-  Object.keys(state.hiddenOwned).forEach(key=>{
+  HIDDEN_KEYS.forEach(key=>{
     if(!state.hiddenOwned[key])return;
     if((state.hiddenStock[key]||0)>=RARE_CAP){hidProgs[key]=0}
     else{
@@ -1510,7 +1590,7 @@ function newGuest(si){
   const stk=state.shopStock[si]||[];
   const items=[];
   // 稀有客人：你拥有稀有物且有现货时，小概率有人出天价点名要买
-  const rareReady=Object.keys(HIDDEN).filter(k=>state.hiddenOwned[k]&&(state.hiddenStock[k]||0)>0);
+  const rareReady=HIDDEN_KEYS.filter(k=>state.hiddenOwned[k]&&(state.hiddenStock[k]||0)>0);
   const night=isNight();
   if(rareReady.length&&Math.random()<(night?VIP_RARE_CHANCE*2:VIP_RARE_CHANCE)*petVipMult()){
     items.push({rare:rareReady[Math.floor(Math.random()*rareReady.length)],count:1});
@@ -1742,10 +1822,12 @@ function checkUnlock(level){
   }
 }
 function rollHidden(extra){
-  const boost=luckyMult()*(extra||1);
+  // 第一次还没有任何稀有物时给 3 倍保底（保证第一颗惊喜能在一两次游戏里出现），之后就是正常稀有度
+  const first=Object.keys(state.hiddenOwned||{}).length===0?3:1;
+  const boost=luckyMult()*(extra||1)*first;
   const r=Math.random();
   let acc=0;
-  for(const key of Object.keys(HIDDEN)){
+  for(const key of HIDDEN_KEYS){
     acc+=HIDDEN[key].rate*boost;
     if(r<acc)return key;
   }
@@ -2035,22 +2117,34 @@ function cookTick(now){
 
 /* ================= 货架：子标签页（左右滑动） ================= */
 let shelfTab=0, shelfDrag=null;
+const SHELF_PANES=['paneUp','paneLock','paneRare'];
+const SHELF_TABS=3, SHELF_PCT=100/SHELF_TABS;
+// 稀有页只在拥有稀有物后才出现（否则空着一页没意义）
+function shelfTabCount(){
+  const anyRare=HIDDEN_KEYS.some(k=>state.hiddenOwned[k]);
+  const btn=document.getElementById('stBtn2');
+  if(btn)btn.classList.toggle('hidden',!anyRare);
+  return anyRare?3:2;
+}
 function setShelfTab(i,animate){
+  const max=shelfTabCount()-1;
+  i=Math.max(0,Math.min(max,i));
   shelfTab=i;
   const tr=document.getElementById('shelfTrack');
   if(!tr)return;
   if(animate===false)tr.style.transition='none';
-  tr.style.transform='translateX('+(-i*50)+'%)';
+  tr.style.transform='translateX('+(-i*SHELF_PCT)+'%)';
   if(animate===false)setTimeout(()=>{tr.style.transition=''},30);
-  const b0=document.getElementById('stBtn0'), b1=document.getElementById('stBtn1');
-  if(b0)b0.classList.toggle('active',i===0);
-  if(b1)b1.classList.toggle('active',i===1);
+  for(let k=0;k<SHELF_TABS;k++){
+    const b=document.getElementById('stBtn'+k);
+    if(b)b.classList.toggle('active',k===i);
+  }
   fitShelf();
 }
 function fitShelf(){
   const view=document.getElementById('shelfView');
   if(!view)return;
-  const pane=document.getElementById(shelfTab===0?'paneUp':'paneLock');
+  const pane=document.getElementById(SHELF_PANES[shelfTab]||'paneUp');
   if(!pane)return;
   const content=pane.scrollHeight+14;
   // 自适应：优先把菜显示全（双列三行 ≈330px），下限必须给足，否则菜品又被截
@@ -2073,8 +2167,9 @@ function shelfPointerMove(e){
     document.getElementById('shelfTrack').style.transition='none';
   }
   e.preventDefault();
-  const pct=-shelfDrag.tab*50+(dx/shelfDrag.w)*50;
-  document.getElementById('shelfTrack').style.transform='translateX('+Math.max(-50,Math.min(0,pct))+'%)';
+  const max=shelfTabCount()-1;
+  const pct=-shelfDrag.tab*SHELF_PCT+(dx/shelfDrag.w)*SHELF_PCT;
+  document.getElementById('shelfTrack').style.transform='translateX('+Math.max(-max*SHELF_PCT,Math.min(0,pct))+'%)';
 }
 function shelfPointerUp(e){
   if(!shelfDrag)return;
@@ -2087,18 +2182,18 @@ function shelfPointerUp(e){
   if(!d.active)return;                                       // 没滑动 → 当点击
   const dx=(e&&e.clientX!==undefined?e.clientX-d.x:0);
   const fast=Date.now()-d.t<260;
-  if(dx<-d.w*0.2||(fast&&dx<-36))setShelfTab(1);
-  else if(dx>d.w*0.2||(fast&&dx>36))setShelfTab(0);
+  if(dx<-d.w*0.2||(fast&&dx<-36))setShelfTab(d.tab+1);
+  else if(dx>d.w*0.2||(fast&&dx>36))setShelfTab(d.tab-1);
   else setShelfTab(d.tab);
 }
 function renderShelf(){
-  const up=document.getElementById('paneUp'), lock=document.getElementById('paneLock');
-  if(!up||!lock)return;
+  const up=document.getElementById('paneUp'), lock=document.getElementById('paneLock'), rare=document.getElementById('paneRare');
+  if(!up||!lock||!rare)return;
   const wanted=new Set();
   SQ().forEach(g=>Object.keys(trayNeed(g)).forEach(k=>wanted.add(k)));
   const upIdx=[],lockIdx=[];
   menu().forEach((d,i)=>{(isDishOpen(i)?upIdx:lockIdx).push(i)});
-  const keepUpScroll=up.scrollTop, keepLockScroll=lock.scrollTop;   // 重渲染后保留滚动位置
+  const keepUpScroll=up.scrollTop, keepLockScroll=lock.scrollTop, keepRareScroll=rare.scrollTop;   // 重渲染后保留滚动位置
   // ① 已上架（本店菜单）
   up.innerHTML='';
   upIdx.forEach(idx=>{
@@ -2147,8 +2242,9 @@ function renderShelf(){
     const cb=document.getElementById('dcook'+idx);
     if(cb)cb.onclick=()=>startCook(idx);
   });
-  // 稀有菜（首次合出后永久上架，不占本店菜单档位；可卖给稀有客人，也可供奉给这家店镇店）
-  Object.keys(HIDDEN).forEach(key=>{
+  // 稀有菜（首次合出后永久上架；单独一页，不占出餐台的档位）
+  rare.innerHTML='';
+  HIDDEN_KEYS.forEach(key=>{
     if(!state.hiddenOwned[key])return;
     const h=HIDDEN[key],cur=state.hiddenStock[key]||0;
     const here=shrineHas(key);                     // 本店供的就是它
@@ -2178,7 +2274,7 @@ function renderShelf(){
         `<div class="bar rare"><i id="hbar${key}"></i></div>`+
       `</div>`+
       `<div class="p-acts">${act}</div>`;
-    up.appendChild(card);
+    rare.appendChild(card);
     if(wanted.has('r:'+key)){
       const btn=document.getElementById('hserve'+key);
       if(btn)btn.onclick=()=>serveItem('r:'+key);
@@ -2212,10 +2308,12 @@ function renderShelf(){
       (buy?`<button class="li-btn" id="buy${idx}">¥${fmt(buy)}<br>上架</button>`:'');
     lock.appendChild(row);
   });
-  const c0=document.getElementById('stCount0'), c1=document.getElementById('stCount1');
-  if(c0)c0.textContent=upIdx.length+Object.keys(state.hiddenOwned).length;
+  const rareCnt=HIDDEN_KEYS.filter(k=>state.hiddenOwned[k]).length;
+  const c0=document.getElementById('stCount0'), c1=document.getElementById('stCount1'), c2=document.getElementById('stCount2');
+  if(c0)c0.textContent=upIdx.length;
   if(c1)c1.textContent=lockIdx.length;
-  up.scrollTop=keepUpScroll; lock.scrollTop=keepLockScroll;
+  if(c2)c2.textContent=rareCnt;
+  up.scrollTop=keepUpScroll; lock.scrollTop=keepLockScroll; rare.scrollTop=keepRareScroll;
   lockIdx.forEach(idx=>{
     const lv=dishAt(idx).lv;
     const btn=document.getElementById('buy'+idx);
@@ -2225,7 +2323,10 @@ function renderShelf(){
       else toast('💰','金币不够～');
     };
   });
-  setShelfTab(lockIdx.length?shelfTab:0,false);
+  let t=shelfTab;
+  if(t===1&&!lockIdx.length)t=0;
+  if(t===2&&!rareCnt)t=0;
+  setShelfTab(t,false);
   fitShelf();
 }
 
@@ -2455,7 +2556,7 @@ function refreshStockBadges(){
     const info=document.querySelector('#dcard'+idx+' .p-info');
     if(info&&isCooking(idx))info.textContent='再等 '+(cookLeft(idx)/1000).toFixed(1)+' 秒';
   });
-  Object.keys(state.hiddenOwned).forEach(key=>{
+  HIDDEN_KEYS.forEach(key=>{
     if(!state.hiddenOwned[key])return;
     const cur=state.hiddenStock[key]||0;
     const tag=document.getElementById('hstock'+key);
@@ -2842,7 +2943,7 @@ function openChest(){
   state.chestNext=Date.now()+120000+Math.random()*120000;
   const roll=Math.random();
   let html='',give=null;
-  const rareKeys=Object.keys(HIDDEN).filter(k=>!state.hiddenOwned[k]);
+  const rareKeys=HIDDEN_KEYS.filter(k=>!state.hiddenOwned[k]);
   if(roll<0.12&&rareKeys.length){                 // 小概率直接开出稀有菜
     const key=rareKeys[Math.floor(Math.random()*rareKeys.length)];
     html=HIDDEN[key].e+' 稀有菜「'+HIDDEN[key].n+'」';
@@ -3256,35 +3357,43 @@ const PETS={
   dog:{n:'小奶狗',e:'🐶',rar:1,fur:'#d5a274',furD:'#b58757',furL:'#e8c19a',accent:'#ff9ec4',
     ear:'flop',tail:'curl',muzzle:'snout',mark:'none',
     skill:{k:'gold',n:'每 30 秒帮你捡金币',per:[0,0,1,1.6,2.4,3.4]},
-    food:[1,2],how:'用 Lv.1~2 的菜投喂就有机会把它引来'},
+    food:[1,2],how:'用 Lv.1~2 的菜投喂就有机会把它引来',
+    love:['老板…不对，是宝贝！','你回来的那一下，尾巴就不听使唤了','今天也想一直跟着你','嗯…你比昨天更好看了（每天都是）']},
   cat:{n:'巷口猫',e:'🐱',rar:1,fur:'#9aa4b0',furD:'#7b8593',furL:'#c3ccd6',accent:'#ffd166',
     ear:'point',tail:'long',muzzle:'snout',mark:'stripe',
     skill:{k:'tip',n:'上菜额外小费（按赏金比例）',per:[0,0,.05,.09,.13,.18]},
-    food:[2,3],how:'用 Lv.2~3 的菜投喂'},
+    food:[2,3],how:'用 Lv.2~3 的菜投喂',
+    love:['才不是特意等你…（在门口坐了一下午）','别人喂的不吃，就吃你给的','你的手放上来，呼噜声就藏不住了','勉为其难，让你当我的铲屎官吧']},
   rabbit:{n:'团子兔',e:'🐰',rar:1,fur:'#f4ece2',furD:'#dfd2c4',furL:'#fffaf4',accent:'#ffb3c7',
     ear:'long',tail:'puff',muzzle:'flat',mark:'none',
     skill:{k:'cook',n:'制作更快（出餐提速）',per:[0,0,.10,.16,.22,.30]},
-    food:[3,4],how:'用 Lv.3~4 的菜投喂'},
+    food:[3,4],how:'用 Lv.3~4 的菜投喂',
+    love:['你摸摸我的耳朵，我就乖乖的','我只有一小团，但喜欢你有一整间店那么多','想跳到你怀里，然后赖着不走','你笑的时候，我最想蹦起来']},
   fox:{n:'偷吃小狐',e:'🦊',rar:2,fur:'#f0a05a',furD:'#d4813a',furL:'#ffd0a0',accent:'#fff3e0',
     ear:'point',tail:'fluff',muzzle:'snout',mark:'none',
     skill:{k:'price',n:'全场售价提升',per:[0,0,.05,.08,.12,.16]},
-    food:[4,5],how:'用 Lv.4~5 的菜投喂'},
+    food:[4,5],how:'用 Lv.4~5 的菜投喂',
+    love:['我可是很挑的，只偷你家的菜','你手暖暖的，借我蹭一下','我尾巴大，可以给你当围巾','别对别人笑那么多，我会吃醋的']},
   panda:{n:'熊猫团子',e:'🐼',rar:2,fur:'#eef0f5',furD:'#33383f',furL:'#ffffff',accent:'#3f3129',
     ear:'round',tail:'puff',muzzle:'flat',mark:'patch',
     skill:{k:'order',n:'客人赏金提升',per:[0,0,.07,.11,.16,.22]},
-    food:[5,6],how:'用 Lv.5~6 的菜投喂'},
+    food:[5,6],how:'用 Lv.5~6 的菜投喂',
+    love:['竹子可以不吃，你做的菜不行','抱着你，比抱着竹子舒服多了','慢一点也没关系，我一直在','你累了就靠着我，我圆圆的很软']},
   penguin:{n:'围裙企鹅',e:'🐧',rar:2,fur:'#3f4a5c',furD:'#2b3444',furL:'#fdfdff',accent:'#ffb347',
     ear:'none',tail:'none',muzzle:'beak',mark:'none',
     skill:{k:'offline',n:'离线收益提升',per:[0,0,.12,.22,.34,.50]},
-    food:[6,7],how:'用 Lv.6~7 的菜投喂'},
+    food:[6,7],how:'用 Lv.6~7 的菜投喂',
+    love:['我走得慢，但你等我，我就一定到','围裙是为你系上的','外面再冷，店里有你就是暖的','你去哪我跟哪，摇摇晃晃也跟着']},
   dragon:{n:'灶王小青龙',e:'🐲',rar:3,fur:'#5fbf9a',furD:'#3f9d7b',furL:'#a8e8cd',accent:'#f5c242',
     ear:'horn',tail:'spike',muzzle:'fang',mark:'spots',
     skill:{k:'rare',n:'稀有菜补货更快 & 稀有客人更多',per:[0,0,.20,.40,.65,1.00]},
-    food:[8,9,10],how:'用 Lv.8 以上的菜投喂（越贵越容易被它闻见）'},
+    food:[8,9,10],how:'用 Lv.8 以上的菜投喂（越贵越容易被它闻见）',
+    love:['我守着这口灶，也守着你','你的愿望，我用龙火给你烧得亮亮的','谁惹你不高兴，我喷他一脸火','我记性很好——你许过的愿我都记着']},
   unicorn:{n:'星光独角兽',e:'🦄',rar:3,fur:'#f6d7f0',furD:'#dcb0d8',furL:'#fff4fe',accent:'#a98bf0',
     ear:'horn',tail:'fluff',muzzle:'flat',mark:'none',
     skill:{k:'all',n:'全能：售价 / 赏金 / 制作 全小幅提升',per:[0,0,.04,.06,.09,.13]},
-    food:[10,11,12],how:'用 Lv.10 以上的菜投喂'},
+    food:[10,11,12],how:'用 Lv.10 以上的菜投喂',
+    love:['你是我见过最好看的风景','星光分你一半，剩下的都照着你','我把好运都攒着给你','许愿吧，我负责让它成真']},
 };
 const PET_KEYS=Object.keys(PETS);
 const PET_RECRUIT_K=[0,.15,.45,1.1];               // 招募价系数（按稀有度）
@@ -3356,7 +3465,29 @@ const PET_LINES={
   arrive:['（闻到了香味，凑过来）','这里的味道好香！','能收留我吗？'],
   trip:['我出门转转，很快回来！','去看看巷口有没有好吃的～','（叼着小包出门了）'],
   back:['我回来啦，给你带了这个！','路上捡到的，给你～','（尾巴摇个不停）'],
+  // 通用的情话池（每只宠物还有自己的专属几句，见 PETS[].love）
+  loveCommon:['今天也要好好吃饭，好好被喜欢','你忙你的，我就在这儿陪着你','你做的每一道菜，我都想第一个尝','遇到你之后，连店里都亮了一点','要是累了就休息，店又不会跑'],
 };
+// 情话：优先用这只宠物的专属几句，偶尔掺一句通用的
+function petLoveLine(){
+  const own=petCfg(state.pet.kind).love||[];
+  const pool=own.concat(PET_LINES.loveCommon);
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+function petSayLove(){
+  const p=P();
+  const line=petLoveLine();
+  p.line=line;p.lineAt=Date.now();
+  const b=document.getElementById('petBubble');
+  if(b){
+    b.textContent=line;
+    b.classList.add('love');
+    b.classList.remove('hidden','out');
+    clearTimeout(petSay._t);
+    petSay._t=setTimeout(()=>{b.classList.add('out');setTimeout(()=>{b.classList.add('hidden');b.classList.remove('love')},520)},7200);
+  }
+  return line;
+}
 function petSay(kind){
   const p=P();
   let pool=PET_LINES[kind]||PET_LINES.idle;
@@ -3426,7 +3557,7 @@ function heartAt(el,n){
     setTimeout(()=>h.remove(),1300);
   }
 }
-// 摸头（情绪价值：即时反馈 + 亲密度）
+// 摸头（情绪价值：即时反馈 + 亲密度；心情好时更会说甜话）
 function petHead(){
   const now=Date.now();
   const el=document.getElementById('petTap');
@@ -3435,13 +3566,13 @@ function petHead(){
   const p=P();
   if(petAway()){petSay('trip');return}
   if(now-(p.lastPet||0)<30000){
-    petSay('pet');
+    (p.mood>=70&&Math.random()<0.5)?petSayLove():petSay('pet');
     return;
   }
   p.lastPet=now;
   p.mood=Math.min(100,p.mood+6);
   p.bond=(p.bond||0)+1;
-  petSay('pet');
+  (p.mood>=70&&Math.random()<0.45)?petSayLove():petSay('pet');
   renderPet();save();
 }
 // 投喂：消耗 1 件本店货架上的菜，等级越高成长越快（成品的价值换成宠物的成长）
@@ -3624,17 +3755,20 @@ function petTick(now){
     p.mood=Math.max(0,p.mood-(gap>30?2:1));
     save();
   }
-  // 定期自言自语
+  // 定期自言自语（心情好时偶尔说句甜的）
   if(now-(petSay._last||0)>32000){
     petSay._last=now;
-    if(!petPanelOpen)petSay(petAway()?'trip':'idle');
+    if(!petPanelOpen){
+      if(p.mood>=70&&Math.random()<0.25)petSayLove();
+      else petSay(petAway()?'trip':'idle');
+    }
   }
 }
 let petPanelOpen=false;
 function openPetPanel(){petPanelOpen=true;renderPetPanel();}
 // 稀有物饲料行（有稀有物才显示）
 function rareFoodHtml(){
-  const owned=Object.keys(HIDDEN).filter(k=>state.hiddenOwned[k]);
+  const owned=HIDDEN_KEYS.filter(k=>state.hiddenOwned[k]);
   if(!owned.length)return '';
   const tiles=owned.map(k=>{
     const h=HIDDEN[k],s=state.hiddenStock[k]||0;
@@ -3697,7 +3831,8 @@ function renderPetPanel(){
     '<div class="pet-bar exp"><i style="width:'+expPct+'%"></i></div>'+
     '<div class="pet-bar-lab"><span>心情</span><span>'+p.mood+' / 100（影响技能发挥）</span></div>'+
     '<div class="pet-bar mood"><i style="width:'+p.mood+'%"></i></div>'+
-    '<div class="pet-say">“'+(p.line||st.tip)+'”</div>'+
+    '<div class="pet-say" id="petSayLine">“'+(p.line||st.tip)+'”</div>'+
+    '<div class="m-btns"><button class="m-plain" id="petWhisperBtn">💌 听它说句话</button></div>'+
     '<div class="pet-bar-lab" style="margin-top:10px"><span>🥣 投喂（用当前店的菜，等级越高长得越快；它爱吃的菜更容易引来新伙伴）</span></div>'+
     '<div class="pet-foods" id="petFoods">'+foodHtml+'</div>'+
     rareFoodHtml()+
@@ -3725,6 +3860,14 @@ function renderPetPanel(){
   });
   document.getElementById('petClose').onclick=()=>{petPanelOpen=false;m.remove();renderPet()};
   document.getElementById('petHeadBtn').onclick=petHead;
+  document.getElementById('petWhisperBtn').onclick=()=>{
+    const line=petSayLove();
+    const el=document.getElementById('petSayLine');
+    if(el){el.textContent='“'+line+'”';el.classList.remove('pop-love');void el.offsetWidth;el.classList.add('pop-love')}
+    heartAt(document.querySelector('.pet-hero-art'),4);
+    P().mood=Math.min(100,P().mood+3);
+    save();renderPet();
+  };
   document.getElementById('petRename').onclick=()=>{
     const v=document.getElementById('petNameIn').value.trim();
     if(!v)return;
@@ -3777,47 +3920,259 @@ $('#btnReset').onclick=()=>{
 window.addEventListener('beforeunload',save);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
 
-/* ================= 启动 ================= */
-load();
-ensurePets();                    // 建/迁移宠物数据（老存档的单只宠物 → dog）
-fillQueue();renderShop();        // 内部已含 renderBar()
-renderMergeHead();
-renderGrid();
-renderChips();
-refreshEggBadge();
-renderTrinkets();
-renderPet();
-renderScene();
-$('#barSign').onclick=signClick;
-$('#btnCombo').onclick=doCombo;
-$('#btnEggs').onclick=()=>{$('#menuModal').classList.add('hidden');renderEggsPanel()};
-$('#btnPet').onclick=()=>{$('#menuModal').classList.add('hidden');openPetPanel()};
-$('#btnAch').onclick=()=>{$('#menuModal').classList.add('hidden');renderAchPanel()};
-// 货架子标签页：点按钮切换 + 面板上左右滑动
-$('#stBtn0').onclick=()=>setShelfTab(0);
-$('#stBtn1').onclick=()=>setShelfTab(1);
-(function(){
-  const view=document.getElementById('shelfView');
-  if(!view)return;
-  view.addEventListener('pointerdown',e=>{
-    shelfPointerDown(e);
-    window.addEventListener('pointermove',shelfPointerMove,{passive:false});
-    window.addEventListener('pointerup',shelfPointerUp);
-    window.addEventListener('pointercancel',shelfPointerUp);
-  });
-  window.addEventListener('resize',()=>fitShelf());
-})();
-if(!state.chestNext)state.chestNext=Date.now()+45000;
-if(!state.catNext)state.catNext=Date.now()+60000;
-refreshAchBadge();
-settleOffline();                                   // 先结算离线收益（它读 lastSeen）
-checkAch();                                        // 再判定成就——顺序不能反：checkAch 会 save() 覆盖 lastSeen
-setInterval(tick,200);
-setInterval(save,10000);
-setTimeout(()=>{checkNight();checkDaily();},900);   // 开场彩蛋判定
-if(state.genCount===0&&state.totalMerged===0){
-  setTimeout(()=>toast('👋','欢迎开店！点一位客人开始服务，或去合成台生成产品'),600);
+/* ================= 账号（本地多账号） =================
+   纯前端方案：进度按账号名分别存在这台设备的浏览器里（localStorage）。
+   没有服务器，所以这不是"账号密码级"的安全，只是把进度分开放好；
+   换设备/换浏览器请用「存档码」导出导入（见账号面板）。 */
+const ACC_KEY=SAVE_KEY+'::accounts', CUR_KEY=SAVE_KEY+'::current';
+const accSaveKey=n=>SAVE_KEY+'::'+n;
+function accList(){
+  try{const a=JSON.parse(localStorage.getItem(ACC_KEY)||'[]');return Array.isArray(a)?a:[]}catch(e){return []}
 }
+function accWrite(l){try{localStorage.setItem(ACC_KEY,JSON.stringify(l))}catch(e){}}
+const accFind=n=>accList().find(a=>a.name===n)||null;
+const currentAccount=()=>{try{return localStorage.getItem(CUR_KEY)||''}catch(e){return ''}};
+function setCurrentAccount(n){try{n?localStorage.setItem(CUR_KEY,n):localStorage.removeItem(CUR_KEY)}catch(e){}}
+function accCreate(n){
+  n=String(n||'').trim().slice(0,12);
+  if(!n)return '';
+  const l=accList(),i=l.findIndex(a=>a.name===n);
+  if(i>=0)l[i].last=Date.now();else l.push({name:n,last:Date.now(),created:Date.now()});
+  accWrite(l);
+  return n;
+}
+function accDelete(n){
+  accWrite(accList().filter(a=>a.name!==n));
+  try{localStorage.removeItem(accSaveKey(n))}catch(e){}
+}
+const accHasSave=n=>{try{return !!localStorage.getItem(accSaveKey(n))}catch(e){return false}};
+// 老玩家：本机已有一份"没账号时代"的存档 → 让第一个进入的账号继承它
+function legacyInfo(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);
+    if(!raw||raw.length<20)return null;
+    const s=JSON.parse(raw);
+    if(!s||!Array.isArray(s.unlocked))return null;
+    return {coins:s.coins||0,shopTier:s.shopTier||0,orders:s.ordersDone||0};
+  }catch(e){return null}
+}
+function accClaimLegacy(n){
+  if(accHasSave(n))return false;
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);
+    if(!raw)return false;
+    localStorage.setItem(accSaveKey(n),raw);
+    return true;
+  }catch(e){return false}
+}
+// 存档码：整份存档 → base64 文本（换设备粘贴即恢复）
+function b64enc(str){
+  const bytes=new TextEncoder().encode(str);
+  let bin='';const CH=0x8000;
+  for(let i=0;i<bytes.length;i+=CH)bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+CH));
+  return btoa(bin);
+}
+function b64dec(b64){
+  const bin=atob(String(b64).replace(/\s+/g,''));
+  const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+function exportCode(){return b64enc(JSON.stringify(state))}
+function importCode(code){
+  let s=null;
+  try{s=JSON.parse(b64dec(code))}catch(e){s=null}
+  if(!s||!Array.isArray(s.unlocked)||!Array.isArray(s.grid)){toast('❌','存档码无效，检查是否复制完整');return false}
+  if(!accName){toast('👤','先登录一个账号再导入');return false}
+  state=Object.assign(defaultState(),s);
+  state.account=accName;
+  save();
+  ensurePets();
+  fillQueue();renderShop();renderMergeHead();renderGrid();renderChips();
+  renderTrinkets();renderPet();renderScene();refreshAchBadge();refreshEggBadge();
+  toast('📥','存档已导入！');
+  return true;
+}
+/* ---- 登录界面 ---- */
+function showLogin(){
+  const mask=document.getElementById('loginMask');
+  if(!mask)return;
+  mask.classList.remove('hidden');
+  renderLoginList();
+  const li=document.getElementById('loginLegacy');
+  const L=legacyInfo();
+  if(li)li.innerHTML=L?('本机有一份老进度（💰'+fmt(L.coins)+' · '+SHOPS[Math.min(L.shopTier,SHOPS.length-1)].n+'）<br>输入昵称进店就会自动继承'):'';
+  const inp=document.getElementById('loginName');
+  if(inp){inp.value='';setTimeout(()=>inp.focus(),200)}
+}
+function hideLogin(){const m=document.getElementById('loginMask');if(m)m.classList.add('hidden')}
+function renderLoginList(){
+  const box=document.getElementById('loginList');
+  if(!box)return;
+  const l=accList().sort((a,b)=>(b.last||0)-(a.last||0));
+  box.innerHTML=l.length
+    ? l.map(a=>`<button class="acc-chip" data-acc="${a.name}"><b>${a.name}</b>
+        <span>${a.last?('上次 '+timeAgo(a.last)):'新账号'}</span></button>`).join('')
+    : '<div class="acc-empty">还没有账号，输入昵称开一家吧</div>';
+  box.querySelectorAll('[data-acc]').forEach(b=>{
+    b.onclick=()=>{const n=b.dataset.acc;if(accHasSave(n))startGame(n);else startGame(n)};
+  });
+}
+function timeAgo(t){
+  const d=Date.now()-t;
+  if(d<60000)return '刚刚';
+  if(d<3600000)return Math.floor(d/60000)+' 分钟前';
+  if(d<86400000)return Math.floor(d/3600000)+' 小时前';
+  return Math.floor(d/86400000)+' 天前';
+}
+/* ---- 按账号启动 / 切换 ---- */
+function startGame(name){
+  name=accCreate(name);
+  if(!name){toast('✍️','先给自己起个昵称吧');return}
+  if(accName&&accName!==name)save();       // 先把当前账号的进度存好，切换不能丢
+  accClaimLegacy(name);                    // 第一个账号继承老存档
+  accName=name;
+  setCurrentAccount(name);
+  state=defaultState();
+  state.account=name;
+  load();ensurePets();
+  state.account=name;                      // load 会整体替换 state，这里再钉一次
+  if(!state.chestNext)state.chestNext=Date.now()+45000;
+  if(!state.catNext)state.catNext=Date.now()+60000;
+  fillQueue();renderShop();
+  renderMergeHead();renderGrid();renderChips();refreshEggBadge();
+  renderTrinkets();renderPet();renderScene();refreshAchBadge();
+  hideLogin();
+  const m=document.getElementById('accMask');if(m)m.remove();
+  refreshAccBtn();
+  settleOffline();                         // 先结算离线收益（它读 lastSeen）
+  checkAch();                              // 顺序不能反：checkAch 会 save() 覆盖 lastSeen
+  if(state.genCount===0&&state.totalMerged===0){
+    setTimeout(()=>toast('👋','欢迎开店！点一位客人开始服务，或去合成台生成产品'),600);
+  }
+  toast('👤','欢迎回来，'+name+'！');
+}
+function logoutAccount(){
+  save();
+  accName='';
+  setCurrentAccount('');
+  const m=document.getElementById('accMask');if(m)m.remove();
+  showLogin();
+}
+function refreshAccBtn(){
+  const b=document.getElementById('btnAcc');
+  if(b)b.innerHTML='👤 账号：'+(accName||'未登录');
+}
+/* ---- 账号面板 ---- */
+function openAccPanel(){
+  const old=document.getElementById('accMask');if(old)old.remove();
+  const m=document.createElement('div');
+  m.className='modal-mask';m.id='accMask';
+  const l=accList().sort((a,b)=>(b.last||0)-(a.last||0));
+  const rows=l.map(a=>{
+    const on=a.name===state.account;
+    return '<div class="acc-row'+(on?' on':'')+'">'+
+      '<span class="acc-n">'+(on?'✅ ':'')+a.name+'</span>'+
+      '<span class="acc-t">'+(a.last?timeAgo(a.last):'')+'</span>'+
+      (on?'<span class="acc-cur">当前</span>':'<button class="acc-go" data-go="'+a.name+'">切换</button>')+
+      '<button class="acc-del" data-del="'+a.name+'" title="删除这个账号（进度一起删）">✕</button>'+
+    '</div>';
+  }).join('');
+  m.innerHTML='<div class="modal"><h3>👤 账号</h3>'+
+    '<p class="acc-note">进度按账号分别存在这台设备上。换设备/换浏览器时，用下面的<b>存档码</b>搬运。</p>'+
+    '<div class="acc-list">'+rows+'</div>'+
+    '<div class="m-btns" style="margin-top:8px">'+
+      '<input class="pet-name-in" id="accNewIn" maxlength="12" placeholder="新账号昵称">'+
+      '<button class="m-primary" id="accNew" style="flex:0 0 auto;padding:8px 12px">新建</button>'+
+    '</div>'+
+    '<div class="pet-bar-lab" style="margin-top:12px"><span>📤 导出存档码（复制发给对方 / 存备忘录）</span></div>'+
+    '<textarea class="acc-code" id="accCodeOut" readonly rows="3"></textarea>'+
+    '<div class="m-btns"><button class="m-plain" id="accCopy">复制存档码</button>'+
+      '<button class="m-plain" id="accExport">生成存档码</button></div>'+
+    '<div class="pet-bar-lab" style="margin-top:10px"><span>📥 导入存档码（粘贴后覆盖当前账号进度）</span></div>'+
+    '<textarea class="acc-code" id="accCodeIn" rows="3" placeholder="把存档码粘贴到这里"></textarea>'+
+    '<div class="m-btns"><button class="m-primary" id="accImport">导入</button></div>'+
+    '<div class="m-btns" style="margin-top:10px"><button class="m-plain" id="accLogout">退出登录</button>'+
+      '<button class="m-primary" id="accClose">关闭</button></div>'+
+  '</div>';
+  document.body.appendChild(m);
+  m.querySelectorAll('[data-go]').forEach(b=>{b.onclick=()=>startGame(b.dataset.go)});
+  m.querySelectorAll('[data-del]').forEach(b=>{
+    b.onclick=()=>{
+      const n=b.dataset.del;
+      if(n===state.account){toast('⚠️','这是当前账号，先切到别的账号再删');return}
+      if(confirm('删除账号「'+n+'」？它的进度会一起删除，不能恢复')){accDelete(n);openAccPanel()}
+    };
+  });
+  document.getElementById('accNew').onclick=()=>{
+    const v=document.getElementById('accNewIn').value;
+    const n=accCreate(v);
+    if(!n){toast('✍️','先输入昵称');return}
+    startGame(n);
+  };
+  document.getElementById('accExport').onclick=()=>{
+    document.getElementById('accCodeOut').value=exportCode();
+    toast('📤','存档码已生成，点「复制」或长按全选复制');
+  };
+  document.getElementById('accCopy').onclick=async()=>{
+    const ta=document.getElementById('accCodeOut');
+    if(!ta.value)ta.value=exportCode();
+    try{await navigator.clipboard.writeText(ta.value);toast('📋','存档码已复制！')}
+    catch(e){ta.select();toast('📋','已全选，长按复制即可')}
+  };
+  document.getElementById('accImport').onclick=()=>{
+    const v=document.getElementById('accCodeIn').value.trim();
+    if(!v){toast('📥','先把存档码粘贴进来');return}
+    if(importCode(v)){openAccPanel()}
+  };
+  document.getElementById('accLogout').onclick=logoutAccount;
+  document.getElementById('accClose').onclick=()=>m.remove();
+  m.onclick=e=>{if(e.target===m)m.remove()};
+}
+/* ================= 启动事件绑定（只绑一次） ================= */
+function bindStartupEvents(){
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.onclick=()=>{
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      $('#page-'+t.dataset.page).classList.add('active');
+      if(t.dataset.page==='shop')renderShop();
+    };
+  });
+  $('#barSign').onclick=signClick;
+  $('#btnCombo').onclick=doCombo;
+  $('#btnEggs').onclick=()=>{$('#menuModal').classList.add('hidden');renderEggsPanel()};
+  $('#btnPet').onclick=()=>{$('#menuModal').classList.add('hidden');openPetPanel()};
+  $('#btnAch').onclick=()=>{$('#menuModal').classList.add('hidden');renderAchPanel()};
+  $('#stBtn0').onclick=()=>setShelfTab(0);
+  $('#stBtn1').onclick=()=>setShelfTab(1);
+  $('#stBtn2').onclick=()=>setShelfTab(2);
+  $('#btnAcc').onclick=()=>{$('#menuModal').classList.add('hidden');openAccPanel()};
+  $('#loginGo').onclick=()=>startGame(document.getElementById('loginName').value);
+  $('#loginName').onkeydown=e=>{if(e.key==='Enter')startGame(document.getElementById('loginName').value)};
+  (function(){
+    const view=document.getElementById('shelfView');
+    if(!view)return;
+    view.addEventListener('pointerdown',e=>{
+      shelfPointerDown(e);
+      window.addEventListener('pointermove',shelfPointerMove,{passive:false});
+      window.addEventListener('pointerup',shelfPointerUp);
+      window.addEventListener('pointercancel',shelfPointerUp);
+    });
+    window.addEventListener('resize',()=>fitShelf());
+  })();
+  setInterval(tick,200);
+  setInterval(()=>{if(accName)save()},10000);
+  setInterval(()=>{if(accName)refreshAccBtn()},5000);
+  setTimeout(()=>{checkNight();checkDaily();},900);   // 开场彩蛋判定
+}
+
+/* ================= 启动 ================= */
+bindStartupEvents();
+const acc0=currentAccount();
+if(acc0&&accFind(acc0))startGame(acc0);            // 上次登录过 → 直接进店
+else showLogin();                                  // 首次/退出后 → 登录界面
 </script>
 </body>
 </html>

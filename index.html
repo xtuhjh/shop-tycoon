@@ -97,7 +97,7 @@ body{
 .s3-lamp{position:absolute;left:50%;top:-8px;width:78%;height:72%;transform:translateX(-50%);
   background:radial-gradient(ellipse at 50% 0%,rgba(255,220,150,.55),transparent 72%);pointer-events:none}
 /* 墙上的菜单板与置物架（填充空洞） */
-.s3-board{position:absolute;left:36%;top:6px;width:32%;height:26px;border-radius:6px;
+.s3-board{position:absolute;left:40%;top:6px;width:26%;height:26px;border-radius:6px;
   background:linear-gradient(180deg,#3b2a24,#261b18);border:2px solid #96713c;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 3px 8px rgba(0,0,0,.3)}
 .s3-board:after{content:'';position:absolute;inset:4px 6px;
@@ -203,36 +203,36 @@ body{
 @keyframes paidPop{0%{transform:scale(1)}25%{transform:scale(1.06)}55%{transform:scale(1.01)}100%{transform:scale(.86);opacity:.15}}
 @keyframes giPop{0%{transform:scale(.8)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
 /* 订单气泡 */
-.gbub{position:relative;display:flex;flex-direction:column;gap:2px;align-items:center;
-  background:rgba(255,255,255,.95);border:1.5px solid #e6dcef;border-radius:11px;padding:3px 5px 4px;
+.gbub{position:relative;display:flex;flex-direction:column;gap:2px;align-items:center;max-width:120px;
+  background:rgba(255,255,255,.96);border:1.5px solid #e6dcef;border-radius:11px;padding:3px 5px 4px;
   box-shadow:0 3px 10px rgba(40,20,10,.34)}
 .gbub:after{content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
-  border:6px solid transparent;border-bottom:0;border-top-color:rgba(255,255,255,.95)}
+  border:6px solid transparent;border-bottom:0;border-top-color:rgba(255,255,255,.96)}
 .gslot.vip .gbub{border-color:#f5c242;box-shadow:0 0 0 2px rgba(245,194,66,.35),0 3px 10px rgba(40,20,10,.34)}
 .gb-top{display:flex;align-items:center;gap:3px;font-size:9px;font-weight:800;color:#6b5b6e;white-space:nowrap}
 .gb-top em{font-style:normal;color:#d35400}
-.gb-need{display:flex;gap:3px;justify-content:center;flex-wrap:wrap}
-.gb-skip{position:absolute;right:-5px;bottom:-8px;border:1px solid #ecd9ac;background:#fff;border-radius:8px;
-  color:#b09454;font-size:8.5px;font-weight:800;padding:0 4px;line-height:1.6;cursor:pointer;font-family:inherit;
-  white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.22)}
+.gb-need{display:flex;flex-wrap:wrap;gap:3px;justify-content:center}
+/* 需求胶囊：图标 + 菜名 + 进度（灰=没上 / 橙=上了一半 / 绿=齐了） */
+.need-chip{display:inline-flex;align-items:center;gap:2px;border-radius:7px;padding:1px 4px;
+  font-size:9px;font-weight:800;line-height:1.6;white-space:nowrap;
+  background:#f2eef5;color:#8d8296;border:1px solid #ddd2e6}
+.need-chip i{font-style:normal;font-size:12px;line-height:1}
+.need-chip u{text-decoration:none}
+.need-chip b{font-weight:800;font-size:8px;color:#fff;background:#a3abb8;border-radius:6px;padding:0 3px}
+.need-chip.none i{filter:grayscale(1) opacity(.45)}
+.need-chip.part{background:#fdf3df;color:#9a6a12;border-color:#f0d79a}
+.need-chip.part b{background:#f0a72b}
+.need-chip.part i{filter:grayscale(.3)}
+.need-chip.full{background:#e2f8ec;color:#1a7a4a;border-color:#a9e3c3}
+.need-chip.full b{background:#22a55c}
+.need-chip.full i{filter:none;animation:dishPop .45s cubic-bezier(.2,1.5,.4,1)}
+.gb-foot{display:flex;align-items:center;justify-content:space-between;gap:4px;width:100%;margin-top:1px}
+.gb-left{font-size:8.5px;font-weight:800;color:#c0392b;white-space:nowrap}
+.gb-left.done{color:#22a55c}
+.gb-skip{border:1px solid #ecd9ac;background:#fff;border-radius:8px;color:#b09454;font-size:8.5px;font-weight:800;
+  padding:0 4px;line-height:1.6;cursor:pointer;font-family:inherit;white-space:nowrap;
+  box-shadow:0 1px 3px rgba(0,0,0,.18)}
 .gb-skip:active{transform:scale(.94)}
-/* 需求磁贴：没上到=灰、上到一半=橙、够了=绿 */
-.dish{
-  position:relative;display:flex;align-items:center;justify-content:center;
-  width:22px;height:22px;border-radius:8px;background:rgba(255,255,255,.92);
-  box-shadow:0 1px 3px rgba(120,130,150,.3);
-}
-.dish i{font-style:normal;font-size:13px;line-height:1;transition:filter .3s}
-.dish.none i{filter:grayscale(1) opacity(.28)}
-.dish.part i{filter:grayscale(.3) opacity(.9)}
-.dish.full i{filter:none;animation:dishPop .45s cubic-bezier(.2,1.5,.4,1)}
-.dish b{
-  position:absolute;right:-4px;bottom:-4px;font-size:8px;font-weight:800;line-height:1.5;
-  background:#a3abb8;color:#fff;border-radius:7px;padding:0 3px;
-  box-shadow:0 1px 3px rgba(0,0,0,.16);
-}
-.dish.part b{background:#f0a72b}
-.dish.full b{background:#22a55c}
 @keyframes dishPop{0%{transform:scale(.5) rotate(-12deg)}60%{transform:scale(1.3) rotate(6deg)}100%{transform:scale(1) rotate(0)}}
 
 /* ===== 上菜动作：接菜 → 端菜 → 落盘回弹 → 客人反应 ===== */
@@ -718,25 +718,29 @@ body{
   .stats-bar{font-size:11.5px;padding:7px 10px;gap:3px}
   .shop-chip{font-size:11px;padding:6px 8px}
   .shop-chip .sc-e{font-size:15px}
-  /* 2.5D 场景：客人连同订单气泡住在吧台里，所以要比原来高一些 */
-  .shop3d{height:182px}
+  /* 2.5D 场景：客人连同订单气泡住在吧台里，气泡里要放得下菜名，所以场景要够高 */
+  .shop3d{height:200px}
+  .s3-guests{bottom:30%}                 /* 气泡变高后要往下让，别压到左上角招牌 */
   .bar-pet{bottom:3%}
   .s3-waiter{bottom:13%}
   .bar-trinkets{bottom:24px}
   .s3-hint{display:none}
   .s3-shelf{display:none}
-  .s3-board{top:4px;height:22px;left:32%;width:36%}
+  .s3-board{top:4px;height:22px;left:40%;width:26%}
+  .s3-sign{padding:3px 7px;font-size:11.5px;gap:4px}
+  .s3-sign #barSignName{display:none}   /* 店名 HUD 上已经有了，窄屏让位给菜单板 */
   .machine{width:36px}
   .machine .m-body{font-size:20px}
   .machine .m-bar{width:26px}
   .actor .bd{font-size:19px}
   /* 订单气泡紧凑化，3 位客人并排也放得下 */
-  .gbub{padding:2px 4px 3px;border-radius:10px}
-  .gb-top{font-size:8.5px;gap:2px}
-  .dish{width:20px;height:20px;border-radius:7px}
-  .dish i{font-size:12px}
-  .dish b{font-size:7.5px;right:-3px;bottom:-3px;padding:0 2px}
-  .gb-skip{font-size:8px;padding:0 3px;right:-4px;bottom:-7px}
+  .gbub{padding:2px 4px 3px;border-radius:10px;max-width:112px}
+  .gb-top{font-size:8px;gap:2px}
+  .need-chip{font-size:8.5px;padding:0 3px;gap:1px}
+  .need-chip i{font-size:11px}
+  .need-chip b{font-size:7.5px;padding:0 2px}
+  .gb-left{font-size:8px}
+  .gb-skip{font-size:8px;padding:0 3px}
   .card{padding:8px 10px;gap:9px;margin-bottom:7px;border-radius:14px}
   /* 出餐台改双列紧凑卡片：单列时一屏只看得到 2 张，菜品「展示不全」 */
   #paneUp{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:7px;align-content:start}
@@ -1300,10 +1304,12 @@ function load(){
 // 这里只负责稀有菜（它不占玩家操作，按慢速自动补货）与进度条刷新。
 function produceTick(dt,sp){
   let changed=false;
+  // 细进度条 = 库存条（囤了几成）。出餐进度只在"正在做"的那张卡片里显示，
+  // 两者分开语义，玩家不会误以为点一道菜、别的菜也在动。
   menu().forEach((d,idx)=>{
     if(!isDishOpen(idx))return;
     const bar=document.getElementById('dbar'+idx);
-    if(bar)bar.style.width=(isCooking(idx)?cookPct(idx):(dStock(idx)>=STOCK_CAP?100:0))+'%';
+    if(bar)bar.style.width=Math.min(100,Math.round(dStock(idx)/STOCK_CAP*100))+'%';
   });
   Object.keys(state.hiddenOwned).forEach(key=>{
     if(!state.hiddenOwned[key])return;
@@ -1917,22 +1923,30 @@ function renderShelf(){
       act='<div class="cook-wrap"><div class="cook-bar"><i id="dcbar'+idx+'"></i></div>'+
           '<span class="cook-txt" id="dctxt'+idx+'">出餐中</span></div>';
     }else{
-      act='<button class="p-btn cook-btn" id="dcook'+idx+'" aria-label="制作 '+p.n+'"'+(full?' disabled':'')+'>'+(full?'已满':'制作 👨‍🍳')+'</button>';
+      act='<button class="p-btn cook-btn" id="dcook'+idx+'" aria-label="制作 '+p.n+'"'+(full?' disabled':'')+'>'+(full?'🧺 已囤满':'制作 👨‍🍳')+'</button>';
     }
     let serve='';
     if(wanted.has('l:'+lv)){
       card.classList.add('serving-need');
       serve='<button class="p-btn serve-btn sm" id="dserve'+idx+'" aria-label="上菜 '+p.n+' Lv.'+lv+'"'+(stock>0?'':' disabled')+'>上菜 🍽️</button>';
     }
+    // 库存条：直接反映囤了几成（一开始就写好宽度，重渲染时不会从 0 闪一下）
+    const barPct=Math.round(stock/STOCK_CAP*100);
+    const info=cooking?('再等 '+(cookLeft(idx)/1000).toFixed(1)+' 秒')
+      :(full?('库存已满 '+STOCK_CAP+' 件，先端给客人'):('制作 '+ (cookMs()/1000).toFixed(1) +' 秒 / 份 · ¥'+fmt(PRODUCTS[lv-1].p*mult())));
     card.innerHTML=
       `<div class="p-emoji">${p.e}</div>`+
       `<div class="p-body">`+
         `<div class="p-name"><span class="p-e-inline">${p.e}</span>${p.n} <span class="lv">Lv.${lv}</span>${stockTag}</div>`+
-        `<div class="p-info">${cooking?('再等 '+(cookLeft(idx)/1000).toFixed(1)+' 秒'):('制作 '+ (cookMs()/1000).toFixed(1) +' 秒 / 份 · ¥'+fmt(PRODUCTS[lv-1].p*mult()))}</div>`+
-        `<div class="bar"><i id="dbar${idx}"></i></div>`+
+        `<div class="p-info">${info}</div>`+
+        `<div class="bar"><i id="dbar${idx}" style="width:${barPct}%"></i></div>`+
       `</div>`+
       `<div class="p-acts">${serve}${act}</div>`;
     up.appendChild(card);
+    if(cooking){                                    // 出餐条同样一开始就是正确宽度，避免重渲染时从 0 长起来
+      const cb0=document.getElementById('dcbar'+idx);
+      if(cb0)cb0.style.width=cookPct(idx)+'%';
+    }
     if(wanted.has('l:'+lv)){
       const sb=document.getElementById('dserve'+idx);
       if(sb)sb.onclick=()=>serveItem('l:'+lv);
@@ -2826,22 +2840,33 @@ function renderScene(){
     if(el.className!=='gslot'+(g.vip?' vip':'')+(g.fx==='paid'?' paid':'')+(g.fx==='happy'?' happy':'')+(g.isNew?' enter':''))
       el.className='gslot'+(g.vip?' vip':'')+(g.fx==='paid'?' paid':'')+(g.fx==='happy'?' happy':'')+(g.isNew?' enter':'');
     g.isNew=false;
-    // 气泡：需求菜单（灰=还没上、橙=上了一半、绿=够了）+ 赏金 + 送走
+    // 需求胶囊：图标 + 菜名 + 进度，比原来只有一个小图标方块好认得多
     const need=g.items.map(it=>{
       const k=itemKey(it),have=g.tray[k]||0;
       const cls=have>=it.count?'full':(have>0?'part':'none');
       const mark=have>=it.count?'✓':(have+'/'+it.count);
-      return '<span class="dish '+cls+'" title="'+keyName(k)+' '+have+'/'+it.count+'"><i>'+keyEmoji(k)+'</i><b>'+mark+'</b></span>';
+      const nm=keyIsRare(k)?(HIDDEN[it.rare].n+'×'+it.count):(dishName(it.level)+(it.count>1?('×'+it.count):''));
+      return '<span class="need-chip '+cls+'" title="'+keyName(k)+' '+have+'/'+it.count+'">'+
+        '<i>'+keyEmoji(k)+'</i><u>'+nm+'</u><b>'+mark+'</b></span>';
     }).join('');
+    const rest=g.items.reduce((s,it)=>{const k=itemKey(it);return s+Math.max(0,it.count-(g.tray[k]||0))},0);
     const orderTxt=g.items.map(it=>it.rare
       ?(HIDDEN[it.rare].n+'×'+it.count)
       :(dishName(it.level)+'×'+it.count)).join(' ');
-    el.querySelector('.gbub').innerHTML=
+    // 内容没变就不重写 DOM：否则每次重绘都会让已达成的绿胶囊重播动画（看着像"别的菜也在动"）
+    const bubHTML=
       '<span class="gb-top">第'+(i+1)+'位'+(g.vip?' ✨':'')+(g.night?'🌙':'')+
         '<em>💰'+fmt(g.rewardCoins)+' ⚡'+fmt(g.rewardEnergy)+'</em></span>'+
       '<span class="gb-need">'+need+'</span>'+
-      '<button class="gb-skip" aria-label="送走第'+(i+1)+'位客人">送走</button>';
-    el.querySelector('.gb-skip').onclick=()=>skipGuest(i);
+      '<span class="gb-foot"><span class="gb-left'+(rest?'':' done')+'">'+(rest?('还差 '+rest+' 件'):'齐了！')+'</span>'+
+        '<button class="gb-skip" aria-label="送走第'+(i+1)+'位客人">送走</button></span>';
+    const bub=el.querySelector('.gbub');
+    if(bub.dataset.h!==bubHTML){
+      bub.dataset.h=bubHTML;
+      bub.innerHTML=bubHTML;
+      const sk=bub.querySelector('.gb-skip');
+      if(sk)sk.onclick=()=>skipGuest(i);
+    }
     el.setAttribute('aria-label','第'+(i+1)+'位客人'+(g.vip?'（稀有客人）':'')+' 需要 '+orderTxt+
       ' 赏金'+g.rewardCoins+'金币'+g.rewardEnergy+'能量');
     const gp=el.querySelector('.gp');

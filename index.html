@@ -68,6 +68,7 @@ body{
 .shop-strip{
   display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:4px;
   padding:0 0 4px;margin-bottom:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  touch-action:pan-x;
 }
 .shop-strip::-webkit-scrollbar{display:none}
 .shop-chip{
@@ -1085,7 +1086,7 @@ body{
         <li>🚫 队伍里没人点的菜端不出去；点气泡上的「送走」可花小费换一位客人</li>
         <li>👥 <b>客人不共享</b>：每家店有自己的客人队列和货架库存，切店等于换一批客人；客人只点你在这家店已经上架的菜</li>
         <li>📋 <b>客人的口味会跟着你成长</b>：合成出更高等级后，卖这个等级的店，客人订单里就会出现新菜</li>
-        <li>💰 <b>金币管商店线</b>：升级店铺（卖更快）、<b>开新店</b>（价格随你的收入自动缩放，永远是"攒一会儿"）、金币解锁商品、送走客人</li>
+        <li>💰 <b>金币管商店线</b>：升级店铺（卖更快）、<b>开新店</b>（<b>固定价格</b>，不随收入浮动，可以盯着一个数攒）、金币解锁商品、送走客人</li>
         <li>⚡ <b>能量管合成线</b>：生成产品、升级合成台；出货模式可把产品回收成能量</li>
         <li>🛍️ <b>点击店铺条</b>切换经营的店（换店＝换菜单、换客人、换货架）：小摊⚡翻倍、咖啡馆生产×1.5、食堂客人奖励×1.6、白金餐厅稀有钱×2…</li>
         <li>🏆 <b>成就</b>：36 个长期目标（服务客人数、合并次数、营收、收集…），每达成一个<b>永久提升全场售价</b>，攒满 +84%；在 ⚙️ 里查看进度条</li>
@@ -1190,22 +1191,23 @@ const HIDDEN={
            shrine:{price:.50, order:.25, cook:.30, desc:'该店售价 +50% · 赏金 +25% · 生产 +30%'}},
 };
 const HIDDEN_KEYS=Object.keys(HIDDEN);
-// openK：开这家店的价位系数（≈需要攒多少秒的卖货收入），价格随进度自动缩放，不会出现「要么秒买要么挂几小时」
+// cost：开这家店的固定解锁价（金币）。原来是按收入自动缩放的，金额一直浮动、没法看着一个数攒钱；
+// 现在写死。数值按「准备开这家店时的店铺收入 × 约 10~45 秒」定的（实测各阶段收入后取的整数值）。
 // menu：每家店自己的 4 道招牌菜。菜绑定一个「等级」——等级决定售价与能否上架（合成台合出该等级才解锁）。
 // 所以合成台是中央厨房（按等级出半成品），门店负责把等级做成自家招牌菜：
 // 同样 Lv.5，咖啡馆做成「手冲美式」、深夜食堂做成「炭烤串」。菜单只 4 道，出餐台两行放得下、不用上下拉。
 const SHOPS=[
-  {e:'🛖',n:'街边小摊',  openK:0,  mult:1,   perk:'energy',perkDesc:'⚡能量获取 ×2',
+  {e:'🛖',n:'街边小摊',  cost:0,  mult:1,   perk:'energy',perkDesc:'⚡能量获取 ×2',
    menu:[{lv:1,n:'柠檬水',e:'🍋'},{lv:2,n:'糖葫芦',e:'🍡'},{lv:3,n:'烤肠',e:'🌭'},{lv:4,n:'刨冰',e:'🍧'}]},
-  {e:'🏪',n:'便利店',    openK:20, mult:2.5, perk:'none',  perkDesc:'均衡经营',
+  {e:'🏪',n:'便利店',    cost:8000, mult:2.5, perk:'none',  perkDesc:'均衡经营',
    menu:[{lv:3,n:'关东煮',e:'🍢'},{lv:4,n:'茶叶蛋',e:'🥚'},{lv:5,n:'饭团',e:'🍙'},{lv:6,n:'泡面',e:'🍜'}]},
-  {e:'☕',n:'文艺咖啡馆',openK:30, mult:6,   perk:'speed', perkDesc:'🏭生产速度 ×1.5',
+  {e:'☕',n:'文艺咖啡馆',cost:300000, mult:6,   perk:'speed', perkDesc:'🏭生产速度 ×1.5',
    menu:[{lv:5,n:'手冲美式',e:'☕'},{lv:6,n:'燕麦拿铁',e:'🥛'},{lv:7,n:'冰滴咖啡',e:'🧊'},{lv:8,n:'芝士蛋糕',e:'🍰'}]},
-  {e:'🍽️',n:'深夜食堂',  openK:45, mult:15,  perk:'order', perkDesc:'🍽️客人奖励 ×1.6',
+  {e:'🍽️',n:'深夜食堂',  cost:10000000, mult:15,  perk:'order', perkDesc:'🍽️客人奖励 ×1.6',
    menu:[{lv:7,n:'炭烤串',e:'🍢'},{lv:8,n:'豚骨拉面',e:'🍜'},{lv:9,n:'冰镇生啤',e:'🍺'},{lv:10,n:'招牌炒饭',e:'🍚'}]},
-  {e:'🏛️',n:'白金餐厅',  openK:60, mult:40,  perk:'lucky', perkDesc:'✨稀有钱出现率 ×2',
+  {e:'🏛️',n:'白金餐厅',  cost:350000000, mult:40,  perk:'lucky', perkDesc:'✨稀有钱出现率 ×2',
    menu:[{lv:9,n:'香煎鹅肝',e:'🦆'},{lv:10,n:'松露意面',e:'🍝'},{lv:11,n:'战斧牛排',e:'🥩'},{lv:12,n:'龙虾刺身',e:'🦞'}]},
-  {e:'💎',n:'米其林殿堂',openK:90, mult:100, perk:'all',   perkDesc:'全能：⚡×1.5 🏭×1.3 🍽️×1.3 ✨×1.5',
+  {e:'💎',n:'米其林殿堂',cost:12000000000, mult:100, perk:'all',   perkDesc:'全能：⚡×1.5 🏭×1.3 🍽️×1.3 ✨×1.5',
    menu:[{lv:9,n:'鱼子酱',e:'🐟'},{lv:10,n:'白松露',e:'🍄'},{lv:11,n:'和牛',e:'🥩'},{lv:12,n:'传世盛宴',e:'🌟'}]},
 ];
 const FACES=['🧑','👩','👴','👵','👦','👧','🧕','👨‍🌾','🧑‍💼','👩‍🎨','🕵️','🧙'];
@@ -1329,12 +1331,10 @@ const luckyMult=()=>perkLevel('lucky',2,1.5);
 const genCost=()=>Math.min(50000,Math.floor(8*Math.pow(1.012,state.genCount)));
 const genCostAt=lv=>Math.floor(genCost()*Math.pow(3,lv-1));
 const shipGain=lv=>Math.floor(6*Math.pow(2,lv-1));
-// 开新店价格（金币）= 已解锁商品总价 × 新店倍率 × 系数秒数 → 永远约等于「攒 K 秒收入」
-const unlockedPriceSum=()=>PRODUCTS.reduce((s,p,i)=>s+(state.unlocked[i]?p.p:0),0);
+// 开新店的固定价格（写死，不随收入/余额浮动，方便玩家盯着一个数攒钱）
 const openCostCoins=tier=>{
   const s=SHOPS[tier];
-  if(!s||!s.openK)return 0;
-  return Math.max(200,Math.round(unlockedPriceSum()*s.mult*s.openK));
+  return (s&&s.cost)||0;
 };
 
 function toast(emoji,text,gold){
@@ -2061,12 +2061,17 @@ function updateHUD(){
 }
 function renderShopStrip(){
   const strip=$('#shopStrip');
+  // 内容没变就不重建：以前每次 renderShop 都重建，会把玩家手动滑到的位置顶回 0，感觉"滑不动"
+  const sig=state.activeShop+'|'+state.shopTier+'|'+((state.shrine||[]).join(','));
+  if(strip.dataset.sig===sig)return;
+  const keep=strip.scrollLeft;
+  strip.dataset.sig=sig;
   strip.innerHTML='';
   SHOPS.forEach((s,i)=>{
     const d=document.createElement('button');
     const unlocked=i<=state.shopTier;
     d.className='shop-chip'+(i===state.activeShop?' active-shop':'')+(unlocked?(i===state.activeShop?'':' switchable'):' locked');
-    // 未解锁的店也把解锁价标出来（价格会随收入缩放，所以只是个"当前报价"），点一下能看详情
+    // 未解锁的店也把固定的解锁价标出来；点一下能看详情
     d.innerHTML=unlocked
       ?`<span class="sc-e">${s.e}</span>${s.n}${state.shrine&&state.shrine[i]?'<span class="sc-tag shrine">🏮</span>':''}${i===state.activeShop?'<span class="sc-tag">✓</span>':''}`
       :`<span class="sc-e">${s.e}</span>${s.n}<span class="sc-tag lock">🔒¥${fmt(openCostCoins(i))}</span>`;
@@ -2074,17 +2079,14 @@ function renderShopStrip(){
     d.onclick=unlocked?(()=>switchShop(i)):(()=>shopPreview(i));
     strip.appendChild(d);
   });
-  // 让"当前店 + 下一家要开的店"自动露出来，不然窄屏看不到解锁价
-  const key=state.activeShop+'|'+state.shopTier;
-  if(strip._key!==key){
-    strip._key=key;
-    const show=Math.min(state.shopTier+1,SHOPS.length-1);
-    const chip=strip.children[show]||strip.children[state.activeShop];
-    if(chip){
-      // 注意：offsetLeft 是相对已定位的 #app 算的，不是相对 strip，所以用 rect 差值来滚
-      const sr=strip.getBoundingClientRect(), cr=chip.getBoundingClientRect();
-      strip.scrollLeft=Math.max(0,strip.scrollLeft+(cr.right-sr.right)+8);   // 只横滚，不动页面
-    }
+  strip.scrollLeft=keep;
+  // 让"当前店 + 下一家要开的店"露出来（只在切店/进度变化时做一次，不干扰手动滑动）
+  const show=Math.min(state.shopTier+1,SHOPS.length-1);
+  const chip=strip.children[show]||strip.children[state.activeShop];
+  if(chip){
+    // 注意：offsetLeft 是相对已定位的 #app 算的，不是相对 strip，所以用 rect 差值来滚
+    const sr=strip.getBoundingClientRect(), cr=chip.getBoundingClientRect();
+    strip.scrollLeft=Math.max(0,strip.scrollLeft+(cr.right-sr.right)+8);
   }
 }
 // 未解锁店铺预览：能开/不能开、要多少钱、这家店卖什么、加成是什么
@@ -2111,7 +2113,7 @@ function shopPreview(i){
         ? ('解锁需要 <b>¥'+fmt(cost)+'</b>'+(canOpen?'　✅ 现在就能开！':'　还差 ¥'+fmt(cost-state.coins)))
         : ('解锁需要 <b>¥'+fmt(cost)+'</b><br><span class="sp-warn">要先开「'+prev.n+'」才能开这家</span>'))+
     '</div>'+
-    '<div class="sp-note">价格是按你现在的收入自动缩放的（≈攒 '+s.openK+' 秒的卖货收入），收入涨了它也会跟着涨，所以这只是"当前报价"。</div>'+
+    '<div class="sp-note">价格是固定的，不会跟着你的收入或余额变动——可以放心盯着这个数攒钱。</div>'+
     '<div class="m-btns"><button class="m-plain" id="spClose">知道了</button>'+
       (canOpen?'<button class="m-primary" id="spOpen">🏪 现在就开（¥'+fmt(cost)+'）</button>':'')+
     '</div></div>';
@@ -3468,7 +3470,7 @@ const PETS={
     love:['你是我见过最好看的风景','星光分你一半，剩下的都照着你','我把好运都攒着给你','许愿吧，我负责让它成真']},
 };
 const PET_KEYS=Object.keys(PETS);
-const PET_RECRUIT_K=[0,.15,.45,1.1];               // 招募价系数（按稀有度）
+const PET_RECRUIT_COST=[0,10000,250000,8000000];   // 直接招募的固定价（按稀有度：普通/稀有/传说）
 function newPetState(owned){
   return {owned:!!owned,lv:1,exp:0,bond:0,mood:80,fed:0,lastFed:0,lastPet:0,lastMood:0,
     pickNext:0,tripAt:0,tripBack:0,met:false,got:0,line:'',lineAt:0,face:''};
@@ -3519,10 +3521,7 @@ const petSkillNow=()=>Math.round((petCfg(state.pet.kind).skill.per[Math.min(petL
 const petMultBonus=()=>skillOf('price');           // 全场售价
 const petOrderBonus=()=>skillOf('order');          // 客人赏金
 const petVipMult=()=>1+skillOf('rare');            // 稀有客人出现率
-const petRecruitCost=k=>{
-  const r=PETS[k].rar;
-  return Math.max(600,Math.round(unlockedPriceSum()*mult()*PET_RECRUIT_K[r]));
-};
+const petRecruitCost=k=>PET_RECRUIT_COST[PETS[k].rar]||PET_RECRUIT_COST[1];
 const PET_LINES={
   idle:['今天也一起加油吧！','老板～我闻到香味了','（在吧台边打滚）','有你在真好','我帮你看着柜台！','今天的客人好多呀'],
   hungry:['肚子有点饿了…','（盯着货架咽口水）','老板，今天有剩的吗？'],

@@ -465,7 +465,7 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow-y:au
   filter:drop-shadow(0 3px 5px rgba(120,60,20,.26))}
 .dish-tile .dt-name{font-size:11px;font-weight:800;color:#6b5b6e;max-width:100%;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dish-tile .dt-stock{position:absolute;top:5px;right:6px;font-size:9.5px;font-weight:800;color:#fff;
+.dish-tile .dt-stock{position:absolute;bottom:3px;right:5px;font-size:9.5px;font-weight:800;color:#fff;
   background:#b9c0cc;border-radius:8px;padding:0 5px}
 .dish-tile.ready .dt-stock{background:#27ae60}
 .dish-tile.full .dt-stock{background:#e67e22}
@@ -481,11 +481,14 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow-y:au
 /* 客人在等这道菜：绿色呼吸提示 */
 .dish-tile.wanted{box-shadow:0 3px 12px rgba(67,233,123,.35),inset 0 0 0 2px #43e97b}
 /* 做好了：头顶浮出「上菜」气泡（点它端给客人） */
-.dish-tile .dt-serve{position:absolute;top:3px;left:50%;transform:translateX(-50%);display:none;z-index:3;
-  pointer-events:none;font-size:10.5px;font-weight:800;color:#0c4633;
-  background:linear-gradient(135deg,#43e97b,#38f9d7);border-radius:9px;padding:1px 7px;white-space:nowrap;
+.dish-tile .dt-serve{position:absolute;top:2px;left:50%;transform:translateX(-50%);display:none;z-index:3;
+  cursor:pointer;font-size:10.5px;font-weight:800;color:#0c4633;
+  background:linear-gradient(135deg,#43e97b,#38f9d7);border-radius:9px;padding:2px 8px;white-space:nowrap;
   box-shadow:0 2px 8px rgba(56,249,215,.65);animation:serveBro 1.1s ease-in-out infinite}
 .dish-tile.ready .dt-serve{display:block}
+.dish-tile.ready .dt-serve:active{transform:translateX(-50%) scale(.92)}
+/* 备货满 3 份：灶台先歇着，角标变橙提醒先出货 */
+.dish-tile.full .dt-name{color:#b06a12}
 #paneRare .card .p-e-inline{display:inline;margin-right:2px}
 #paneUp .card .p-acts,#paneRare .card .p-acts{flex-direction:row;min-width:0;gap:5px;margin-top:auto}
 #paneUp .card .p-btn,#paneRare .card .p-btn{flex:1;min-width:0;padding:6px 4px;font-size:11.5px;line-height:1.15}
@@ -1028,7 +1031,7 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow-y:au
 .pet-mood{font-size:11px;position:absolute;right:-3px;top:-5px}
 /* 说话气泡（居中在宠物头顶，几秒后自动消失，避免杂乱） */
 .pet-bubble{
-  position:absolute;left:0;bottom:100%;margin-bottom:4px;max-width:118px;
+  position:absolute;left:0;bottom:100%;margin-bottom:4px;width:112px;
   background:#fff;border:1.5px solid #f0d79a;border-radius:11px;padding:4px 8px;
   font-size:10.5px;font-weight:700;color:#7a5f28;line-height:1.4;text-align:center;
   box-shadow:0 4px 10px rgba(150,110,40,.22);animation:bubbleIn .35s cubic-bezier(.2,1.5,.4,1);
@@ -1252,7 +1255,10 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow-y:au
     <div class="modal">
       <h3>📖 玩法说明</h3>
       <ul>
-        <li>👨‍🍳 <b>自己做菜</b>：出餐台上每道菜就是一颗大图标——<b>点一下开火</b>；点火后图标外会转出一圈出餐进度环，<b>再点就是添柴加速</b>（每点一下立刻缩短 0.65 秒，连点连快）；<b>做好了图标上会浮出「上菜 🍽️」提示，再点一下就端给客人</b>；每样最多囤 5 件</li>
+        <li>👨‍🍳 <b>自己做菜</b>：出餐台上每道菜就是一颗大图标——
+          <b>图标区 = 灶台</b>：点一下开火；点火后图标外转出出餐进度环，<b>再点就是添柴加速</b>（每点一下缩短 0.65 秒，连点连快）。
+          <b>做好了图标头顶会浮出「上菜 🍽️×N」按钮，点它端给客人</b>（点提示不影响灶台，可以继续备菜）。
+          <b>每样最多备 3 份</b>（客人单样最多也只点 3 份），热销菜可以提前备好，客人来了立刻就能上</li>
         <li>🍳 <b>每家有每家的菜单</b>：每家店只卖 4 道自家招牌菜（小摊卖柠檬水糖葫芦、咖啡馆卖拿铁蛋糕…），<b>4 道正好两行，不用上下拉</b></li>
         <li>🧾 <b>菜单按等级走</b>：每道菜绑定一个等级，售价由等级决定。合成台是中央厨房（按等级出产品），门店负责做成自家招牌——同一个 Lv.5，咖啡馆做成「手冲美式」、深夜食堂做成「炭烤串」</li>
         <li>🏭 <b>稀有菜例外</b>：🍀🎐🌈🧧👑💎 六种稀有菜不占玩家操作，会自己慢速补货（每样最多 3 件），单独住在「✨ 稀有」那一页</li>
@@ -1397,7 +1403,7 @@ const SAVE_KEY='shopMergeGame_v1';
 const GOLD_BUY={2:300,3:2500};
 const MERGE_UP={2:300,3:2500,4:15000};
 const MERGE_MAX=4;
-const STOCK_CAP=5;            // 每种商品的货架库存上限
+const STOCK_CAP=3;            // 每种菜的备货上限（客人单样最多点 3 份，正好对齐）
 const RARE_CAP=3;             // 稀有物库存上限
 const PROD_SEC=5;             // 货架生产 1 件所需基准秒数（受店铺等级与生产加成影响）
 const RARE_PROD_MULT=10;      // 稀有物生产慢 10 倍
@@ -1690,6 +1696,8 @@ function load(){
         state.shopStock=SHOPS.map(sh=>sh.menu.map(d=>Math.min(STOCK_CAP,oldStock[d.lv-1]||0)));
         state.shopCook=SHOPS.map(sh=>sh.menu.map(d=>oldCook[d.lv-1]||0));
       }
+      // 备货上限从 5 降到 3：老存档里多出来的夹回上限
+      if(Array.isArray(state.shopStock))state.shopStock=state.shopStock.map(arr=>Array.isArray(arr)?arr.map(v=>Math.min(STOCK_CAP,v|0)):arr);
       if(!state.shopQueue||state.shopQueue.length!==SHOPS.length)state.shopQueue=SHOPS.map(()=>[]);
       if(!Array.isArray(state.shrine))state.shrine=SHOPS.map(()=>null);
       state.shrine.length=SHOPS.length;
@@ -2591,20 +2599,25 @@ function renderShelf(){
     const tile=document.createElement('button');
     tile.className='dish-tile'+(isWanted?' wanted':'')+(cooking?' cooking':'')+(full?' full':'')+(stock>0?' ready':'');
     tile.id='dcard'+idx;
-    tile.setAttribute('aria-label',p.n+' Lv.'+lv+'，库存 '+stock+'/'+STOCK_CAP+(cooking?'，出餐中，点按加速':'，点按制作'));
+    tile.setAttribute('aria-label',p.n+' Lv.'+lv+'，已备 '+stock+'/'+STOCK_CAP+
+      (cooking?'，出餐中，点按加速':'，点按开火做下一份')+'；头顶提示可上菜');
     tile.innerHTML=
       '<span class="dt-ring"></span>'+
       '<span class="dt-emoji">'+p.e+'</span>'+
       '<span class="dt-name">'+p.n+'</span>'+
       '<span class="dt-stock">'+stock+'/'+STOCK_CAP+'</span>'+
       '<span class="dt-sec" id="dtsec'+idx+'"></span>'+
-      '<span class="dt-serve" id="dserve'+idx+'">上菜 🍽️</span>';
-    // 一颗瓦片管全流程：做菜中再点=加速；做好了点=端给客人；空闲点=开火
+      '<span class="dt-serve" id="dserve'+idx+'" role="button">上菜 🍽️'+(stock>1?(' \u00d7'+stock):'')+'</span>';
+    // 图标区 = 灶台：点一下开火，做菜中再点=添柴加速，备满 3 份就提醒先端出去
+    // （提前把热销菜备几份，客人来了立刻就能上）
     tile.onclick=()=>{
       if(isCooking(idx))boostCook(idx);
-      else if(dStock(idx)>0)serveItem('l:'+lv);
+      else if(dStock(idx)>=STOCK_CAP)toast('🧺',p.n+'已备好 '+STOCK_CAP+' 份，先端给客人');
       else startCook(idx);
     };
+    // 头顶「上菜 ×N」= 端给客人（点了不会影响灶台继续做菜）
+    const sv=tile.querySelector('.dt-serve');
+    if(sv)sv.onclick=e=>{e.stopPropagation();serveItem('l:'+lv)};
     if(cooking){                                  // 出餐环一开始就是正确进度，避免重渲染时从 0 长起来
       const ring0=tile.querySelector('.dt-ring');
       if(ring0)ring0.style.setProperty('--p',cookPct(idx));
@@ -2932,7 +2945,10 @@ function refreshStockBadges(){
       if(sec)sec.textContent=cooking?((cookLeft(idx)/1000).toFixed(0)+'s'):'';
     }
     const sb=document.getElementById('dserve'+idx);
-    if(sb)sb.classList.toggle('show',st>0);
+    if(sb){
+      sb.textContent='上菜 🍽️'+(st>1?(' ×'+st):'');
+      sb.setAttribute('aria-label','把'+p.n+'端给客人'+(st>1?('（已备 '+st+' 份）'):''));
+    }
   });
   HIDDEN_KEYS.forEach(key=>{
     if(!state.hiddenOwned[key])return;

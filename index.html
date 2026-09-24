@@ -109,14 +109,13 @@ body{
 .shop-chip .sc-tag{background:#f1e7f5;color:#9b59b6;border-radius:6px;padding:1px 5px;font-size:10px;font-weight:800}
 .shop-chip .sc-tag.shrine{background:linear-gradient(135deg,#ffe9a8,#f5c242);color:#5c3a00}
 
-/* ===== 2.5D 店铺场景 ===== */
-.shop3d{
-  position:relative;height:238px;border-radius:18px;overflow:hidden;margin-bottom:10px;
-  background:linear-gradient(180deg,#2b2038 0%,#452f42 30%,#7a4a3a 62%,#a8683c 100%);
-  box-shadow:0 8px 24px rgba(60,30,20,.3),inset 0 0 0 1px rgba(255,255,255,.08);
-}
-/* 后墙（要足够高，客人头顶的订单气泡得落在墙上） */
-.s3-wall{position:absolute;left:0;right:0;top:0;height:82%;
+/* ===== 一体化店面：后厨 → 出餐台 → 服务员动线 → 吧台（客人） ===== */
+.rest{border-radius:18px;overflow:hidden;margin-bottom:8px;
+  box-shadow:0 8px 24px rgba(60,30,20,.25),inset 0 0 0 1px rgba(255,255,255,.08)}
+.rest-kitchen{position:relative;height:128px;overflow:hidden;
+  background:linear-gradient(180deg,#2b2038 0%,#452f42 40%,#7a4a3a 78%,#a8683c 100%)}
+/* 后墙 */
+.s3-wall{position:absolute;left:0;right:0;top:0;height:74%;
   background:linear-gradient(180deg,#5a3b4e 0%,#7d4f3d 48%,#a86b45 100%)}
 .s3-wall:after{content:'';position:absolute;inset:0;
   background:repeating-linear-gradient(90deg,rgba(255,225,180,.06) 0 2px,transparent 2px 28px)}
@@ -150,9 +149,9 @@ body{
   animation:shrineGlow 2.6s ease-in-out infinite}
 @keyframes shrineGlow{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 /* 后厨操作台 + 生产机器 */
-.s3-ck{position:absolute;left:4%;right:4%;bottom:0;height:26px;border-radius:5px 5px 0 0;
+.s3-ck{position:absolute;left:4%;right:4%;bottom:0;height:24px;border-radius:5px 5px 0 0;
   background:linear-gradient(180deg,#d3a067,#9c6a34 70%);box-shadow:0 3px 0 #7c5226,0 8px 16px rgba(0,0,0,.35)}
-.machine{position:absolute;bottom:20px;width:42px;display:flex;flex-direction:column;align-items:center;
+.machine{position:absolute;bottom:18px;width:42px;display:flex;flex-direction:column;align-items:center;
   transform:translateX(-50%)}
 .machine .m-body{font-size:23px;line-height:1;filter:drop-shadow(0 3px 4px rgba(0,0,0,.4))}
 .machine.cooking .m-body{animation:mCook .9s ease-in-out infinite}
@@ -161,37 +160,36 @@ body{
 .machine .m-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffd166,#ff8a5b);border-radius:9px;transition:width .2s linear}
 .machine .m-badge{position:absolute;top:-8px;right:-2px;font-size:9px;font-weight:800;color:#fff;
   background:#22a55c;border-radius:7px;padding:0 4px;box-shadow:0 1px 3px rgba(0,0,0,.4)}
-/* 透视地板（更亮，格纹清晰才有 2.5D 纵深） */
-.s3-floor{position:absolute;left:-18%;right:-18%;bottom:0;height:52%;
+/* 厨房透视地板 */
+.s3-floor{position:absolute;left:-18%;right:-18%;bottom:0;height:46%;
   transform:perspective(320px) rotateX(52deg);transform-origin:bottom center;
   background:
     radial-gradient(ellipse at 50% 0%,rgba(255,220,150,.35),transparent 62%),
     repeating-conic-gradient(#f0d3a4 0% 25%,#dcbb8b 0% 50%) 50%/26px 26px;
   box-shadow:inset 0 26px 44px rgba(60,30,10,.42)}
-/* 客人面前的吧台台面 */
-.s3-bar{position:absolute;left:1%;right:1%;bottom:32%;height:15px;border-radius:5px;z-index:5;
-  background:linear-gradient(180deg,#e8b06a,#bd8033 55%,#94601f);
-  box-shadow:0 6px 14px rgba(0,0,0,.45),inset 0 2px 0 rgba(255,255,255,.42)}
-.s3-hint{position:absolute;right:9px;top:34px;z-index:6;font-size:9.5px;font-weight:700;color:#ffe9c0;
-  text-align:right;line-height:1.45;text-shadow:0 1px 3px rgba(0,0,0,.6);opacity:.9}
-/* 场景里的角色（直立、带影子、按深度缩放） */
-.actor{position:absolute;z-index:5;transform:translateX(-50%) scale(var(--z,1));transform-origin:bottom center}
+/* 场景里的角色（直立、带影子） */
+.actor{position:relative;z-index:5;transform:none;transform-origin:bottom center}
 .actor .sh{position:absolute;left:50%;bottom:-3px;width:20px;height:6px;border-radius:50%;
   background:rgba(40,18,6,.34);transform:translateX(-50%)}
 .actor .bd{display:block;font-size:22px;line-height:1;animation:bob .6s ease-in-out infinite;
   filter:drop-shadow(0 3px 4px rgba(0,0,0,.35))}
 @keyframes bob{0%,100%{transform:translateY(0) rotate(-2.5deg)}50%{transform:translateY(-3px) rotate(2.5deg)}}
-/* 服务员：在吧台后的厨房过道来回走，上菜时走到吧台前 */
-.s3-waiter{left:44%;bottom:14%}
+/* 服务员动线：出餐台与吧台之间的一条窄走道 */
+.rest-lane{position:relative;height:44px;overflow:hidden;
+  background:linear-gradient(180deg,#8a5a38,#6e452a);
+  border-top:1px solid rgba(255,255,255,.14);border-bottom:1px solid rgba(0,0,0,.3)}
+.rest-lane:after{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,rgba(255,235,200,.08) 0 2px,transparent 2px 30px)}
+.s3-waiter{position:absolute;left:50%;bottom:4px}
 .s3-waiter .mv{animation:walkX 11s ease-in-out infinite}
-@keyframes walkX{0%,100%{transform:translateX(-52px)}50%{transform:translateX(52px)}}
+@keyframes walkX{0%,100%{transform:translateX(-64px)}50%{transform:translateX(64px)}}
 .s3-waiter.serving .mv{animation:serveRun 1.25s ease-in-out}
 @keyframes serveRun{
-  0%{transform:translateX(-52px) translateY(0)}
-  35%{transform:translateX(-4px) translateY(12px)}
-  50%{transform:translateX(0) translateY(14px)}
-  65%{transform:translateX(4px) translateY(12px)}
-  100%{transform:translateX(-52px) translateY(0)}
+  0%{transform:translateX(-64px) translateY(0)}
+  35%{transform:translateX(-4px) translateY(10px)}
+  50%{transform:translateX(0) translateY(12px)}
+  65%{transform:translateX(4px) translateY(10px)}
+  100%{transform:translateX(-64px) translateY(0)}
 }
 .s3-waiter .tray{position:absolute;left:50%;top:-9px;transform:translateX(-50%);font-size:13px}
 .s3-waiter.serving .tray{animation:trayUp 1.25s ease-in-out}
@@ -223,34 +221,41 @@ body{
 .bar-pet.rush .pet-btn{animation:petRush .8s ease-in-out infinite}
 @keyframes petRush{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px) scale(1.12)}}
 /* 吧台上的小玩意 */
-.bar-trinkets{position:absolute;right:10px;bottom:31%;display:flex;gap:6px;align-items:flex-end;z-index:7}
+.bar-trinkets{position:absolute;right:10px;bottom:22px;display:flex;gap:6px;align-items:flex-end;z-index:7}
 
-/* 吧台里的客人：立牌 + 头顶订单气泡（气泡本身就是订单，不再单独占一块版面） */
-.s3-guests{position:absolute;left:0;right:0;bottom:27%;z-index:7;display:flex;justify-content:space-around;
-  align-items:flex-end;padding:0 3px;pointer-events:none}
-.gslot{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:auto}
+/* 服务吧台：客人站在这条带里，头顶是放大的订单气泡 */
+.rest-guests{position:relative;min-height:158px;display:flex;justify-content:space-around;
+  align-items:flex-end;padding:10px 5px 12px;pointer-events:none;z-index:7;
+  background:linear-gradient(180deg,#6e452a 0%,#8a5a38 46%,#a8683c 100%)}
+.rest-guests:before{content:'';position:absolute;left:0;right:0;bottom:0;height:16px;z-index:2;
+  background:linear-gradient(180deg,#e8b06a,#bd8033 55%,#94601f);
+  box-shadow:0 -4px 10px rgba(0,0,0,.35),inset 0 2px 0 rgba(255,255,255,.42)}
+.gslot{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;
+  pointer-events:auto;flex:0 0 32%;min-width:0;max-width:118px;margin-bottom:10px}
 .gslot .actor{position:relative;left:auto;bottom:auto;transform:none;z-index:1}
 .gslot.enter,.gslot.happy{animation:giPop .35s ease}
 .gslot.paid{animation:paidPop 1.05s ease forwards}
 @keyframes paidPop{0%{transform:scale(1)}25%{transform:scale(1.06)}55%{transform:scale(1.01)}100%{transform:scale(.86);opacity:.15}}
 @keyframes giPop{0%{transform:scale(.8)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
-/* 订单气泡 */
-.gbub{position:relative;display:flex;flex-direction:column;gap:2px;align-items:center;max-width:120px;
-  background:rgba(255,255,255,.96);border:1.5px solid #e6dcef;border-radius:11px;padding:3px 5px 4px;
-  box-shadow:0 3px 10px rgba(40,20,10,.34)}
-.gbub:after{content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
-  border:6px solid transparent;border-bottom:0;border-top-color:rgba(255,255,255,.96)}
-.gslot.vip .gbub{border-color:#f5c242;box-shadow:0 0 0 2px rgba(245,194,66,.35),0 3px 10px rgba(40,20,10,.34)}
-.gb-top{display:flex;align-items:center;gap:3px;font-size:9px;font-weight:800;color:#6b5b6e;white-space:nowrap}
-.gb-top em{font-style:normal;color:#d35400}
-.gb-need{display:flex;flex-wrap:wrap;gap:3px;justify-content:center}
-/* 需求胶囊：图标 + 菜名 + 进度（灰=没上 / 橙=上了一半 / 绿=齐了） */
-.need-chip{display:inline-flex;align-items:center;gap:2px;border-radius:7px;padding:1px 4px;
-  font-size:9px;font-weight:800;line-height:1.6;white-space:nowrap;
+/* 订单气泡（放大版：这是玩家的主要阅读物） */
+.gbub{position:relative;display:flex;flex-direction:column;gap:3px;align-items:center;width:100%;
+  background:rgba(255,255,255,.97);border:2px solid #e6dcef;border-radius:13px;padding:5px 6px 6px;
+  box-shadow:0 4px 12px rgba(40,20,10,.38)}
+.gbub:after{content:'';position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);
+  border:7px solid transparent;border-bottom:0;border-top-color:rgba(255,255,255,.97)}
+.gslot.vip .gbub{border-color:#f5c242;box-shadow:0 0 0 2px rgba(245,194,66,.4),0 4px 12px rgba(40,20,10,.38)}
+.gb-top{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px 4px;font-size:11px;
+  font-weight:800;color:#6b5b6e;line-height:1.25;text-align:center}
+.gb-top em{font-style:normal;color:#d35400;font-size:10.5px}
+.gb-need{display:flex;flex-direction:column;gap:3px;align-items:stretch;width:100%}
+/* 需求胶囊：图标 + 菜名 + 进度，一行一颗，够大看得清（灰=没上 / 橙=上了一半 / 绿=齐了） */
+.need-chip{display:flex;align-items:center;gap:4px;border-radius:9px;padding:3px 6px;
+  font-size:12px;font-weight:800;line-height:1.4;white-space:nowrap;overflow:hidden;
   background:#f2eef5;color:#8d8296;border:1px solid #ddd2e6}
-.need-chip i{font-style:normal;font-size:12px;line-height:1}
-.need-chip u{text-decoration:none}
-.need-chip b{font-weight:800;font-size:8px;color:#fff;background:#a3abb8;border-radius:6px;padding:0 3px}
+.need-chip i{font-style:normal;font-size:16px;line-height:1;flex-shrink:0}
+.need-chip u{text-decoration:none;flex:1;min-width:0;line-height:1.2;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.need-chip b{font-weight:800;font-size:10px;color:#fff;background:#a3abb8;border-radius:7px;padding:1px 5px;flex-shrink:0}
 .need-chip.none i{filter:grayscale(1) opacity(.45)}
 .need-chip.part{background:#fdf3df;color:#9a6a12;border-color:#f0d79a}
 .need-chip.part b{background:#f0a72b}
@@ -258,14 +263,33 @@ body{
 .need-chip.full{background:#e2f8ec;color:#1a7a4a;border-color:#a9e3c3}
 .need-chip.full b{background:#22a55c}
 .need-chip.full i{filter:none;animation:dishPop .45s cubic-bezier(.2,1.5,.4,1)}
-.gb-foot{display:flex;align-items:center;justify-content:space-between;gap:4px;width:100%;margin-top:1px}
-.gb-left{font-size:8.5px;font-weight:800;color:#c0392b;white-space:nowrap}
+.gb-foot{display:flex;align-items:center;justify-content:space-between;gap:4px;width:100%;margin-top:2px}
+.gb-left{font-size:10.5px;font-weight:800;color:#c0392b;white-space:nowrap}
 .gb-left.done{color:#22a55c}
-.gb-skip{border:1px solid #ecd9ac;background:#fff;border-radius:8px;color:#b09454;font-size:8.5px;font-weight:800;
-  padding:0 4px;line-height:1.6;cursor:pointer;font-family:inherit;white-space:nowrap;
+.gb-skip{border:1px solid #ecd9ac;background:#fff;border-radius:9px;color:#b09454;font-size:10.5px;font-weight:800;
+  padding:2px 7px;line-height:1.5;cursor:pointer;font-family:inherit;white-space:nowrap;
   box-shadow:0 1px 3px rgba(0,0,0,.18)}
 .gb-skip:active{transform:scale(.94)}
 @keyframes dishPop{0%{transform:scale(.5) rotate(-12deg)}60%{transform:scale(1.3) rotate(6deg)}100%{transform:scale(1) rotate(0)}}
+
+/* ===== 出餐台带（菜品 2×2 就贴在厨房下面） ===== */
+.rest-dishes{background:rgba(255,255,255,.55);padding:5px 7px 6px}
+/* ===== 折叠区：低频按钮与统计 ===== */
+.more-bar{margin-top:2px}
+.more-toggle{width:100%;border:1.5px dashed #d8c9e0;background:rgba(255,255,255,.5);border-radius:12px;
+  padding:6px 10px;font-size:11.5px;font-weight:800;color:#8d7a92;cursor:pointer;font-family:inherit}
+.more-toggle:active{transform:scale(.99)}
+.more-drawer{margin-top:6px;padding:8px;border-radius:14px;background:rgba(255,255,255,.72);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.7)}
+.more-drawer.hidden{display:none}
+/* ===== 合成台固定操作坞 ===== */
+.merge-dock{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:60;
+  display:flex;gap:9px;padding:8px;border-radius:16px;width:min(92vw,412px);
+  background:rgba(255,255,255,.94);box-shadow:0 6px 22px rgba(80,60,90,.28);
+  backdrop-filter:blur(6px)}
+.merge-dock.hidden{display:none}
+.merge-dock .big-btn{flex:1;margin:0}
+.merge-dock-pad{height:84px}
 
 /* ===== 上菜动作：接菜 → 端菜 → 落盘回弹 → 客人反应 ===== */
 .fly-emoji{
@@ -323,7 +347,7 @@ body{
 }
 /* 连击提示（场景左侧空位，避开右上角提示） */
 .combo-badge{
-  position:absolute;left:9px;top:46px;z-index:9;font-size:12px;font-weight:900;color:#fff;
+  position:absolute;left:8px;bottom:22px;z-index:9;font-size:12px;font-weight:900;color:#fff;
   background:linear-gradient(135deg,#ff8a5b,#f857a6);border-radius:11px;padding:2px 9px;
   box-shadow:0 4px 12px rgba(248,87,166,.5);animation:comboIn .45s cubic-bezier(.2,1.7,.4,1);
 }
@@ -449,19 +473,21 @@ body{
 .cook-txt{font-size:9.5px;font-weight:800;color:#ef6f4e;white-space:nowrap}
 .lock-desc{font-size:11px;color:#a08fa6}
 /* ===== 货架子标签页（左右滑动切换，页面高度不再随菜品增加）===== */
-.shelf-tabs{display:flex;align-items:center;gap:6px;margin:4px 0 5px}
+.shelf-tabs{display:flex;align-items:center;gap:5px;margin:0 0 5px}
 .st-btn{
-  border:none;background:rgba(255,255,255,.6);border-radius:10px;padding:6px 11px;cursor:pointer;
-  font-family:inherit;font-size:12px;font-weight:800;color:#8d7a92;display:flex;align-items:center;gap:4px;
+  border:none;background:rgba(255,255,255,.6);border-radius:9px;padding:4px 9px;cursor:pointer;
+  font-family:inherit;font-size:11px;font-weight:800;color:#8d7a92;display:flex;align-items:center;gap:4px;
   transition:all .18s;
 }
-.st-btn em{font-style:normal;font-size:10px;background:#efe6f3;color:#9b59b6;border-radius:7px;padding:0 5px;font-weight:800}
+.st-btn em{font-style:normal;font-size:9.5px;background:#efe6f3;color:#9b59b6;border-radius:7px;padding:0 4px;font-weight:800}
 .st-btn.active{background:#fff;color:#ff5e62;box-shadow:0 3px 10px rgba(255,94,98,.22)}
 .st-btn.active em{background:#ffe3e3;color:#e74c3c}
-.st-hint{margin-left:auto;font-size:10px;color:#b0a2b8;font-weight:700;white-space:nowrap}
+.st-hint{display:none}
+/* 出餐台固定高度：2×2 四宫格正好放下（稀有页内容多时内部滚动） */
 .shelf-view{
   position:relative;overflow:hidden;border-radius:14px;background:rgba(255,255,255,.34);
-  padding:6px;box-shadow:inset 0 2px 10px rgba(120,90,140,.1);transition:height .25s ease;
+  padding:6px;box-shadow:inset 0 2px 10px rgba(120,90,140,.1);
+  height:228px;
 }
 .shelf-track{display:flex;height:100%;width:300%;transition:transform .32s cubic-bezier(.3,.9,.35,1);will-change:transform}
 .shelf-pane{width:33.3333%;height:100%;overflow-y:auto;overflow-x:hidden;padding-right:3px;touch-action:pan-y}
@@ -496,11 +522,7 @@ body{
 .sa-btn:disabled{filter:grayscale(.65);opacity:.58;cursor:not-allowed}
 #btnUpShop{background:linear-gradient(135deg,#36d1dc,#5b86e5);box-shadow:0 3px 9px rgba(91,134,229,.3)}
 #btnNewShop{background:linear-gradient(135deg,#f093fb,#c471ed);box-shadow:0 3px 9px rgba(196,113,237,.3)}
-/* 合成台页的操作按钮（生成/出货）：保持大一点，属于高频操作 */
-.merge-actions{
-  display:flex;gap:9px;margin-top:11px;padding:8px;border-radius:16px;
-  background:rgba(255,255,255,.86);box-shadow:0 4px 14px rgba(80,60,90,.12);
-}
+/* 生成/出货按钮：住在 .merge-dock 固定操作坞里，保持大一点，属于高频操作 */
 .big-btn{
   flex:1;border:none;border-radius:14px;padding:13px 8px;cursor:pointer;color:#fff;
   font-size:13.5px;font-weight:800;line-height:1.45;transition:transform .12s;
@@ -613,9 +635,6 @@ body{
   0%,100%{transform:scale(1.18,.88) rotate(-7deg)}
   50%{transform:scale(.9,1.16) rotate(6deg)}
 }
-/* 拖动玩法提示 */
-.drag-hint{font-size:11px;color:#a08fa6;font-weight:700;text-align:center;margin-top:8px}
-.drag-hint b{color:#9b59b6}
 .cell.hidden-item{border-color:#f5c242}
 .cell.hidden-item::before{
   content:'';position:absolute;inset:0;
@@ -670,7 +689,7 @@ body{
   animation:floatUp 1s ease forwards;white-space:nowrap;text-shadow:0 1px 2px rgba(255,255,255,.8);
 }
 @keyframes floatUp{0%{opacity:0;transform:translateY(4px)}15%{opacity:1}100%{opacity:0;transform:translateY(-34px)}}
-#toasts{position:fixed;left:50%;transform:translateX(-50%);top:14px;z-index:100;display:flex;flex-direction:column;gap:8px;width:min(92vw,420px)}
+#toasts{position:fixed;left:50%;transform:translateX(-50%);top:14px;z-index:100;display:flex;flex-direction:column;gap:8px;width:min(92vw,420px);pointer-events:none}
 .toast{
   background:rgba(40,30,50,.93);color:#fff;border-radius:12px;padding:9px 13px;
   font-size:13px;font-weight:700;line-height:1.35;box-shadow:0 8px 22px rgba(0,0,0,.25);
@@ -793,14 +812,13 @@ body{
   .stats-bar{font-size:11.5px;padding:7px 10px;gap:3px}
   .shop-chip{font-size:11px;padding:6px 8px}
   .shop-chip .sc-e{font-size:15px}
-  /* 2.5D 场景：客人连同订单气泡住在吧台里，气泡里要放得下菜名，所以场景要够高 */
-  .shop3d{height:200px}
-  .s3-guests{bottom:30%}                 /* 气泡变高后要往下让，别压到左上角招牌 */
-  .bar-pet{bottom:3%}
-  .s3-waiter{bottom:13%}
-  .bar-trinkets{bottom:24px}
-  .s3-hint{display:none}
-  .st-hint{display:none}                 /* 三个子标签后标签栏会换行，这行提示纯装饰，去掉省 20px */
+  /* 一体化店面：手机上压缩各带高度，但订单气泡保持放大（可读性优先） */
+  .rest-kitchen{height:118px}
+  .rest-lane{height:40px}
+  .rest-guests{min-height:150px}
+  .s3-floor{height:40%}
+  .bar-pet{bottom:4px}
+  .bar-trinkets{bottom:20px}
   .s3-shelf{display:none}
   .s3-board{top:4px;height:22px;left:40%;width:26%}
   .s3-sign{padding:3px 7px;font-size:11.5px;gap:4px}
@@ -808,15 +826,9 @@ body{
   .machine{width:36px}
   .machine .m-body{font-size:20px}
   .machine .m-bar{width:26px}
-  .actor .bd{font-size:19px}
-  /* 订单气泡紧凑化，3 位客人并排也放得下 */
-  .gbub{padding:2px 4px 3px;border-radius:10px;max-width:112px}
-  .gb-top{font-size:8px;gap:2px}
-  .need-chip{font-size:8.5px;padding:0 3px;gap:1px}
-  .need-chip i{font-size:11px}
-  .need-chip b{font-size:7.5px;padding:0 2px}
-  .gb-left{font-size:8px}
-  .gb-skip{font-size:8px;padding:0 3px}
+  .actor .bd{font-size:20px}
+  .gslot{max-width:108px}
+  .shelf-view{height:214px}
   .card{padding:8px 10px;gap:9px;margin-bottom:7px;border-radius:14px}
   /* 出餐台的 2×2 四宫格与卡片内部排布已在基础样式里定义（任何屏宽一致），这里只做字号微调 */
   #paneUp .card .p-name,#paneRare .card .p-name{font-size:14px}
@@ -828,7 +840,6 @@ body{
   .card .p-info{font-size:11.5px}
   .card .p-btn{font-size:12px;padding:8px 9px}
   .big-btn{font-size:12.5px;padding:11px 6px}
-  .merge-actions{gap:7px;padding:7px;margin-top:10px}
   .shop-acts{gap:6px;margin-bottom:7px}
   .sa-btn{font-size:11.5px;padding:7px 6px}
   .merge-head{flex-wrap:wrap;gap:5px}
@@ -848,7 +859,6 @@ body{
   #grid{gap:6px;padding:8px}
   .cell .c-emoji{font-size:21px}
   .shop-chip{font-size:10px;padding:5px 7px}
-  .merge-actions{flex-direction:column}
   .big-btn{font-size:12px}
   .sa-btn{font-size:10.5px;padding:7px 4px}
 }
@@ -1020,47 +1030,53 @@ body{
 
   <main>
     <section id="page-shop" class="page active">
-      <div class="stats-bar" id="statsBar"></div>
       <div class="shop-strip" id="shopStrip"></div>
-      <!-- 低频操作：升级/开店，做成小按钮放在店铺条下面 -->
-      <div class="shop-acts">
-        <button class="sa-btn" id="btnUpShop"></button>
-        <button class="sa-btn new" id="btnNewShop"></button>
-      </div>
-      <!-- 2.5D 店铺场景：后厨机器在生产、服务员走动上菜、狗子玩耍 -->
-      <div class="shop3d" id="shop3d">
-        <div class="s3-wall"><div class="s3-lamp"></div><div class="s3-board"></div><div class="s3-shelf"></div>
+      <!-- 一体化店面：后厨(机器做菜) → 出餐台(菜品 2×2) → 服务员动线 → 吧台(客人+大订单气泡) -->
+      <div class="rest">
+        <div class="rest-kitchen" id="shop3d">
+          <div class="s3-wall"><div class="s3-lamp"></div><div class="s3-board"></div><div class="s3-shelf"></div></div>
+          <div class="s3-floor"></div>
+          <div class="s3-ck"></div>
+          <div id="s3Machines"></div>
+          <button class="s3-sign" id="barSign" aria-label="吧台招牌，连点试试看">
+            <span id="barSignEmoji">🛖</span><span id="barSignName">街边小摊</span><em id="barSignLv">Lv.1</em>
+          </button>
+          <span class="s3-night hidden" id="barNight">🌙 深夜赏金 ×3</span>
+          <!-- 镇店之宝：供奉的稀有物挂在墙上 -->
+          <span class="s3-shrine hidden" id="s3Shrine"></span>
+          <div class="bar-trinkets" id="barTrinkets"></div>
+          <div class="bar-pet" id="barPet"></div>
         </div>
-        <!-- 后厨操作台 + 机器：贴着场景底（是墙的子元素时会贴到墙底，和客人叠在一起） -->
-        <div class="s3-ck"></div>
-        <div id="s3Machines"></div>
-        <div class="s3-floor"></div>
-        <div class="s3-bar"></div>
-        <button class="s3-sign" id="barSign" aria-label="吧台招牌，连点试试看">
-          <span id="barSignEmoji">🛖</span><span id="barSignName">街边小摊</span><em id="barSignLv">Lv.1</em>
-        </button>
-        <span class="s3-night hidden" id="barNight">🌙 深夜赏金 ×3</span>
-        <!-- 镇店之宝：供奉的稀有物挂在墙上 -->
-        <span class="s3-shrine hidden" id="s3Shrine"></span>
-        <span class="s3-hint">点出餐台的「制作」开火<br>做好后点「上菜」端给客人</span>
-        <div id="s3Actors"></div>
-        <!-- 客人直接站在吧台里，头顶气泡就是订单（要什么菜 / 赏金 / 送走） -->
-        <div class="s3-guests" id="s3Guests"></div>
-        <div class="bar-trinkets" id="barTrinkets"></div>
-        <div class="bar-pet" id="barPet"></div>
+        <!-- 出餐台：本店 4 道招牌菜（2×2）；待解锁 / 稀有是低频页，用小标签切换 -->
+        <div class="rest-dishes">
+          <div class="shelf-tabs">
+            <button class="st-btn active" id="stBtn0" data-tab="0">🍳 出餐台 <em id="stCount0">0</em></button>
+            <button class="st-btn" id="stBtn1" data-tab="1">🔒 待解锁 <em id="stCount1">0</em></button>
+            <button class="st-btn hidden" id="stBtn2" data-tab="2">✨ 稀有 <em id="stCount2">0</em></button>
+          </div>
+          <div class="shelf-view" id="shelfView">
+            <div class="shelf-track" id="shelfTrack">
+              <div class="shelf-pane" id="paneUp"></div>
+              <div class="shelf-pane" id="paneLock"></div>
+              <div class="shelf-pane" id="paneRare"></div>
+            </div>
+          </div>
+        </div>
+        <!-- 服务员动线：在出餐台和吧台之间来回走 -->
+        <div class="rest-lane" id="s3Actors"></div>
+        <!-- 服务吧台：客人站在这里，头顶是放大的订单气泡 -->
+        <div class="rest-guests" id="s3Guests"></div>
       </div>
-      <!-- 出餐台（本店 4 道招牌菜）：紧贴厨房；稀有物单独一页，避免把出餐台撑到要上下拉 -->
-      <div class="shelf-tabs">
-        <button class="st-btn active" id="stBtn0" data-tab="0">🍳 出餐台 <em id="stCount0">0</em></button>
-        <button class="st-btn" id="stBtn1" data-tab="1">🔒 待解锁 <em id="stCount1">0</em></button>
-        <button class="st-btn hidden" id="stBtn2" data-tab="2">✨ 稀有 <em id="stCount2">0</em></button>
-        <span class="st-hint">← 左右滑动切换 →</span>
-      </div>
-      <div class="shelf-view" id="shelfView">
-        <div class="shelf-track" id="shelfTrack">
-          <div class="shelf-pane" id="paneUp"></div>
-          <div class="shelf-pane" id="paneLock"></div>
-          <div class="shelf-pane" id="paneRare"></div>
+      <!-- 低频操作折叠区：统计 / 升级 / 开新店 / 玩法说明（默认收起，主界面一眼看全） -->
+      <div class="more-bar">
+        <button class="more-toggle" id="moreToggle" aria-expanded="false">⋯ 店铺与说明</button>
+        <div class="more-drawer hidden" id="moreDrawer">
+          <div class="stats-bar" id="statsBar"></div>
+          <div class="shop-acts">
+            <button class="sa-btn" id="btnUpShop"></button>
+            <button class="sa-btn new" id="btnNewShop"></button>
+            <button class="sa-btn" id="btnHelp">📖 玩法说明</button>
+          </div>
         </div>
       </div>
     </section>
@@ -1070,14 +1086,16 @@ body{
       <div class="merge-tip" id="mergeTip"></div>
       <div id="grid"></div>
       <button class="combo-btn" id="btnCombo" aria-label="触发隐藏套餐彩蛋">🍱 咦…这三样凑齐了？点我试试</button>
-      <div class="drag-hint">🖐 按住一道菜<b>拖动</b>到同级菜上直接合并 · 拖到空格可移动整理 · 拖到「出货模式」按钮上直接换能量 · 也可以点两下</div>
       <div class="lv-chips" id="lvChips"></div>
-      <div class="merge-actions">
-        <button class="big-btn" id="btnGen"></button>
-        <button class="big-btn" id="btnShipMode">📦 出货模式：关</button>
-      </div>
+      <div class="merge-dock-pad"></div>
     </section>
   </main>
+
+  <!-- 合成台固定操作坞：生成 / 出货，钉在屏幕底部，不随页面滚动 -->
+  <div class="merge-dock hidden" id="mergeDock">
+    <button class="big-btn" id="btnGen"></button>
+    <button class="big-btn" id="btnShipMode">📦 出货模式：关</button>
+  </div>
 
   <div id="toasts"></div>
 
@@ -1097,7 +1115,7 @@ body{
         <li>🚫 队伍里没人点的菜端不出去；点气泡上的「送走」可花小费换一位客人</li>
         <li>👥 <b>客人不共享</b>：每家店有自己的客人队列和货架库存，切店等于换一批客人；客人只点你在这家店已经上架的菜</li>
         <li>📋 <b>客人的口味会跟着你成长</b>：合成出更高等级后，卖这个等级的店，客人订单里就会出现新菜</li>
-        <li>💰 <b>金币管商店线</b>：升级店铺（卖更快）、<b>开新店</b>（<b>固定价格</b>，不随收入浮动，可以盯着一个数攒）、金币解锁商品、送走客人</li>
+        <li>💰 <b>金币管商店线</b>：升级店铺（卖更快）、<b>开新店</b>（<b>固定价格</b>，不随收入浮动，可以盯着一个数攒）、金币解锁商品、送走客人；升级和开新店在页面底部「⋯ 店铺与说明」折叠条里，点开就能操作</li>
         <li>⚡ <b>能量管合成线</b>：生成产品、升级合成台；出货模式可把产品回收成能量</li>
         <li>🛍️ <b>点击店铺条</b>切换经营的店（换店＝换菜单、换客人、换货架）：小摊⚡翻倍、咖啡馆生产×1.5、食堂客人奖励×1.6、白金餐厅稀有钱×2…</li>
         <li>🏆 <b>成就</b>：36 个长期目标（服务客人数、合并次数、营收、收集…），每达成一个<b>永久提升全场售价</b>，攒满 +84%；在 ⚙️ 里查看进度条</li>
@@ -1348,7 +1366,9 @@ const openCostCoins=tier=>{
   return (s&&s.cost)||0;
 };
 
-function toast(emoji,text,gold){
+let quietUntil=0;               // 待机结算后的"静默期"：成就/宝箱/每日礼等 toast 一律压掉，回来只看一张卡
+function toast(emoji,text,gold,force){
+  if(!gold&&!force&&Date.now()<quietUntil)return;
   const wrap=$('#toasts');
   // 同一条文案 1.5 秒内不重复弹（登录/切号会触发两次结算，之前会看到两条一样的"欢迎回来"）
   const now=Date.now();
@@ -2277,16 +2297,8 @@ function setShelfTab(i,animate){
   fitShelf();
 }
 function fitShelf(){
-  const view=document.getElementById('shelfView');
-  if(!view)return;
-  const pane=document.getElementById(SHELF_PANES[shelfTab]||'paneUp');
-  if(!pane)return;
-  const content=pane.scrollHeight+14;
-  // 自适应：优先把菜显示全（双列三行 ≈330px），下限必须给足，否则菜品又被截
-  const others=document.documentElement.scrollHeight-view.getBoundingClientRect().height;
-  const avail=window.innerHeight-others-10;
-  const cap=Math.max(340,Math.min(440,avail));
-  view.style.height=Math.min(content,cap)+'px';
+  // 高度已固定在 CSS（2×2 正好放下）；保留空函数供既有调用点使用
+  return;
 }
 function shelfPointerDown(e){
   if(e.button!==undefined&&e.button!==0)return;
@@ -2938,6 +2950,7 @@ function settleOffline(){
   const hh=Math.floor(sec/3600), mm=Math.floor(sec%3600/60);
   const away=(hh?hh+' 小时 ':'')+mm+' 分钟';
   offlineJustSettled=now;
+  quietUntil=now+20000;                 // 结算后 20 秒静默：成就/每日礼/宝箱提示都不弹，只有这一张卡
   showReward({
     icon:'🌙',title:'欢迎回来，老板！',
     name:'离开 '+away+(capped?'（收益按 8 小时上限结算）':''),
@@ -3486,7 +3499,7 @@ function bumpCombo(){
   comboTimer=now;
   if(comboCount>state.stats.bestCombo)state.stats.bestCombo=comboCount;   // 长期统计：最高连击
   if(comboCount<2)return comboCount;
-  const scene=document.getElementById('shop3d');
+  const scene=document.querySelector('.rest-guests')||document.getElementById('shop3d');
   if(!scene)return comboCount;
   let b=document.getElementById('comboBadge');
   if(!b){
@@ -4319,6 +4332,8 @@ function bindStartupEvents(){
       document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
       t.classList.add('active');
       $('#page-'+t.dataset.page).classList.add('active');
+      const dock=document.getElementById('mergeDock');   // 操作坞只在合成台显示
+      if(dock)dock.classList.toggle('hidden',t.dataset.page!=='merge');
       if(t.dataset.page==='shop')renderShop();
     };
   });
@@ -4331,6 +4346,13 @@ function bindStartupEvents(){
   $('#stBtn1').onclick=()=>setShelfTab(1);
   $('#stBtn2').onclick=()=>setShelfTab(2);
   $('#btnAcc').onclick=()=>{$('#menuModal').classList.add('hidden');openAccPanel()};
+  $('#moreToggle').onclick=()=>{
+    const d=$('#moreDrawer');
+    const open=d.classList.toggle('hidden')===false;
+    $('#moreToggle').setAttribute('aria-expanded',open?'true':'false');
+    $('#moreToggle').textContent=(open?'▴ 收起':'⋯ 店铺与说明');
+  };
+  $('#btnHelp').onclick=()=>$('#menuModal').classList.remove('hidden');
   $('#loginGo').onclick=()=>startGame(document.getElementById('loginName').value);
   $('#loginName').onkeydown=e=>{if(e.key==='Enter')startGame(document.getElementById('loginName').value)};
   (function(){

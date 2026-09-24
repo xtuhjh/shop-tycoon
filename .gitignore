@@ -1,3 +1,4 @@
 *.log
 _*.py
 _*.js
+_test/

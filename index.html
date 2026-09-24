@@ -230,16 +230,16 @@ body{
 .rest-guests:before{content:'';position:absolute;left:0;right:0;bottom:0;height:16px;z-index:2;
   background:linear-gradient(180deg,#e8b06a,#bd8033 55%,#94601f);
   box-shadow:0 -4px 10px rgba(0,0,0,.35),inset 0 2px 0 rgba(255,255,255,.42)}
-.gslot{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;
-  pointer-events:auto;flex:0 0 32%;min-width:0;max-width:118px;margin-bottom:10px}
+.gslot{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;
+  pointer-events:auto;flex:0 0 32%;min-width:0;max-width:118px;margin-bottom:8px}
 .gslot .actor{position:relative;left:auto;bottom:auto;transform:none;z-index:1}
 .gslot.enter,.gslot.happy{animation:giPop .35s ease}
 .gslot.paid{animation:paidPop 1.05s ease forwards}
 @keyframes paidPop{0%{transform:scale(1)}25%{transform:scale(1.06)}55%{transform:scale(1.01)}100%{transform:scale(.86);opacity:.15}}
 @keyframes giPop{0%{transform:scale(.8)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
 /* 订单气泡（放大版：这是玩家的主要阅读物） */
-.gbub{position:relative;display:flex;flex-direction:column;gap:5px;align-items:center;width:100%;
-  background:rgba(255,255,255,.97);border:2px solid #e6dcef;border-radius:13px;padding:6px 7px 10px;
+.gbub{position:relative;display:flex;flex-direction:column;gap:3px;align-items:center;width:100%;
+  background:rgba(255,255,255,.97);border:2px solid #e6dcef;border-radius:13px;padding:5px 6px 9px;
   box-shadow:0 4px 12px rgba(40,20,10,.38)}
 .gbub:after{content:'';position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);
   border:7px solid transparent;border-bottom:0;border-top-color:rgba(255,255,255,.97)}
@@ -263,7 +263,26 @@ body{
 .need-tile.full b{background:#22a55c}
 .need-tile.full i{animation:dishPop .45s cubic-bezier(.2,1.5,.4,1)}
 .need-tile.rare{border-color:#f5c242;box-shadow:0 0 9px rgba(245,194,66,.55),0 2px 6px rgba(40,20,10,.16)}
-.gb-foot{display:flex;align-items:center;justify-content:space-between;gap:4px;width:100%;margin-top:2px}
+/* 耐心条：内嵌在气泡底边上（不占高度），绿→橙→红；只剩四分之一时客人变脸 😠、气泡发抖提醒你赶紧上菜 */
+.gb-pat{position:absolute;left:8px;right:8px;bottom:2px;height:4px;border-radius:99px;background:rgba(60,30,20,.16);overflow:hidden}
+.gb-pat i{display:block;height:100%;width:100%;border-radius:99px;background:linear-gradient(90deg,#1f9e56,#7ed957);transition:width .45s linear}
+.gb-pat.low i{background:linear-gradient(90deg,#e8960c,#ffd166)}
+.gb-pat.red i{background:linear-gradient(90deg,#d63031,#ff8a5b)}
+.gslot.impatient .gbub{border-color:#ff8a8e;animation:impatientShake .8s ease-in-out infinite}
+@keyframes impatientShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-1.6px)}40%{transform:translateX(1.6px)}60%{transform:translateX(-1px)}80%{transform:translateX(1px)}}
+.gb-angry{display:none}
+.gslot.impatient .gb-angry{display:inline;animation:angryWob .5s ease-in-out infinite}
+@keyframes angryWob{0%,100%{transform:rotate(-8deg) scale(1.1)}50%{transform:rotate(8deg) scale(1.2)}}
+/* 三种大单的紧凑气泡：磁贴改小号挤成一行、隐掉"还差 N 件"（角标已说明），别把页面顶出屏 */
+.gslot.many .need-tile{width:auto;min-width:27px;height:35px;padding:0 4px;border-radius:10px}
+.gslot.many .need-tile i{font-size:20px}
+.gslot.many .need-tile b{bottom:-7px;font-size:9px;padding:0 4px}
+.gslot.many .gb-need{flex-wrap:nowrap;gap:7px}
+.gslot.many .gbub{gap:4px;padding:5px 6px 9px}
+.gslot.many .gb-top{font-size:10px}
+.gslot.many .gb-top em{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:74px}
+.gslot.many .gb-foot{display:none}
+.gb-foot{display:flex;align-items:center;justify-content:space-between;gap:4px;width:100%;margin-top:0}
 .gb-left{font-size:10.5px;font-weight:800;color:#c0392b;white-space:nowrap}
 .gb-left.done{color:#22a55c}
 .gb-skip{border:1px solid #ecd9ac;background:#fff;border-radius:9px;color:#b09454;font-size:10.5px;font-weight:800;
@@ -558,7 +577,7 @@ body{
   font-size:12.5px;font-weight:600;color:#6b5b6e;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;
 }
 #grid{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+  display:grid;grid-template-columns:repeat(5,1fr);gap:8px;
   background:rgba(255,255,255,.35);padding:10px;border-radius:18px;
   box-shadow:inset 0 2px 10px rgba(120,90,140,.12);
 }
@@ -843,9 +862,9 @@ body{
   .shop-chip{font-size:11px;padding:6px 8px}
   .shop-chip .sc-e{font-size:15px}
   /* 一体化店面：手机上压缩各带高度，但订单气泡保持放大（可读性优先） */
-  .rest-kitchen{height:118px}
+  .rest-kitchen{height:110px}
   .rest-lane{height:40px}
-  .rest-guests{min-height:150px}
+  .rest-guests{min-height:142px}
   .s3-floor{height:40%}
   .bar-pet{bottom:4px}
   .bar-trinkets{bottom:20px}
@@ -891,6 +910,17 @@ body{
   .shop-chip{font-size:10px;padding:5px 7px}
   .big-btn{font-size:12px}
   .sa-btn{font-size:10.5px;padding:7px 4px}
+  /* 超窄屏：磁贴收小保证单行、赏金行省略号封顶，气泡不再被顶高 */
+  .need-tile{width:38px;height:38px;border-radius:11px}
+  .need-tile i{font-size:22px}
+  .gb-top{font-size:10px}
+  .gb-top em{font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:86px}
+  .gslot.many .need-tile{min-width:24px;height:32px;padding:0 3px}
+  .gslot.many .need-tile i{font-size:18px}
+  .gslot.many .gb-top{font-size:9px;gap:1px 3px}
+  .gslot{margin-bottom:4px}
+  .gb-foot{font-size:9.5px}
+  .rest-guests{min-height:136px;padding:8px 5px 10px}
 }
 /* 横屏矮视口（手机横过来）：压缩顶部，避免内容区太扁 */
 @media (max-height:480px) and (orientation:landscape){
@@ -1139,6 +1169,7 @@ body{
         <li>🏭 <b>稀有菜例外</b>：🍀🎐🌈🧧👑💎 六种稀有菜不占玩家操作，会自己慢速补货（每样最多 3 件），单独住在「✨ 稀有」那一页</li>
         <li>💰 <b>只有把菜端给客人，才收得到钱</b>：客人付款 = 商品价 × 售价倍率 × 客人数量；能量也是上菜才给</li>
         <li>🍽️ <b>上菜</b>：客人就在吧台里，头顶气泡写着要什么菜、给多少赏金。客人要的菜会亮起绿色「上菜」，点一下服务员就端过去；凑齐自动结账、客人走人下一位补位</li>
+        <li>⏳ <b>客人有耐心</b>：气泡里的耐心条一直在走，剩四分之一时客人变脸 😠 催你——见底就气走了（这单赏金没了，还要<b>冷场 12 秒</b>才来新客人）。做菜时点「🔥 点我加速」抢时间，或花小费「送走」换人不亏耐心</li>
         <li>✨ <b>稀有客人</b>：偶尔有人出天价点名要你那道稀有菜（🍀🌈👑）</li>
         <li>🏮 <b>稀有物不止能卖</b>：点稀有菜卡片上的「🏮 镇店」把它<b>供奉给这家店当镇店之宝</b>（消耗 1 件现货，之后会自己补）→ 该店<b>永久加成</b>：🍀 售价+10% · 🌈 售价+20% 赏金+10% · 👑 售价+35% 赏金+20% 生产+15%，<b>只对那一家店生效</b>，店铺条上会挂 🏮</li>
         <li>✨ <b>稀有物也能喂宠物</b>：成长远超菜品（🍀+220 / 🌈+700 / 👑+2400）、心情直接拉满，还有 30% 概率把传说伙伴（🐲灶王小青龙 / 🦄星光独角兽）引来</li>
@@ -1272,7 +1303,7 @@ const SHOPS=[
 const FACES=['🧑','👩','👴','👵','👦','👧','🧕','👨‍🌾','🧑‍💼','👩‍🎨','🕵️','🧙'];
 const FACE_HAPPY='😋', FACE_PAID='😍', FACE_NO='🙅';
 const MAX_LV=12;
-const GRID_SIZE=20;
+const GRID_SIZE=25;
 const SAVE_KEY='shopMergeGame_v1';
 const GOLD_BUY={2:300,3:2500};
 const MERGE_UP={2:300,3:2500,4:15000};
@@ -1545,6 +1576,7 @@ function load(){
       if(typeof s.activeShop!=='number')s.activeShop=(typeof s.shopTier==='number'?s.shopTier:0);
       if(s.activeShop>s.shopTier)s.activeShop=s.shopTier;
       state=Object.assign(defaultState(),s);
+      while(state.grid.length<GRID_SIZE)state.grid.push(null);   // 棋盘扩容：老存档 20 格 → 25 格，补空位
       state.grid.length=GRID_SIZE;
       for(let i=0;i<GRID_SIZE;i++){
         const c=state.grid[i];
@@ -1577,6 +1609,14 @@ function load(){
       // 旧队列按等级点单，切店后可能点到本店没有的菜 → 过滤掉，剩下的由 fillQueue 补齐
       state.shopQueue=state.shopQueue.map((q,si)=>q.filter(g=>g&&Array.isArray(g.items)&&g.items.length
         &&g.items.every(it=>it.rare||slotOfLvIn(si,it.level)>=0)));
+      // 老存档的客人没有耐心字段 → 按单量补一个宽松的默认值（毫秒，和 newGuest 同口径）
+      state.shopQueue.forEach(q=>q.forEach(g=>{
+        if(typeof g.pat!=='number'||typeof g.patMax!=='number'){
+          const pieces=(g.items||[]).reduce((s,it)=>s+(it.count||1),0);
+          g.patMax=(45+12*pieces)*1000;
+          g.pat=g.patMax;
+        }
+      }));
       delete state.stock;delete state.cook;delete state.queue;
     }
   }catch(e){}
@@ -1692,7 +1732,9 @@ function newGuest(si){
       const w=(stk[i]||0)>0?3:1;                     // 有现货的更常被点
       for(let k=0;k<w;k++)pool.push(i);
     });
-    const kinds=Math.min(open.length,1+Math.floor(Math.random()*2)+(Math.random()<0.35?1:0));
+    // 点几样：菜越全点得越豪——1 道菜只能点 1 样，2 道 1-2 样，3 道以上过半几率点满 3 样
+    const kinds=open.length>=3?(Math.random()<0.55?3:2)
+      :(open.length===2?(Math.random()<0.4?2:1):1);
     const used=new Set();
     let guard=0;
     while(items.length<kinds&&guard++<60){
@@ -1713,6 +1755,9 @@ function newGuest(si){
       energyBase+=it.level*it.count;
     }
   });
+  // 耐心：基础 45 秒 + 每件菜 12 秒；出天价的稀有客愿多等 25%（给得起也等得起）
+  const pieces=items.reduce((s,it)=>s+it.count,0);
+  const patMs=Math.round((45+12*pieces)*1000*(items.some(it=>it.rare)?1.25:1));
   return{
     face:FACES[Math.floor(Math.random()*FACES.length)],
     items,
@@ -1723,18 +1768,65 @@ function newGuest(si){
     tray:{},
     fx:'',
     isNew:true,
+    pat:patMs,
+    patMax:patMs,
   };
 }
 function fillQueue(si){
   si=(si===undefined)?state.activeShop:si;
   const q=state.shopQueue[si];
   if(!q)return;
+  if(guestCdAt[si]&&Date.now()<guestCdAt[si])return;   // 刚气走客人：店里冷清一会儿，新客晚点来
   let guard=0;
   while(q.length<3&&guard++<8){
     const g=newGuest(si);
     if(!g)break;                       // 本店还没有已上架的菜 → 队列留空（界面给提示）
     q.push(g);
   }
+}
+/* ---- 客人耐心 ----
+   只对"你正在经营的这家店"倒数（切走/切后台时冻结，回来接着等）；
+   耐心见底 → 客人气走（赏金自然没了），且 12 秒内不来新客人——这就是处罚，疼但不毁档。 */
+const guestCdAt=[];                    // 每店"冷场到几点"（毫秒时间戳，不存档：重开页面就翻篇）
+function patienceTick(now){
+  if(document.hidden)return;
+  const q=state.shopQueue[state.activeShop];
+  if(!q||!q.length)return;
+  let timeout=false;
+  for(let i=q.length-1;i>=0;i--){
+    const g=q[i];
+    if(typeof g.pat!=='number')continue;
+    g.pat-=200;
+    if(g.pat<=0){
+      q.splice(i,1);
+      timeout=true;
+      guestCdAt[state.activeShop]=now+12000;
+      toast('😤','第'+(i+1)+'位客人等太久，气走了…（12 秒后才来新客人）');
+    }
+  }
+  if(timeout){renderBar();renderShop();save();return}
+  if(now-(patienceTick._ui||0)>500){
+    patienceTick._ui=now;
+    updatePatienceBars();
+  }
+}
+// 轻量刷新：只动耐心条的宽度和"不耐烦"状态，不重绘整个气泡（避免动画重播）
+function updatePatienceBars(){
+  const q=SQ();
+  const wrap=document.getElementById('s3Guests');
+  if(!wrap)return;
+  wrap.querySelectorAll('.gslot').forEach(el=>{
+    const i=+String(el.id).replace('s3Guest','');
+    const g=q[i];
+    if(!g)return;
+    const pct=Math.max(0,Math.round((g.pat||0)/(g.patMax||1)*100));
+    const bar=document.getElementById('gpat'+i);
+    if(bar){
+      bar.style.width=pct+'%';
+      if(bar.parentNode)bar.parentNode.className='gb-pat'+(pct<=20?' red':(pct<=50?' low':''));
+    }
+    el.classList.toggle('impatient',pct<=25);
+  });
 }
 // 新菜品上架后：凡是卖这个等级的店，让还没上菜的客人重新点单，把新菜纳入需求
 function refreshGuestsForNewProduct(level){
@@ -2135,7 +2227,11 @@ function stripPointerDown(e){
   if(strip.scrollWidth<=strip.clientWidth+1)return;          // 不需要滚就不接管
   stripDrag={strip:strip,x:e.clientX,left:strip.scrollLeft,moved:0};
   strip.classList.add('dragging');
-  if(strip.setPointerCapture)try{strip.setPointerCapture(e.pointerId)}catch(err){}
+  // 不用 setPointerCapture：捕获会把后续 click 重定向到条容器，芯片（切店/看锁定店）就收不到点击了。
+  // 拖动改挂 window，既能跟出条外，又不影响点击落点
+  window.addEventListener('pointermove',stripPointerMove,{passive:false});
+  window.addEventListener('pointerup',stripPointerUp);
+  window.addEventListener('pointercancel',stripPointerUp);
 }
 function stripPointerMove(e){
   if(!stripDrag)return;
@@ -2151,14 +2247,14 @@ function stripPointerUp(e){
   const d=stripDrag;stripDrag=null;
   d.strip.classList.remove('dragging');
   if(d.moved>6)d.strip._sup=Date.now();                      // 抑制紧随其后的 click
+  window.removeEventListener('pointermove',stripPointerMove);
+  window.removeEventListener('pointerup',stripPointerUp);
+  window.removeEventListener('pointercancel',stripPointerUp);
 }
 function bindStripDrag(strip){
   if(strip._dragBound)return;
   strip._dragBound=true;
   strip.addEventListener('pointerdown',stripPointerDown);
-  strip.addEventListener('pointermove',stripPointerMove,{passive:false});
-  strip.addEventListener('pointerup',stripPointerUp);
-  strip.addEventListener('pointercancel',stripPointerUp);
   // 拖动刚结束的那一下点击，只拦"落在店铺条里的"，不影响同时去点别的地方
   document.addEventListener('click',e=>{
     if(strip._sup&&Date.now()-strip._sup<350&&strip.contains(e.target)){
@@ -2691,6 +2787,7 @@ function mtGuestWant(){
 function tick(){
   const dt=0.2,sp=speed(),now=Date.now();
   const produced=produceTick(dt,sp);
+  patienceTick(now);                                    // 客人耐心倒数（当前店、页面可见时）
   // 弹窗打开时暂停后台 DOM 刷新，避免和弹窗入场动画抢帧。
   // 注意：静态的"玩法说明"弹窗常驻 DOM（只有 hidden 类），必须排除，否则这里恒为真、后台刷新会被永久禁用
   const modalOpen=!!document.querySelector('.egg-mask')||!!document.querySelector('.modal-mask:not(.hidden)');
@@ -3498,8 +3595,11 @@ function renderScene(){
       wrap.appendChild(el);
     }
     const face=g.fx==='paid'?'😍':(g.fx==='happy'?'😋':'');
-    if(el.className!=='gslot'+(g.vip?' vip':'')+(g.fx==='paid'?' paid':'')+(g.fx==='happy'?' happy':'')+(g.isNew?' enter':''))
-      el.className='gslot'+(g.vip?' vip':'')+(g.fx==='paid'?' paid':'')+(g.fx==='happy'?' happy':'')+(g.isNew?' enter':'');
+    const patPct=Math.max(0,Math.round((g.pat||0)/(g.patMax||1)*100));
+    const imp=patPct<=25?' impatient':'';
+    const many=g.items.length>=3?' many':'';            // 三种大单走紧凑气泡，保住一屏
+    const slotCls='gslot'+(g.vip?' vip':'')+(g.fx==='paid'?' paid':'')+(g.fx==='happy'?' happy':'')+(g.isNew?' enter':'')+imp+many;
+    if(el.className!==slotCls)el.className=slotCls;
     g.isNew=false;
     // 需求磁贴：一张大图标认一道菜（图标和出餐台卡片同一个），下方角标是进度；菜名进 title 悬停可看
     const need=g.items.map(it=>{
@@ -3516,9 +3616,10 @@ function renderScene(){
       :(dishName(it.level)+'×'+it.count)).join(' ');
     // 内容没变就不重写 DOM：否则每次重绘都会让已达成的绿胶囊重播动画（看着像"别的菜也在动"）
     const bubHTML=
-      '<span class="gb-top">第'+(i+1)+'位'+(g.vip?' ✨':'')+(g.night?'🌙':'')+
+      '<span class="gb-top">第'+(i+1)+'位'+(g.vip?' ✨':'')+(g.night?'🌙':'')+'<span class="gb-angry">😠</span>'+
         '<em>💰'+fmt(g.rewardCoins)+' ⚡'+fmt(g.rewardEnergy)+'</em></span>'+
       '<span class="gb-need">'+need+'</span>'+
+      '<span class="gb-pat'+(patPct<=20?' red':(patPct<=50?' low':''))+'"><i id="gpat'+i+'" style="width:'+patPct+'%"></i></span>'+
       '<span class="gb-foot"><span class="gb-left'+(rest?'':' done')+'">'+(rest?('还差 '+rest+' 件'):'齐了！')+'</span>'+
         '<button class="gb-skip" aria-label="送走第'+(i+1)+'位客人">送走</button></span>';
     const bub=el.querySelector('.gbub');
@@ -4256,6 +4357,8 @@ function importCode(code){
   if(!accName){toast('👤','先登录一个账号再导入');return false}
   state=Object.assign(defaultState(),s);
   state.account=accName;
+  while(state.grid.length<GRID_SIZE)state.grid.push(null);   // 导入老存档码：棋盘扩到 25 格
+  state.grid.length=GRID_SIZE;
   save();
   ensurePets();
   fillQueue();renderShop();renderMergeHead();renderGrid();renderChips();
